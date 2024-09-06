@@ -1,12 +1,18 @@
 <script>
 	import Header from './Header.svelte';
-	import '../app.css';
 </script>
+<svelte:head>
+	<link
+	rel="stylesheet"
+	href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+  >
+</svelte:head>
+
 
 <div class="app">
 	<Header />
 
-	<main>
+	<main class="container-fluid">
 		<slot />
 	</main>
 
