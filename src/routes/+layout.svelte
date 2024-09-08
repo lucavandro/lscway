@@ -49,7 +49,7 @@
 	#easter-egg {
 		text-align: center;
 		padding: 2rem;
-		height: 100vh;
+		height: 100svh;
 		display: flex;
 		flex-direction: column;
 		/* align-content: space-around; */
@@ -63,7 +63,7 @@
 	.app {
 		display: flex;
 		flex-direction: column;
-		min-height: 100vh;
+		min-height: 100svh;
 	}
 
 	main {
