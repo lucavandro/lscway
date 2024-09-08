@@ -1,27 +1,32 @@
 <script>
-	import Header from './Header.svelte';
+	import Header from "./Header.svelte";
 </script>
+
 <svelte:head>
 	<link
-	rel="stylesheet"
-	href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
-  >
+		rel="stylesheet"
+		href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
+	/>
 </svelte:head>
-
 
 <div class="app">
 	<Header />
-
+	
 	<main class="container-fluid">
 		<slot />
 	</main>
 
 	<footer>
-		<p>visit <a href="https://kit.svelte.dev">kit.svelte.dev</a> to learn SvelteKit</p>
+		<p>
+			Developed with 💙 by Liceo Scientifico Cortese
+		</p>
 	</footer>
 </div>
 
 <style>
+	
+
+
 	.app {
 		display: flex;
 		flex-direction: column;
@@ -47,13 +52,4 @@
 		padding: 12px;
 	}
 
-	footer a {
-		font-weight: bold;
-	}
-
-	@media (min-width: 480px) {
-		footer {
-			padding: 12px 0;
-		}
-	}
 </style>
