@@ -1,5 +1,6 @@
 <script>
 	import { getOraScolastica, getDay } from "$lib/dateutils.js";
+    import PwaButton from "./PWAButton.svelte";
 	import Tabs from "./Tabs.svelte";
 	let time;
 	let day;
@@ -19,8 +20,10 @@
 		<nav>
 			<ul>
 				<li><strong>Cortese WAY</strong></li>
+				<li><PwaButton /></li>
 			</ul>
 			<ul>
+				
 				<li>{day}</li>
 				<li>{oraScolastica}</li>
 			</ul>

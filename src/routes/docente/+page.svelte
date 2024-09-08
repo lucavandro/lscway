@@ -1,6 +1,6 @@
 <script>
 	import { onMount } from "svelte";
-	import { weekdays, hours, getOraNum, getDay } from "$lib/dateutils.js"
+	import { getOraNum, getDay } from "$lib/dateutils.js"
     import ItemSelect from "./../ItemSelect.svelte";
     import TimeTable from "./../TimeTable.svelte";
 	import { getPrefTeacher, setPrefTeacher } from "$lib/utils.js"

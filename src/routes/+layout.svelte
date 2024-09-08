@@ -1,5 +1,19 @@
 <script>
 	import Header from "./Header.svelte";
+	import { getDay } from "$lib/dateutils.js";
+	import { onDestroy, onMount } from "svelte";
+	import teslaSticker from "$lib/images/tesla-sticker.png";
+	let day = getDay();
+	let intervalTimer;
+	onMount(() => {
+		intervalTimer = setInterval(() => {
+			day = getDay();
+		}, 60 * 1000);
+	});
+
+	onDestroy(() => {
+		clearInterval(intervalTimer);
+	});
 </script>
 
 <svelte:head>
@@ -10,22 +24,41 @@
 </svelte:head>
 
 <div class="app">
-	<Header />
-	
-	<main class="container-fluid">
-		<slot />
-	</main>
+	{#if day === "DOM"}
+		<div class="container-fluid" id="easter-egg">
+			<div><img src={teslaSticker} alt="" /></div>
+			<h3>
+				Non posso ci posso credere...<br />anche di domenica stai su
+				quest'app???
+			</h3>
+		</div>
+	{:else}
+		<Header />
 
-	<footer>
-		<p>
-			Developed with 💙 by Liceo Scientifico Cortese
-		</p>
-	</footer>
+		<main class="container-fluid">
+			<slot />
+		</main>
+
+		<footer>
+			<p>Developed with 💙 by Liceo Scientifico Cortese</p>
+		</footer>
+	{/if}
 </div>
 
 <style>
-	
+	#easter-egg {
+		text-align: center;
+		padding: 2rem;
+		height: 100vh;
+		display: flex;
+		flex-direction: column;
+		/* align-content: space-around; */
+		justify-content: center;
+	}
 
+	#easter-egg img {
+		max-height: 40vh;
+	}
 
 	.app {
 		display: flex;
@@ -51,5 +84,4 @@
 		align-items: center;
 		padding: 12px;
 	}
-
 </style>

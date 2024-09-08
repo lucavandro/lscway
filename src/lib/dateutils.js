@@ -32,7 +32,6 @@ export function getOra(){
 }
 
 export function getDay(){
-    return "LUN"
     return weekdays[ new Date().getDay() - 1 ] || "DOM"
 }
 
