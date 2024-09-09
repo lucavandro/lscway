@@ -6,7 +6,7 @@
     "scope": "/app/way/tmp",
     "display": "standalone",
     "theme_color": "#1d232f",
-    "background_color": "#1d232f",
+    "background_color": "#ffffff",
     "icons": [
         {
             "src": "icon-192.png",
