@@ -3,10 +3,14 @@
     import downloadIcon from "$lib/images/icons/download-square.svg";
     // PWA prompt
     let deferredPrompt;
-    let installButtonVisible = true;
+    let installButtonVisible = false;
 
     onMount(() => {
-        if ("BeforeInstallPromptEvent" in window) {
+        if ("deferredInstallPrompt" in window) {
+            console.log("👍 deferredInstallPrompt found");
+            deferredPrompt = window.deferredInstallPrompt
+            installButtonVisible = true
+        } else if ("BeforeInstallPromptEvent" in window) {
             console.log(
                 "⏳ BeforeInstallPromptEvent supported but not fired yet",
             );
@@ -23,7 +27,7 @@
 
         window.addEventListener("appinstalled", (e) => {
             console.log("✅ AppInstalled fired", true);
-            installButtonVisible = false
+            installButtonVisible = false;
         });
     });
 
@@ -44,17 +48,15 @@
             } else if (outcome === "dismissed") {
                 console.log("😟 User dismissed the install prompt");
             }
-           
         }
     }
 </script>
 
 {#if installButtonVisible}
     <button on:click={installApp} class="outline contrast"
-        ><img src={downloadIcon} alt="" srcset="" /> Installa </button
-    >
+        ><img src={downloadIcon} alt="" srcset="" /> Installa
+    </button>
 {/if}
 
 <style>
-  
 </style>

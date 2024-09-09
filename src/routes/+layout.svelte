@@ -5,10 +5,13 @@
 	import teslaSticker from "$lib/images/tesla-sticker.webp";
 	let day = getDay();
 	let intervalTimer;
+
 	onMount(() => {
 		intervalTimer = setInterval(() => {
 			day = getDay();
 		}, 60 * 1000);
+
+	
 	});
 
 	onDestroy(() => {
@@ -21,18 +24,15 @@
 		rel="stylesheet"
 		href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
 	/>
+	<script>
+		window.addEventListener('beforeinstallprompt', event => {
+			event.preventDefault()
+			window.deferredInstallPrompt = event
+		})
+	</script>
 </svelte:head>
 
 <div class="app">
-	{#if day === "DOM"}
-		<div class="container-fluid" id="easter-egg">
-			<div><img src={teslaSticker} alt="" /></div>
-			<h3>
-				Non posso ci posso credere...<br />anche di domenica stai su
-				quest'app???
-			</h3>
-		</div>
-	{:else}
 		<Header />
 
 		<main class="container-fluid">
@@ -42,23 +42,10 @@
 		<footer>
 			<p>Developed with 💙 by Liceo Scientifico Cortese</p>
 		</footer>
-	{/if}
 </div>
 
 <style>
-	#easter-egg {
-		text-align: center;
-		padding: 2rem;
-		height: 100svh;
-		display: flex;
-		flex-direction: column;
-		/* align-content: space-around; */
-		justify-content: center;
-	}
 
-	#easter-egg img {
-		max-height: 40vh;
-	}
 
 	.app {
 		display: flex;
