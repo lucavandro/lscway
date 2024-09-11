@@ -1,6 +1,6 @@
 <script>
 	import { getOraScolastica, getDay } from "$lib/dateutils.js";
-    import PwaButton from "./PWAButton.svelte";
+	import PwaButton from "./PWAButton.svelte";
 	import Tabs from "./Tabs.svelte";
 	let time;
 	let day;
@@ -23,7 +23,6 @@
 				<li><PwaButton /></li>
 			</ul>
 			<ul>
-				
 				<li>{day}</li>
 				<li>{oraScolastica}</li>
 			</ul>
@@ -33,7 +32,13 @@
 </header>
 
 <style>
-	header {
-		background-color: #1d232f;
+	@media (prefers-color-scheme: dark) {
+		header {
+			background-color: #1d232f;
+		}
+	}
+
+	header{
+		background-color: var(--pico-muted-border-color);
 	}
 </style>

@@ -1,6 +1,5 @@
 <script>
     import { onMount } from "svelte";
-    import downloadIcon from "$lib/images/icons/download-square.svg";
     // PWA prompt
     let deferredPrompt;
     let installButtonVisible = false;
@@ -8,8 +7,8 @@
     onMount(() => {
         if ("deferredInstallPrompt" in window) {
             console.log("👍 deferredInstallPrompt found");
-            deferredPrompt = window.deferredInstallPrompt
-            installButtonVisible = true
+            deferredPrompt = window.deferredInstallPrompt;
+            installButtonVisible = true;
         } else if ("BeforeInstallPromptEvent" in window) {
             console.log(
                 "⏳ BeforeInstallPromptEvent supported but not fired yet",
@@ -53,9 +52,7 @@
 </script>
 
 {#if installButtonVisible}
-    <button on:click={installApp} class="outline contrast"
-        ><img src={downloadIcon} alt="" srcset="" /> Installa
-    </button>
+    <button on:click={installApp} class="outline contrast"> Installa </button>
 {/if}
 
 <style>

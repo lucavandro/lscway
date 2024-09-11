@@ -6,7 +6,7 @@
 </script>
 
 <label for="{label}">{label}</label>
-<select name="{label}" bind:value={item} on:change={onChange}>
+<select id="{label}" bind:value={item} on:change={onChange}>
     {#each list as element}
         <option value={element}>{element}</option>
     {/each}

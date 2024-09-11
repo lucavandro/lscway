@@ -55,8 +55,10 @@
 		align-items: center;
 		text-decoration: none;
 		border-radius: 0;
-		color: white;
+		color: var(--pico-color)
 	}
+
+
 
 	/* Stile per il tab attivo */
 	#tabs .active {

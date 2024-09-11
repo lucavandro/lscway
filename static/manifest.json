@@ -1,12 +1,15 @@
-{
-    "mode": "development",
+{ 
     "short_name": "WAY Cortese",
     "name": "Way Cortese",
+    "description":  "App orario del Liceo Cortese",
     "start_url": "/app/way/tmp",
     "scope": "/app/way/tmp",
     "display": "standalone",
-    "theme_color": "#1d232f",
+    "display_override": [ "fullscreen"],
+    "orientation": "portrait",
+    "theme_color": "transparent",
     "background_color": "#ffffff",
+    "lang": "it-IT",
     "icons": [
         {
             "src": "icon-192.png",

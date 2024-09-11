@@ -10,4 +10,5 @@ const precache_list = [
   revision: version,
 }));
 
+console.log(precache_list)
 precacheAndRoute(precache_list);

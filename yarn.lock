@@ -3056,7 +3056,7 @@ workbox-range-requests@7.1.0:
   dependencies:
     workbox-core "7.1.0"
 
-workbox-recipes@7.1.0:
+workbox-recipes@^7.1.0, workbox-recipes@7.1.0:
   version "7.1.0"
   resolved "https://registry.npmjs.org/workbox-recipes/-/workbox-recipes-7.1.0.tgz"
   integrity sha512-NRrk4ycFN9BHXJB6WrKiRX3W3w75YNrNrzSX9cEZgFB5ubeGoO8s/SDmOYVrFYp9HMw6sh1Pm3eAY/1gVS8YLg==
