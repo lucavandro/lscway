@@ -1,4 +1,4 @@
-import { getOra, getDay } from "./dateutils"
+import { hours } from "./dateutils"
 
 export function getPrefTeacher() {
    return localStorage.getItem("prefTeacher")
@@ -27,5 +27,9 @@ export function setPrefClassroom(value) {
          localStorage.setItem("prefClassroom", value)
 }
 
+
+export function getDataByHourIndex(data, hour){
+    data.filter( e=> e.ora === hours[i])
+}
 
 
