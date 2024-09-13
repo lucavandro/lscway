@@ -19,7 +19,7 @@
 	<div class="container">
 		<nav>
 			<ul>
-				<li><strong>Cortese WAY</strong></li>
+				<li><strong>WAY Cortese</strong></li>
 				<li><PwaButton /></li>
 			</ul>
 			<ul>

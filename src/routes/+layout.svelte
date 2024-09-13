@@ -10,8 +10,6 @@
 		intervalTimer = setInterval(() => {
 			day = getDay();
 		}, 60 * 1000);
-
-	
 	});
 
 	onDestroy(() => {
@@ -25,32 +23,29 @@
 		href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
 	/>
 	<script>
-		window.addEventListener('beforeinstallprompt', event => {
-			event.preventDefault()
-			window.deferredInstallPrompt = event
-		})
+		window.addEventListener("beforeinstallprompt", (event) => {
+			event.preventDefault();
+			window.deferredInstallPrompt = event;
+		});
 	</script>
 </svelte:head>
 
 <div class="app">
-		<Header />
+	<Header />
 
-		<main class="container-fluid">
-			<slot />
-		</main>
+	<main class="container-fluid">
+		<slot />
+	</main>
 
-		<footer>
-			<p>Developed with 💙 by Liceo Scientifico Cortese</p>
-		</footer>
+	<footer>
+		<p>Developed with 💙 by Liceo Scientifico Cortese</p>
+	</footer>
 </div>
 
 <style>
-
-
 	.app {
 		display: flex;
 		flex-direction: column;
-		min-height: 100svh;
 	}
 
 	main {
@@ -65,12 +60,16 @@
 	}
 
 	footer {
-		display: flex;
-		flex-direction: column;
-		justify-content: center;
-		align-items: center;
+		position: fixed;
+		left: 0;
+		bottom: 0;
+		width: 100%;
 		padding: 12px;
 	}
 
-	
+	footer p {
+		max-width: fit-content;
+		margin: auto;
+		padding: 6px 0;
+	}
 </style>
