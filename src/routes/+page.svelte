@@ -60,7 +60,9 @@
 			fields={["materia", "docente", "aula"]}
 		/>
 	{:else}
-		<TimeTable bind:data={classData} fields={["aula", "docente", "materia"]}
-		></TimeTable>
+		<TimeTable
+			bind:data={classData}
+			fields={["aula", "docente", "materia"]}
+		/>
 	{/if}
 </div>

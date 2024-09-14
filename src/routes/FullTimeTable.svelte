@@ -19,7 +19,7 @@
 <div class="overflow-auto">
     <table class="striped">
         <thead>
-            <th>#</th>
+            <th class="fixed">#</th>
             {#each weekdays.slice(0,6) as weekday}
                 <th>{weekday}</th>
             {/each}
@@ -34,8 +34,6 @@
 
 <style>
     thead th {
-        text-transform: capitalize;
         font-size: 0.75rem;
-        text-align: center;
     }
 </style>

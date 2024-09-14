@@ -12,12 +12,12 @@
     let hour = hours[hourIndex];
 
     $: filterdRowData = {
-        LUN: rowData.find((e) => e.day === "LUN"),
-        MAR: rowData.find((e) => e.day === "MAR"),
-        MER: rowData.find((e) => e.day === "MER"),
-        GIO: rowData.find((e) => e.day === "GIO"),
-        VEN: rowData.find((e) => e.day === "VEN"),
-        SAB: rowData.find((e) => e.day === "SAB"),
+        LUN: rowData.filter((e) => e.day === "LUN"),
+        MAR: rowData.filter((e) => e.day === "MAR"),
+        MER: rowData.filter((e) => e.day === "MER"),
+        GIO: rowData.filter((e) => e.day === "GIO"),
+        VEN: rowData.filter((e) => e.day === "VEN"),
+        SAB: rowData.filter((e) => e.day === "SAB"),
     };
 
     onMount(() => {
@@ -33,16 +33,25 @@
 </script>
 
 <tr class:active={false}>
-    <th>{hourIndex + 1}</th>
+    <th class="fixed">{hourIndex + 1}</th>
 
     {#each weekdays.slice(0, 6) as weekday}
-        {#if filterdRowData[weekday]}
+        {#if filterdRowData[weekday].length === 1}
             <td
                 class:active={hourIndex === currentHour - 1 &&
                     currentDay === weekday}
             >
                 {#each fields as field}
-                    <div>{filterdRowData[weekday][field]}</div>
+                    <div>{filterdRowData[weekday][0][field]}</div>
+                {/each}
+            </td>
+        {:else if filterdRowData[weekday].length === 2}
+            <td
+                class:active={hourIndex === currentHour - 1 &&
+                    currentDay === weekday}
+            >
+                {#each fields as field}
+                    <div>{filterdRowData[weekday][0][field]}/{filterdRowData[weekday][1][field]}</div>
                 {/each}
             </td>
         {:else}
@@ -59,11 +68,10 @@
         color: white;
         font-weight: bold;
     }
-    
+
     td,
     th {
         font-size: 0.75rem;
         white-space: nowrap;
-        text-align: center;
     }
 </style>

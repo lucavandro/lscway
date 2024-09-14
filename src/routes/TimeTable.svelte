@@ -22,11 +22,3 @@
         </tbody>
     </table>
 </div>
-
-<style>
-    thead th {
-        text-transform: capitalize;
-    }
-
-  
-</style>

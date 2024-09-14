@@ -1,0 +1,11 @@
+
+table td,
+table th,
+table td a{
+	text-align: center;
+	white-space: nowrap;
+}
+.app{
+	min-height: 100svh;
+}
+
