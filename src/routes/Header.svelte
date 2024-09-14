@@ -1,5 +1,5 @@
 <script>
-	import { getOraScolastica, getDay } from "$lib/dateutils.js";
+	import { getSchoolHour, getDay } from "$lib/dateutils.js";
     import { onMount } from "svelte";
 	import PwaButton from "./PWAButton.svelte";
 	import Tabs from "./Tabs.svelte";
@@ -7,7 +7,7 @@
 	let oraScolastica;
 
 	function updateTime() {
-		oraScolastica = getOraScolastica();
+		oraScolastica = getSchoolHour();
 		day = getDay();
 	}
 	updateTime();

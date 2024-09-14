@@ -1,44 +1,45 @@
 <script>
 	import { onMount } from "svelte";
-	import { getOraNum, getDay } from "$lib/dateutils.js";
+	import { getHourNum, getDay } from "$lib/dateutils.js";
 	import ItemSelect from "./ItemSelect.svelte";
 	import { getPrefClass, setPrefClass } from "$lib/utils.js";
 	import { page } from "$app/stores";
 	import TimeTable from "./TimeTable.svelte";
+	import FullTimeTable from "./FullTimeTable.svelte";
+	import FullTimeTableSwitch from "./FullTimeTableSwitch.svelte";
 	export let data;
 	let classes,
 		classrooms,
 		currenHour,
 		currenDay = getDay(),
 		teachers = [],
-		selectedClass;
+		selectedClass,
+		showFullTimeTable = false;
 
 	// Declarations
-	$: classData =
-		data?.data
-			?.filter((e) => e.classe === selectedClass && e.day === currenDay)
-			.sort((a, b) => a.ora >= b.ora) || {};
+	$: classWeekData = data?.data?.filter((e) => e.classe === selectedClass);
+	$: classData = classWeekData?.filter((e) => e.day === currenDay);
 	$: teachers = data.docenti;
 	$: classes = data.classi.filter((e) => e != "");
 	$: classrooms = data.aule;
 
 	setInterval(() => {
 		currenDay = getDay();
-		currenHour = getOraNum();
+		currenHour = getHourNum();
 	}, 1000);
 
 	onMount(async () => {
 		let queryClass = $page.url.searchParams.get("q");
 		if (queryClass && data.classi.includes(queryClass)) {
-			selectedClass = queryClass
+			selectedClass = queryClass;
 		} else {
 			selectedClass = getPrefClass() || classes[0];
 		}
 	});
-	
+
 	function onSelectedItemChange() {
 		let queryClass = $page.url.searchParams.get("q");
-		if (!queryClass || queryClass !== selectedClass) {	
+		if (!queryClass || queryClass !== selectedClass) {
 			setPrefClass(selectedClass);
 		}
 	}
@@ -49,8 +50,17 @@
 		label="Classe"
 		bind:item={selectedClass}
 		list={classes}
-		onChange={onSelectedItemChange()}
+		onChange={onSelectedItemChange}
 	/>
-	<TimeTable bind:data={classData} fields={["aula", "docente", "materia"]}
-	></TimeTable>
+
+	<FullTimeTableSwitch bind:control={showFullTimeTable} />
+	{#if showFullTimeTable}
+		<FullTimeTable
+			bind:tableData={classWeekData}
+			fields={["materia", "docente", "aula"]}
+		/>
+	{:else}
+		<TimeTable bind:data={classData} fields={["aula", "docente", "materia"]}
+		></TimeTable>
+	{/if}
 </div>

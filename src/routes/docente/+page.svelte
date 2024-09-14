@@ -1,22 +1,29 @@
 <script>
 	import { onMount } from "svelte";
-	import { getOraNum, getDay } from "$lib/dateutils.js";
-	import ItemSelect from "./../ItemSelect.svelte";
-	import TimeTable from "./../TimeTable.svelte";
+	// Lib
+	import { getHourNum, getDay } from "$lib/dateutils.js";
 	import { getPrefTeacher, setPrefTeacher } from "$lib/utils.js";
 	import { page } from "$app/stores";
+	// Components
+	import TimeTable from "./../TimeTable.svelte";
+	import ItemSelect from "./../ItemSelect.svelte";
+	import FullTimeTable from "./../FullTimeTable.svelte";
+	import FullTimeTableSwitch from "./../FullTimeTableSwitch.svelte";
+
 	export let data;
-	let currenHour, selectedTeacher;
+	let currenHour,
+		selectedTeacher,
+		showFullTimeTable = false;
 
 	// Declarations
-	$: teacherData =
-		data?.data
-			?.filter((e) => e.docente === selectedTeacher && e.day === getDay())
-			.sort((a, b) => a.ora >= b.ora) || {};
+	$: teacherWeekData = data?.data?.filter(
+		(e) => e.docente === selectedTeacher,
+	);
+	$: teacherData = teacherWeekData?.filter((e) => e.day === getDay());
 	$: teachers = data.docenti;
 
-	setInterval(() => (currenHour = getOraNum()), 1000);
-	//Load data from server
+	setInterval(() => (currenHour = getHourNum()), 1000);
+
 	onMount(async () => {
 		let queryClass = $page.url.searchParams.get("q");
 		if (queryClass && data.docenti.includes(queryClass)) {
@@ -28,12 +35,10 @@
 
 	function onSelectedItemChange() {
 		let queryClass = $page.url.searchParams.get("q");
-		if (!queryClass || queryClass !== selectedTeacher) {	
+		if (!queryClass || queryClass !== selectedTeacher) {
 			setPrefTeacher(selectedTeacher);
 		}
 	}
-
-	
 </script>
 
 <div>
@@ -41,7 +46,15 @@
 		label="Docente"
 		bind:item={selectedTeacher}
 		list={teachers}
-		onChange={onSelectedItemChange()}
+		onChange={onSelectedItemChange}
 	/>
-	<TimeTable bind:data={teacherData} fields={["classe", "aula"]}></TimeTable>
+	<FullTimeTableSwitch bind:control={showFullTimeTable} />
+	{#if showFullTimeTable}
+		<FullTimeTable
+			bind:tableData={teacherWeekData}
+			fields={["classe", "aula"]}
+		/>
+	{:else}
+		<TimeTable bind:data={teacherData} fields={["classe", "aula"]} />
+	{/if}
 </div>

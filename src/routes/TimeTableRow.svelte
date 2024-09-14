@@ -2,10 +2,10 @@
     export let data = [];
     export let fields;
     export let hourIndex;
-    import { hours, getOraNum } from "$lib/dateutils.js";
+    import { hours, getHourNum } from "$lib/dateutils.js";
     import { onMount, onDestroy } from "svelte";
 
-    let currentHour = getOraNum();
+    let currentHour = getHourNum();
     let interval;
 
     $: hour = hours[hourIndex];
@@ -13,7 +13,7 @@
 
     onMount(() => {
         interval = setInterval(() => {
-            currentHour = getOraNum();
+            currentHour = getHourNum();
         }, 1000);
     });
 
