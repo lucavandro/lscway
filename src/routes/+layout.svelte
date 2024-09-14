@@ -2,7 +2,6 @@
 	import Header from "./Header.svelte";
 	import { getDay } from "$lib/dateutils.js";
 	import { onDestroy, onMount } from "svelte";
-	import teslaSticker from "$lib/images/tesla-sticker.webp";
 	let day = getDay();
 	let intervalTimer;
 

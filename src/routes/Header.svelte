@@ -1,18 +1,21 @@
 <script>
 	import { getOraScolastica, getDay } from "$lib/dateutils.js";
+    import { onMount } from "svelte";
 	import PwaButton from "./PWAButton.svelte";
 	import Tabs from "./Tabs.svelte";
-	let time;
 	let day;
 	let oraScolastica;
 
 	function updateTime() {
-		time = new Date().toTimeString().split(" ")[0];
 		oraScolastica = getOraScolastica();
 		day = getDay();
 	}
 	updateTime();
-	setInterval(updateTime, 1000);
+	
+
+	onMount(()=>{
+		setInterval(updateTime, 1000);
+	})
 </script>
 
 <header>

@@ -27,7 +27,17 @@
 
     {#each fields as field}
         {#if rowData}
-            <td>{rowData[field]}</td>
+            <td>
+                {#if field === "aula"}
+                    <a href={`./aula/?q=${rowData[field]}`}>{rowData[field]}</a>
+                {:else if field === "docente"}
+                    <a href={`./docente?q=${rowData[field]}`}>{rowData[field]}</a>                    
+                {:else if field === "classe"}
+                    <a href={`./?q=${rowData[field]}`}>{rowData[field]}</a>
+                {:else}
+                    {rowData[field]}
+                {/if}
+            </td>
         {:else}
             <td>-</td>
         {/if}
@@ -35,15 +45,16 @@
 </tr>
 
 <style>
-    td,
-    th {
-        text-align: center;
-    }
-
     tr.active th,
     tr.active td {
         background-color: var(--pico-primary);
         color: white;
         font-weight: bold;
+    }
+
+   a{
+        color: var(--pico-h3-color);
+        text-decoration-color: var(--pico-h3-color);
+        text-decoration: none;
     }
 </style>

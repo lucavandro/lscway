@@ -4,6 +4,7 @@
 	import {getPrefClassroom, setPrefClassroom } from "$lib/utils.js"
     import ItemSelect from "./../ItemSelect.svelte";
     import TimeTable from "./../TimeTable.svelte";
+	import { page } from "$app/stores";
 	export let data; 
 	let currenHour,
 		selectedClassroom;
@@ -14,7 +15,14 @@
 	setInterval(()=> currenHour = getOraNum() , 1000)
 	//Load data from server
 	onMount(async () => {
-		selectedClassroom = getPrefClassroom() || classrooms[0];
+		let queryClass = $page.url.searchParams.get("q");
+	
+		if (queryClass && data.aule.includes(queryClass)) {
+			selectedClassroom = queryClass
+		} else {
+			selectedClassroom = getPrefClassroom() || classrooms[0];
+		}
+		
 	});
 
 
