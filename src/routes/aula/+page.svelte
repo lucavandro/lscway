@@ -25,11 +25,17 @@
 		
 	});
 
+	function onSelectedItemChange() {
+		let queryClass = $page.url.searchParams.get("q");
+		if (!queryClass || queryClass !== selectedClassroom) {	
+			setPrefClassroom(selectedClassroom);
+		}
+	}
 
 
 </script>
 
 <div>
-	<ItemSelect label="Aula" bind:item={selectedClassroom} list={classrooms} onChange={setPrefClassroom(selectedClassroom)} />
+	<ItemSelect label="Aula" bind:item={selectedClassroom} list={classrooms} onChange={onSelectedItemChange()} />
 	<TimeTable bind:data={classroomData} fields={["classe", "docente", "materia"]}></TimeTable>
 </div>
