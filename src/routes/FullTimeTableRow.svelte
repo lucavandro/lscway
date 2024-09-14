@@ -2,14 +2,13 @@
     export let rowData = [];
     export let fields;
     export let hourIndex;
-    import { hours, getDay, getHourNum } from "$lib/dateutils.js";
+    import { getDay, getHourNum } from "$lib/dateutils.js";
     import { onMount, onDestroy } from "svelte";
     import { weekdays } from "$lib/dateutils.js";
 
     let currentDay = getDay();
     let currentHour = getHourNum();
     let interval;
-    let hour = hours[hourIndex];
 
     $: filterdRowData = {
         LUN: rowData.filter((e) => e.day === "LUN"),
