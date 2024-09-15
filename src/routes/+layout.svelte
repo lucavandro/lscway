@@ -2,11 +2,11 @@
 	import Header from "./Header.svelte";
 	import { getDay } from "$lib/dateutils.js";
 	import { onDestroy, onMount } from "svelte";
-	import { replaceState, beforeNavigate } from "$app/navigation";
 
 	let day = getDay();
 	let intervalTimer;
 
+	// Lifecycle events
 	onMount(() => {
 		intervalTimer = setInterval(() => {
 			day = getDay();

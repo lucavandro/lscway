@@ -1,52 +1,59 @@
 <script>
-	import { onMount } from "svelte";
+	import { onDestroy, onMount } from "svelte";
 	import { page } from "$app/stores";
 	// Lib
-	import {getHourNum, getDay } from "$lib/dateutils.js"
-	import {getPrefClassroom, setPrefClassroom } from "$lib/utils.js"
-    // Components
+	import { getHourNum, getDay } from "$lib/dateutils.js";
+	import { getPrefClassroom, setPrefClassroom } from "$lib/utils.js";
+	// Components
 	import ItemSelect from "./../ItemSelect.svelte";
-    import TimeTable from "./../TimeTable.svelte";
+	import TimeTable from "./../TimeTable.svelte";
 	import FullTimeTable from "./../FullTimeTable.svelte";
 	import FullTimeTableSwitch from "./../FullTimeTableSwitch.svelte";
-	export let data; 
+	export let data;
 
 	let currenHour,
 		selectedClassroom,
-		showFullTimeTable = false;
-	
-		// Declarations
-	$: classroomWeekData = data?.data?.filter(e=> e.aula=== selectedClassroom) || []
-	$: classroomData = classroomWeekData?.filter(e=> e.day === getDay() ) || []
-	$: classrooms = data.aule.filter(e => e != "");
+		showFullTimeTable = false,
+		interval;
 
-	setInterval(()=> currenHour = getHourNum() , 1000)
+	// Declarations
+	$: classroomWeekData =
+		data?.data?.filter((e) => e.aula === selectedClassroom) || [];
+	$: classroomData =
+		classroomWeekData?.filter((e) => e.day === getDay()) || [];
+	$: classrooms = data.aule.filter((e) => e != "");
 
-	onMount(async () => {
-		let queryClass = $page.url.searchParams.get("q");
-	
-		if (queryClass && data.aule.includes(queryClass)) {
-			selectedClassroom = queryClass
-		} else {
-			selectedClassroom = getPrefClassroom() || classrooms[0];
-		}
-		
-	});
-
+	// Handlers
 	function onSelectedItemChange() {
 		let queryClass = $page.url.searchParams.get("q");
-		
-		if (!queryClass || queryClass !== selectedClassroom) {	
+
+		if (!queryClass || queryClass !== selectedClassroom) {
 			setPrefClassroom(selectedClassroom);
-			console.log("ciao", selectedClassroom)
 		}
 	}
 
+	// Lifecycle's events
+	onMount(async () => {
+		let queryClass = $page.url.searchParams.get("q");
 
+		if (queryClass && data.aule.includes(queryClass)) {
+			selectedClassroom = queryClass;
+		} else {
+			selectedClassroom = getPrefClassroom() || classrooms[0];
+		}
+		interval = setInterval(() => (currenHour = getHourNum()), 1000);
+	});
+
+	onDestroy(() => clearInterval(interval));
 </script>
 
 <div>
-	<ItemSelect label="Aula" bind:item={selectedClassroom} list={classrooms} onChange={onSelectedItemChange} />
+	<ItemSelect
+		label="Aula"
+		bind:item={selectedClassroom}
+		list={classrooms}
+		onChange={onSelectedItemChange}
+	/>
 	<FullTimeTableSwitch bind:control={showFullTimeTable} />
 	{#if showFullTimeTable}
 		<FullTimeTable
@@ -54,7 +61,9 @@
 			fields={["classe", "docente", "materia"]}
 		/>
 	{:else}
-	<TimeTable bind:data={classroomData} fields={["classe", "docente", "materia"]} />
+		<TimeTable
+			bind:data={classroomData}
+			fields={["classe", "docente", "materia"]}
+		/>
 	{/if}
-	
 </div>

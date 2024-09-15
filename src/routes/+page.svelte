@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from "svelte";
+	import { onDestroy, onMount } from "svelte";
 	import { getHourNum, getDay } from "$lib/dateutils.js";
 	import ItemSelect from "./ItemSelect.svelte";
 	import { getPrefClass, setPrefClass } from "$lib/utils.js";
@@ -14,7 +14,8 @@
 		currenDay = getDay(),
 		teachers = [],
 		selectedClass,
-		showFullTimeTable = false;
+		showFullTimeTable = false,
+		interval;
 
 	// Declarations
 	$: classWeekData = data?.data?.filter((e) => e.classe === selectedClass);
@@ -23,26 +24,31 @@
 	$: classes = data.classi.filter((e) => e != "");
 	$: classrooms = data.aule;
 
-	setInterval(() => {
-		currenDay = getDay();
-		currenHour = getHourNum();
-	}, 1000);
-
-	onMount(async () => {
-		let queryClass = $page.url.searchParams.get("q");
-		if (queryClass && data.classi.includes(queryClass)) {
-			selectedClass = queryClass;
-		} else {
-			selectedClass = getPrefClass() || classes[0];
-		}
-	});
-
+	// Functions
 	function onSelectedItemChange() {
 		let queryClass = $page.url.searchParams.get("q");
 		if (!queryClass || queryClass !== selectedClass) {
 			setPrefClass(selectedClass);
 		}
 	}
+
+	// Lifecycle's events
+	onMount(() => {
+		// Read query params to handle link from other pages
+		let queryClass = $page.url.searchParams.get("q");
+		if (queryClass && data.classi.includes(queryClass)) {
+			selectedClass = queryClass;
+		} else {
+			selectedClass = getPrefClass() || classes[0];
+		}
+
+		interval = setInterval(() => {
+			currenDay = getDay();
+			currenHour = getHourNum();
+		}, 1000);
+	});
+
+	onDestroy(() => clearInterval(interval));
 </script>
 
 <div>

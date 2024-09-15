@@ -1,21 +1,24 @@
 <script>
 	import { getSchoolHour, getDay } from "$lib/dateutils.js";
-    import { onMount } from "svelte";
+	import { onDestroy, onMount } from "svelte";
 	import PwaButton from "./PWAButton.svelte";
 	import Tabs from "./Tabs.svelte";
-	let day;
-	let oraScolastica;
+	let day, schoolHour, interval;
 
 	function updateTime() {
-		oraScolastica = getSchoolHour();
+		schoolHour = getSchoolHour();
 		day = getDay();
 	}
 	updateTime();
-	
 
-	onMount(()=>{
-		setInterval(updateTime, 1000);
-	})
+	// Lifecycle's events
+	onMount(() => {
+		interval = setInterval(updateTime, 1000);
+	});
+
+	onDestroy(() => {
+		clearInterval(interval);
+	});
 </script>
 
 <header>
@@ -27,7 +30,7 @@
 			</ul>
 			<ul>
 				<li>{day}</li>
-				<li>{oraScolastica}</li>
+				<li>{schoolHour}</li>
 			</ul>
 		</nav>
 		<Tabs></Tabs>
@@ -41,7 +44,7 @@
 		}
 	}
 
-	header{
+	header {
 		background-color: var(--pico-muted-border-color);
 	}
 </style>
