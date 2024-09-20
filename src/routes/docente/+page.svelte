@@ -59,9 +59,9 @@
 	{#if showFullTimeTable}
 		<FullTimeTable
 			bind:tableData={teacherWeekData}
-			fields={["classe", "aula"]}
+			fields={["classe", "aula", "materia"]}
 		/>
 	{:else}
-		<TimeTable bind:data={teacherData} fields={["classe", "aula"]} />
+		<TimeTable bind:data={teacherData} fields={["classe", "aula", "materia"]} />
 	{/if}
 </div>

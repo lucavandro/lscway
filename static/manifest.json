@@ -1,12 +1,13 @@
-{ 
+{
+    "id": "way_cortese",
     "name": "WAY Cortese",
     "short_name": "WAY Cortese",
-    "description":  "App orario del Liceo Cortese",
+    "description": "App orario del Liceo Cortese",
     "start_url": "/app/way/tmp",
     "scope": "/app/way/tmp",
     "display": "standalone",
     "orientation": "portrait",
-    "theme_color": "transparent",
+    "theme_color": "#ffffff",
     "background_color": "#ffffff",
     "lang": "it-IT",
     "icons": [
@@ -20,5 +21,35 @@
             "sizes": "512x512",
             "type": "image/png"
         }
-    ]
+    ],
+    "screenshots": [
+        {
+            "src": "ss_1.png",
+            "sizes": "1290x2796",
+            "type": "image/png",
+            "description": "Schermata docente"
+        },
+        {
+            "src": "ss_2.png",
+            "sizes": "1290x2796",
+            "type": "image/png",
+            "description": "Schermata aula"
+        }
+    ],
+    "shortcuts": [
+        {
+            "name": "Classe",
+            "url": "/"
+        },
+        {
+            "name": "Docente",
+            "url": "/docente"
+        },
+        {
+            "name": "Aula",
+            "url": "/aula"
+        }
+    ],
+    "related_applications": [],
+    "prefer_related_applications": false
 }

@@ -16,6 +16,8 @@ export async function getData(fetch){
             if(!e.aula)
                 e.aula = "-"
         }
+    
+
         return e
     })
     return data
