@@ -1,5 +1,5 @@
 <script>
-	import { onMount } from "svelte";
+	import { onMount, onDestroy } from "svelte";
 	// Lib
 	import { getHourNum, getDay } from "$lib/dateutils.js";
 	import { getPrefTeacher, setPrefTeacher } from "$lib/utils.js";
@@ -11,7 +11,7 @@
 	import FullTimeTableSwitch from "./../FullTimeTableSwitch.svelte";
 
 	export let data;
-	let currenHour,
+	let interval,
 		selectedTeacher,
 		showFullTimeTable = false;
 
@@ -22,7 +22,6 @@
 	$: teacherData = teacherWeekData?.filter((e) => e.day === getDay());
 	$: teachers = data.docenti;
 
-	setInterval(() => (currenHour = getHourNum()), 1000);
 
 	onMount(async () => {
 		let queryClass = $page.url.searchParams.get("q");
@@ -31,6 +30,14 @@
 		} else {
 			selectedTeacher = getPrefTeacher() || teachers[0];
 		}
+
+		showFullTimeTable = JSON.parse(sessionStorage.getItem('lscway:docente:showFullTable'))
+	
+	});
+
+	onDestroy(() => {
+		clearInterval(interval)
+		sessionStorage.setItem('lscway:docente:showFullTable', JSON.stringify(showFullTimeTable))
 	});
 
 	function onSelectedItemChange() {

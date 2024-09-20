@@ -3,6 +3,7 @@ export async function getData(fetch){
         "https://www.liceoscientificocortese.edu.it/app/way/api.php",
         {
             mode: "cors",
+            cache: 'no-cache',
         },
     );
     const data = await res.json();

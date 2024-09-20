@@ -29,6 +29,7 @@
 				<li><PwaButton /></li>
 			</ul>
 			<ul>
+				<li ><a href="javascript:location.reload();" class="outline contrast">↺</a></li>
 				<li>{day}</li>
 				<li>{schoolHour}</li>
 			</ul>
@@ -46,5 +47,9 @@
 
 	header {
 		background-color: var(--pico-muted-border-color);
+	}
+
+	a:hover{
+		text-decoration: none;
 	}
 </style>

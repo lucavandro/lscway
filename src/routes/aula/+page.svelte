@@ -10,12 +10,11 @@
 	import FullTimeTable from "./../FullTimeTable.svelte";
 	import FullTimeTableSwitch from "./../FullTimeTableSwitch.svelte";
 	export let data;
-
-	let currenHour,
+	let currentHour,
 		selectedClassroom,
 		showFullTimeTable = false,
 		interval;
-
+		
 	// Declarations
 	$: classroomWeekData =
 		data?.data?.filter((e) => e.aula === selectedClassroom) || [];
@@ -41,10 +40,14 @@
 		} else {
 			selectedClassroom = getPrefClassroom() || classrooms[0];
 		}
-		interval = setInterval(() => (currenHour = getHourNum()), 1000);
+		interval = setInterval(() => (currentHour = getHourNum()), 1000);
+		showFullTimeTable = JSON.parse(sessionStorage.getItem('lscway:aula:showFullTable'))
 	});
-
-	onDestroy(() => clearInterval(interval));
+	
+	onDestroy(() => {
+		clearInterval(interval)
+		sessionStorage.setItem('lscway:aula:showFullTable', JSON.stringify(showFullTimeTable))
+	});
 </script>
 
 <div>

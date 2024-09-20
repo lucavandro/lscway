@@ -33,7 +33,15 @@
                     {:else if field === "docente"}
                         <a href={`./docente?q=${rd[field]}`}>{rd[field]}</a>
                     {:else if field === "classe"}
-                        <a href={`./?q=${rd[field]}`}>{rd[field]}</a>
+                        {#if rd["classe"] === ""}
+                            {#if rd["materia"] === "INC"}
+                                {rd["materia"]}
+                            {:else}
+                                -
+                            {/if}
+                        {:else}
+                            <a href={`./?q=${rd[field]}`}>{rd[field]}</a>
+                        {/if}
                     {:else}
                         {rd[field]}
                     {/if}
@@ -47,20 +55,30 @@
         {#each fields as field}
             <td>
                 {#if field === "aula"}
-                    <a href={`./aula/?q=${rowData[0][field]}`}>{rowData[0][field]}</a>
-                    <hr>
-                    <a href={`./aula/?q=${rowData[1][field]}`}>{rowData[1][field]}</a>
+                    <a href={`./aula/?q=${rowData[0][field]}`}
+                        >{rowData[0][field]}</a
+                    >
+                    <hr />
+                    <a href={`./aula/?q=${rowData[1][field]}`}
+                        >{rowData[1][field]}</a
+                    >
                 {:else if field === "docente"}
-                    <a href={`./docente?q=${rowData[0][field]}`}>{rowData[0][field]}</a>
-                    <hr>
-                    <a href={`./docente?q=${rowData[1][field]}`}>{rowData[1][field]}</a>
+                    <a href={`./docente?q=${rowData[0][field]}`}
+                        >{rowData[0][field]}</a
+                    >
+                    <hr />
+                    <a href={`./docente?q=${rowData[1][field]}`}
+                        >{rowData[1][field]}</a
+                    >
                 {:else if field === "classe"}
-                    <a href={`./?q=${rowData[0][field]}`}>{rowData[0][field]}</a>
-                    <hr>
-                    <a href={`./?q=${rowData[1][field]}`}>{rowData[1][field]}</a>
+                    <a href={`./?q=${rowData[0][field]}`}>{rowData[0][field]}</a
+                    >
+                    <hr />
+                    <a href={`./?q=${rowData[1][field]}`}>{rowData[1][field]}</a
+                    >
                 {:else}
                     {rowData[0][field]}
-                    <hr>
+                    <hr />
                     {rowData[1][field]}
                 {/if}
             </td>

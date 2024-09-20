@@ -10,7 +10,7 @@
 	export let data;
 	let classes,
 		classrooms,
-		currenHour,
+		currentHour,
 		currenDay = getDay(),
 		teachers = [],
 		selectedClass,
@@ -44,11 +44,15 @@
 
 		interval = setInterval(() => {
 			currenDay = getDay();
-			currenHour = getHourNum();
+			currentHour = getHourNum();
 		}, 1000);
+		showFullTimeTable = JSON.parse(sessionStorage.getItem('lscway:classe:showFullTable'))
 	});
 
-	onDestroy(() => clearInterval(interval));
+	onDestroy(() => {
+		clearInterval(interval)
+		sessionStorage.setItem('lscway:classe:showFullTable', JSON.stringify(showFullTimeTable))
+	});
 </script>
 
 <div>
