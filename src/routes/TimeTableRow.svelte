@@ -95,7 +95,8 @@
 
 <style>
     tr.active th,
-    tr.active td {
+    tr.active td, 
+    tr.active td a {
         background-color: var(--pico-primary);
         color: white;
         font-weight: bold;

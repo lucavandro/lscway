@@ -2,6 +2,7 @@
 	import Header from "./Header.svelte";
 	import { getDay } from "$lib/dateutils.js";
 	import { onDestroy, onMount } from "svelte";
+    import Footer from "./Footer.svelte";
 
 	let day = getDay();
 	let intervalTimer;
@@ -39,9 +40,7 @@
 		<slot />
 	</main>
 
-	<footer>
-		<p>Developed with 💙 by Liceo Scientifico Cortese</p>
-	</footer>
+	<Footer />
 </div>
 
 <style>
@@ -61,17 +60,5 @@
 		box-sizing: border-box;
 	}
 
-	footer {
-		position: relative;
-		left: 0;
-		bottom: 0;
-		width: 100%;
-		padding: 12px;
-	}
 
-	footer p {
-		max-width: fit-content;
-		margin: auto;
-		padding: 6px 0;
-	}
 </style>
