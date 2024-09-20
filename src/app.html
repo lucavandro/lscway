@@ -20,6 +20,10 @@
 <body data-sveltekit-preload-data="hover">
 	<div style="display: contents">%sveltekit.body%</div>
 </body>
-
+<script>
+	if (typeof navigator.serviceWorker !== 'undefined') {
+		navigator.serviceWorker.register('service-worker.js')
+	}
+</script>
 
 </html>

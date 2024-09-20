@@ -10,6 +10,7 @@
     "theme_color": "#ffffff",
     "background_color": "#ffffff",
     "lang": "it-IT",
+    "dir": "ltr",
     "icons": [
         {
             "src": "icon-192.png",
@@ -39,17 +40,23 @@
     "shortcuts": [
         {
             "name": "Classe",
-            "url": "/"
+            "url": "/app/way/tmp/",
+            "icons": [{ "src": "classe.png", "sizes": "92x92" }]
         },
         {
             "name": "Docente",
-            "url": "/docente"
+            "url": "/app/way/tmp/docente",
+            "icons": [{ "src": "docente.png", "sizes": "92x92" }]
         },
         {
             "name": "Aula",
-            "url": "/aula"
+            "url": "/app/way/tmp/aula",
+            "icons": [{ "src": "aula.png", "sizes": "92x92" }]
         }
     ],
     "related_applications": [],
-    "prefer_related_applications": false
+    "prefer_related_applications": false,
+    "categories": [
+        "education"
+    ]
 }
