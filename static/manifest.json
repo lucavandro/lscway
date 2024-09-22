@@ -11,6 +11,12 @@
     "background_color": "#ffffff",
     "lang": "it-IT",
     "dir": "ltr",
+    "launch_handler": {
+        "client_mode": [
+            "focus-existing",
+            "auto"
+        ]
+    },
     "icons": [
         {
             "src": "icon-192.png",
@@ -35,23 +41,44 @@
             "sizes": "1290x2796",
             "type": "image/png",
             "description": "Schermata aula"
+        },
+        {
+            "src": "ss_3.png",
+            "sizes": "1592x1029",
+            "type": "image/png",
+            "description": "Schermata aula"
         }
     ],
     "shortcuts": [
         {
             "name": "Classe",
             "url": "/app/way/tmp/",
-            "icons": [{ "src": "classe.png", "sizes": "96x96" }]
+            "icons": [
+                {
+                    "src": "classe.png",
+                    "sizes": "96x96"
+                }
+            ]
         },
         {
             "name": "Docente",
             "url": "/app/way/tmp/docente",
-            "icons": [{ "src": "docente.png", "sizes": "96x96" }]
+            "icons": [
+                {
+                    "src": "docente.png",
+                    "sizes": "96x96"
+                }
+            ]
         },
         {
             "name": "Aula",
             "url": "/app/way/tmp/aula",
-            "icons": [{ "src": "aula.png", "sizes": "96x96" }]
+            "icons": [
+                {
+                    "src": "aula.png",
+                    "sizes": "96x96"
+                }
+            ]
         }
     ],
     "related_applications": [],
