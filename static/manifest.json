@@ -85,5 +85,13 @@
     "prefer_related_applications": false,
     "categories": [
         "education"
+    ],
+    "scope_extensions": [
+        {
+            "origin": "*.liceoscientificocortese.edu.it"
+        },
+        {
+            "origin": "liceoscientificocortese.edu.it"
+        }
     ]
 }
