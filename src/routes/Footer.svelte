@@ -1,4 +1,19 @@
-<div><a href="javascript:location.reload();">↻</a></div>
+<script>
+    let isLoading = false;
+    function reload(){
+        isLoading = true
+        setTimeout(()=>location.reload(), 1000)
+        
+    }
+</script>
+{#if isLoading}
+<div class="container">
+    <progress />
+</div>
+{:else}
+<div><button on:click={reload}>↻</button></div>
+{/if}
+
 <footer>
     <div>
         <p>Developed with 💙 by Liceo Scientifico Cortese</p>
