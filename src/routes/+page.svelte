@@ -18,7 +18,7 @@
 		interval;
 
 	// Declarations
-	$: classWeekData = data?.data?.filter((e) => e.classe === selectedClass);
+	$: classWeekData = data?.data?.filter((e) => e.classe === selectedClass && e.materia != "INCL");
 	$: classData = classWeekData?.filter((e) => e.day === currenDay);
 	$: teachers = data.docenti;
 	$: classes = data.classi.filter((e) => e != "");
