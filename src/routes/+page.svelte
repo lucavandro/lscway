@@ -19,7 +19,7 @@
 
 	// Declarations
 	$: classWeekData = data?.data?.filter((e) => e.classe === selectedClass);
-	$: classData = classWeekData?.filter((e) => e.day === currenDay);
+	$: classData = classWeekData?.filter((e) => e.day === currenDay && e.materia !== "INCL");
 	$: teachers = data.docenti;
 	$: classes = data.classi.filter((e) => e != "");
 	$: classrooms = data.aule;

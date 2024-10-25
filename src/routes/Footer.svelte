@@ -35,18 +35,6 @@
         padding: 6px 0;
     }
 
-    a {
-        font-size: xx-large;
-        text-decoration: none;
-        transform: rotate(90deg);
-        display: block;
-        width: fit-content;
-        margin: auto;
-    }
-    a:hover {
-        text-decoration: none;
-    }
-
     div {
         text-align: center;
     }
