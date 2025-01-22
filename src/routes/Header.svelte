@@ -3,6 +3,7 @@
 	import { onDestroy, onMount } from "svelte";
 	import PwaButton from "./PWAButton.svelte";
 	import Tabs from "./Tabs.svelte";
+	import GoogleSignin from './GoogleSignin.svelte'
 	let day, schoolHour, interval;
 
 	function updateTime() {
@@ -30,6 +31,7 @@
 			</ul>
 			<ul>
 				<li>{day}</li>
+				<li><GoogleSignin/></li>
 				<li>{schoolHour}</li>
 			</ul>
 		</nav>
