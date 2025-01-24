@@ -22,3 +22,20 @@ export async function getData(fetch){
 
     return data
 }
+
+export async function auth(email) {
+    const res = await fetch(
+        "https://www.liceoscientificocortese.edu.it/app/way/auth.php",
+        {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email: email })
+        }
+    );
+
+    const data = await res.json();
+    return data;
+}
