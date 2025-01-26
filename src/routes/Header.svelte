@@ -33,6 +33,7 @@
 				<li>{day}</li>
 				<li><GoogleSignin/></li>
 				<li>{schoolHour}</li>
+				<li><a href="signin">Accedi</a></li>
 			</ul>
 		</nav>
 		<Tabs></Tabs>
