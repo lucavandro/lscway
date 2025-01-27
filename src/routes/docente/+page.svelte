@@ -1,7 +1,7 @@
 <script>
 	import { onMount, onDestroy } from "svelte";
 	// Lib
-	import { getHourNum, getDay } from "$lib/dateutils.js";
+	import { getDay } from "$lib/dateutils.js";
 	import { getPrefTeacher, setPrefTeacher } from "$lib/utils.js";
 	import { page } from "$app/stores";
 	// Components

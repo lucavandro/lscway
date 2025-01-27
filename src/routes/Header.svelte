@@ -3,12 +3,17 @@
 	import { onDestroy, onMount } from "svelte";
 	import PwaButton from "./PWAButton.svelte";
 	import Tabs from "./Tabs.svelte";
-	import GoogleSignin from './GoogleSignin.svelte'
+	import { userEmail } from "$lib/stores.js";
+
 	let day, schoolHour, interval;
 
 	function updateTime() {
 		schoolHour = getSchoolHour();
 		day = getDay();
+	}
+
+	function logout() {
+		userEmail.set("");
 	}
 	updateTime();
 
@@ -31,9 +36,13 @@
 			</ul>
 			<ul>
 				<li>{day}</li>
-				<li><GoogleSignin/></li>
 				<li>{schoolHour}</li>
-				<li><a href="signin">Accedi</a></li>
+				{#if $userEmail}
+					<li><a on:click={logout}>Disconnetti</a></li>
+				{:else}
+					<li><a href="signin">Accedi</a></li>
+				{/if}
+				
 			</ul>
 		</nav>
 		<Tabs></Tabs>

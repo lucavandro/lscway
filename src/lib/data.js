@@ -39,3 +39,20 @@ export async function auth(email) {
     const data = await res.json();
     return data;
 }
+
+export async function confirm(email, code) {
+    const res = await fetch(
+        "https://www.liceoscientificocortese.edu.it/app/way/auth.php",
+        {
+            method: "POST",
+            mode: "cors",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email: email, code: code })
+        }
+    );
+
+    const data = await res.json();
+    return data;
+}

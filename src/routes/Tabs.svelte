@@ -1,6 +1,8 @@
 <script>
 	import { page } from "$app/stores";
 	import { base} from "$app/paths";
+	import { userEmail } from "$lib/stores.js";
+
 </script>
 
 <nav id="tabs">
@@ -22,6 +24,15 @@
 				>Aula</a
 			>
 		</li>
+		{#if $userEmail}
+			<li>
+				<a href="hotspot" class:active={$page.url.pathname === base + "/hotspot"}
+					>Hotspot</a
+				>
+			</li>
+		{/if}
+		
+		
 	</ul>
 </nav>
 
