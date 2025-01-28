@@ -7,7 +7,7 @@
 
 	// Components
 
-	let email = "lucavandro@lscortese.com",
+	let email = "",
 		code = "",
 		showConfirm = false,
 		errorMessage = "",
@@ -49,8 +49,10 @@
 </script>
 
 <div>
+	
 	<form on:submit={onSubmit}>
 		<fieldset>
+			<h4>Funzionalità riservata ai docenti</h4>
 			{#if !$userEmail}
 				<label>
 					Email
