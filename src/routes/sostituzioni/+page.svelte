@@ -1,11 +1,12 @@
 <script>
 	import { userEmail } from "$lib/stores.js";
 	import { goto } from "$app/navigation";
-	import { onMount } from "svelte";
+	import { onMount, onDestroy } from "svelte";
 
 	let sostituzioni = [];
 	let loading = false;
 	let error = null;
+	let interval;
 
 	// Funzione per ottenere la data odierna in formato YYYY-MM-DD
 	function getTodayDate() {
@@ -45,6 +46,14 @@
 			goto('/');
 		} else {
 			fetchSostituzioni();
+			// Aggiorna i dati ogni minuto (60000ms)
+			interval = setInterval(fetchSostituzioni, 60000);
+		}
+	});
+
+	onDestroy(() => {
+		if (interval) {
+			clearInterval(interval);
 		}
 	});
 </script>
