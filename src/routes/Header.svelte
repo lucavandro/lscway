@@ -3,7 +3,7 @@
 	import { onDestroy, onMount } from "svelte";
 	import PwaButton from "./PWAButton.svelte";
 	import Tabs from "./Tabs.svelte";
-	import { userEmail } from "$lib/stores.js";
+	import { userEmail, loadUserFromStorage } from "$lib/stores.js";
 
 	let day, schoolHour, interval;
 
@@ -20,6 +20,7 @@
 	// Lifecycle's events
 	onMount(() => {
 		interval = setInterval(updateTime, 1000);
+		loadUserFromStorage();
 	});
 
 	onDestroy(() => {
