@@ -1,8 +1,10 @@
 <script>
-    import { userEmail } from "$lib/stores.js";
+    import { userEmail, notificationPermission } from "$lib/stores.js";
     import { goto } from "$app/navigation";
     import { onMount, onDestroy } from "svelte";
     import { inviaConfermaSostituzione} from "$lib/data";
+    import { requestNotificationPermission } from "$lib/notifications.js";
+
     let sostituzioni = [];
     let loading = false;
     let error = null;
@@ -81,6 +83,10 @@
         }
     }
 
+    async function enableNotifications() {
+        await requestNotificationPermission();
+    }
+
     onMount(() => {
         // Reindirizza alla home se l'utente non è loggato
         if (!$userEmail) {
@@ -105,6 +111,24 @@
 
 <main class="container">
     {#if $userEmail}
+        <!-- Banner notifiche -->
+        {#if !$notificationPermission}
+            <article class="notification-banner">
+                <header>
+                    <strong>🔔 Abilita le notifiche</strong>
+                </header>
+                <p>
+                    Le notifiche ti aiutano a rimanere aggiornato sulle sostituzioni che richiedono conferma. 
+                    Riceverai un avviso quando ci sono sostituzioni non confermate per la giornata odierna.
+                </p>
+                <footer>
+                    <button on:click={enableNotifications} class="enable-notifications-btn">
+                        Abilita notifiche
+                    </button>
+                </footer>
+            </article>
+        {/if}
+
         {#if loading}
             <p aria-busy="true">Caricamento sostituzioni...</p>
         {:else if error}
@@ -346,6 +370,39 @@
         border-radius: var(--pico-border-radius);
         font-size: 0.875rem;
         margin-top: 0.5rem;
+    }
+
+    .notification-banner {
+        background: linear-gradient(135deg, var(--pico-primary) 0%, var(--pico-primary-hover) 100%);
+        color: var(--pico-primary-inverse);
+        border: none;
+        margin-bottom: 2rem;
+    }
+
+    .notification-banner header strong {
+        color: var(--pico-primary-inverse);
+        font-size: 1.1rem;
+    }
+
+    .notification-banner p {
+        margin: 1rem 0;
+        opacity: 0.9;
+    }
+
+    .enable-notifications-btn {
+        background-color: rgba(255, 255, 255, 0.2);
+        color: var(--pico-primary-inverse);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+        border-radius: var(--pico-border-radius);
+        padding: 0.5rem 1rem;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    .enable-notifications-btn:hover {
+        background-color: rgba(255, 255, 255, 0.3);
+        border-color: rgba(255, 255, 255, 0.5);
     }
 
     @media (max-width: 768px) {

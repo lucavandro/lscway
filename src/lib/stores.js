@@ -5,6 +5,7 @@ import { writable } from 'svelte/store'
 const stored = localStorage.getItem('user:email')
 
 export const userEmail = writable(stored )
+export const notificationPermission = writable(false);
 
 userEmail.subscribe(value => localStorage.setItem('user:email', value))
 
@@ -12,3 +13,5 @@ export const loadUserFromStorage = () => {
   const stored = localStorage.getItem('user:email')
   userEmail.set(stored)
 }
+
+
