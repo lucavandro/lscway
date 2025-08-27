@@ -4,6 +4,7 @@
     import { onMount, onDestroy } from "svelte";
     import { inviaConfermaSostituzione} from "$lib/data";
     import { requestNotificationPermission } from "$lib/notifications.js";
+    import { getTodayDate, isDateBefore } from "$lib/utils.js";
 
     let sostituzioni = [];
     let loading = false;
@@ -12,14 +13,12 @@
     let confirmingIds = new Set(); // Per tracciare quali sostituzioni sono in fase di conferma
     let errorMessages = {}; // Per tracciare errori specifici per ogni sostituzione
 
-    // Funzione per ottenere la data odierna in formato YYYY-MM-DD
-    function getTodayDate() {
-        const today = new Date();
-        return today.toISOString().split("T")[0];
-    }
 
     // Computed per filtrare le sostituzioni odierne
     $: sostituzioniOggi = sostituzioni.filter((s) => s.data === getTodayDate());
+
+    // Computed per filtrare le sostituzioni passate
+    $: sostituzioniPassate = sostituzioni.filter((s) => isDateBefore(s.data, getTodayDate()));
 
     async function fetchSostituzioni() {
         if (!$userEmail) return;
@@ -212,54 +211,52 @@
             </section>
 
             <!-- Sezione storico -->
-            {#if sostituzioni.length > 0}
+            {#if sostituzioniPassate.length > 0}
                 <section class="history-section">
                     <h2>Storico sostituzioni</h2>
-                    <p>Trovate {sostituzioni.length} sostituzioni</p>
-
-                    <div class="overflow-auto">
-                        <table>
-                            <thead>
-                                <tr>
-                                    <th>Data</th>
-                                    <th>Giorno</th>
-                                    <th>Ora</th>
-                                    <th>Classe</th>
-                                    <th>Aula</th>
-                                    <th>Docente Sostituto</th>
-                                    <th>Note</th>
-                                    <th>Stato</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {#each sostituzioni as sostituzione}
-                                    <tr>
-                                        <td>{sostituzione.data}</td>
-                                        <td>{sostituzione.giorno}</td>
-                                        <td>{sostituzione.ora}</td>
-                                        <td>{sostituzione.classe}</td>
-                                        <td>{sostituzione.aula}</td>
-                                        <td>{sostituzione.docSost}</td>
-                                        <td>{sostituzione.note || "-"}</td>
-                                        <td>
-                                            <span
-                                                class="badge"
-                                                class:accepted={sostituzione.accettato}
-                                                class:rejected={!sostituzione.accettato}
-                                            >
-                                                {sostituzione.accettato
-                                                    ? "Accettato"
-                                                    : "Rifiutato"}
-                                            </span>
-                                        </td>
-                                    </tr>
-                                {/each}
-                            </tbody>
-                        </table>
+                    <p>Trovate {sostituzioniPassate.length} sostituzioni passate</p>
+                    
+                    <div class="history-cards">
+                        {#each sostituzioniPassate as sostituzione}
+                            <article class="history-card">
+                                <header>
+                                    <div class="card-header-left">
+                                        <strong>{sostituzione.data} - {sostituzione.giorno}</strong>
+                                        <small>{sostituzione.ora}</small>
+                                    </div>
+                                    <span class="badge" class:accepted={sostituzione.accettato} class:rejected={!sostituzione.accettato}>
+                                        {sostituzione.accettato ? "Accettato" : "Rifiutato"}
+                                    </span>
+                                </header>
+                                <div class="card-content">
+                                    <div class="card-row">
+                                        <span class="label">Classe:</span>
+                                        <span class="value">{sostituzione.classe}</span>
+                                    </div>
+                                    <div class="card-row">
+                                        <span class="label">Aula:</span>
+                                        <span class="value">{sostituzione.aula}</span>
+                                    </div>
+                                    <div class="card-row">
+                                        <span class="label">Titolare:</span>
+                                        <span class="value">{sostituzione.docSost}</span>
+                                    </div>
+                                    {#if sostituzione.note}
+                                        <div class="card-row">
+                                            <span class="label">Note:</span>
+                                            <span class="value">{sostituzione.note}</span>
+                                        </div>
+                                    {/if}
+                                </div>
+                            </article>
+                        {/each}
                     </div>
                 </section>
-            {:else}
-                <p>Nessuna sostituzione trovata.</p>
+            {:else if sostituzioni.length > 0}
+                <section class="history-section">
+                    <h2>Storico sostituzioni</h2>
+                    <p>Nessuna sostituzione passata trovata.</p>
+                </section>
             {/if}
         {/if}
     {:else}
@@ -277,14 +274,109 @@
         margin: 1rem 0;
     }
 
+    .history-section {
+        margin-top: 2rem;
+    }
+
+    .history-cards {
+        display: grid;
+        gap: 1rem;
+        grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+        margin-top: 1rem;
+    }
+
+    .history-card {
+        background: var(--pico-background-color);
+        border: 1px solid var(--pico-muted-border-color);
+        border-radius: var(--pico-border-radius);
+        margin: 0;
+        transition: box-shadow 0.2s ease;
+    }
+
+    .history-card:hover {
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+
+    .history-card header {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        padding: 1rem 1rem 0.5rem 1rem;
+        margin: 0;
+        border-bottom: 1px solid var(--pico-muted-border-color);
+        gap: 1rem;
+    }
+
+    .card-header-left {
+        display: flex;
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+
+    .card-header-left strong {
+        font-size: 1rem;
+        margin: 0;
+    }
+
+    .card-header-left small {
+        color: var(--pico-muted-color);
+        font-size: 0.875rem;
+    }
+
+    .card-content {
+        padding: 1rem;
+    }
+
+    .card-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: flex-start;
+        margin-bottom: 0.5rem;
+        gap: 1rem;
+    }
+
+    .card-row:last-child {
+        margin-bottom: 0;
+    }
+
+    .card-row .label {
+        font-weight: 500;
+        color: var(--pico-muted-color);
+        flex-shrink: 0;
+        min-width: 120px;
+    }
+
+    .card-row .value {
+        text-align: right;
+        word-break: break-word;
+    }
+
+    /* Rimuovi gli stili della tabella obsoleti */
     .overflow-auto {
-        overflow-x: auto;
+        display: none;
     }
 
     table {
-        margin-top: 1rem;
-        width: 100%;
-        min-width: 800px;
+        display: none;
+    }
+
+    @media (max-width: 768px) {
+        .history-cards {
+            grid-template-columns: 1fr;
+        }
+        
+        .card-row {
+            align-items: flex-start;
+            gap: 0.25rem;
+        }
+        
+        .card-row .value {
+            text-align: left;
+        }
+        
+        .card-row .label {
+            min-width: auto;
+        }
     }
 
     .badge {
