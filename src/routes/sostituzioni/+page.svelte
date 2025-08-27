@@ -23,7 +23,7 @@
     async function fetchSostituzioni() {
         if (!$userEmail) return;
 
-        loading = true;
+        loading = true && sostituzioni.length > 0;
         error = null;
 
         try {
@@ -32,7 +32,7 @@
             );
             const data = await response.json();
 
-            if (data.success) {
+            if (data.success && data.data != sostituzioni) {
                 sostituzioni = data.data;
             } else {
                 error = "Errore nel recupero dei dati";
