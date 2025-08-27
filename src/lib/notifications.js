@@ -58,14 +58,14 @@ export function showSubstitutionNotification(substitution) {
 		requireInteraction: true,
 		data: {
 			substitutionId: substitution.id,
-			url: '/sostituzioni'
+			url: 'www.liceoscientificocortese.edu.it/app/way/tmp/sostituzioni'
 		}
 	});
 
 	notification.onclick = function(event) {
 		event.preventDefault();
 		window.focus();
-		window.location.href = '/sostituzioni';
+		window.location.href = 'www.liceoscientificocortese.edu.it/app/way/tmp/sostituzioni';
 		notification.close();
 	};
 
