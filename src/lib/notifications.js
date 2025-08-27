@@ -1,9 +1,22 @@
-
 import { userEmail, notificationPermission } from './stores.js';
 import { get } from 'svelte/store';
-
+import { validateEmail } from './utils.js';
 
 let notifiedSubstitutions = new Set();
+
+
+
+// Funzione per ottenere l'email validata
+function getValidatedUserEmail() {
+  const email = get(userEmail);
+  if (!validateEmail(email)) {
+    // Se l'email non è valida, pulisci lo store
+    userEmail.set(null);
+    localStorage.removeItem('user:email');
+    return null;
+  }
+  return email;
+}
 
 export async function requestNotificationPermission() {
 	if (!('Notification' in window)) {
@@ -94,10 +107,10 @@ export async function setupBackgroundSync() {
 // Funzione per sincronizzare l'email dell'utente con il service worker
 export function syncUserEmailWithServiceWorker() {
 	if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-		const currentEmail = get(userEmail);
+		const currentEmail = getValidatedUserEmail();
 		navigator.serviceWorker.controller.postMessage({
 			type: 'SET_USER_EMAIL',
-			email: currentEmail || null
+			email: currentEmail
 		});
 	}
 }

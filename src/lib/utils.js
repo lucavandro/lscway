@@ -32,4 +32,9 @@ export function getDataByHourIndex(data, hour){
     data.filter( e=> e.ora === hours[i])
 }
 
+// Funzione per validare l'email
+export function validateEmail(email) {
+  return email && typeof email === 'string' && email.endsWith('@lscortese.com');
+}
+
 
