@@ -52,20 +52,20 @@ export function showSubstitutionNotification(substitution) {
 
 	const notification = new Notification('Sostituzione non confermata', {
 		body: `Hai una sostituzione alle ${substitution.ora} per la classe ${substitution.classe} che necessita conferma.`,
-		icon: '/favicon.png',
-		badge: '/favicon.png',
+		icon: 'https://www.liceoscientificocortese.edu.it/app/way/tmp/favicon.png',
+		badge: 'https://www.liceoscientificocortese.edu.it/app/way/tmp/favicon.png',
 		tag: `substitution-${substitution.id}`,
 		requireInteraction: true,
 		data: {
 			substitutionId: substitution.id,
-			url: 'www.liceoscientificocortese.edu.it/app/way/tmp/sostituzioni'
+			url: 'https://www.liceoscientificocortese.edu.it/app/way/tmp/sostituzioni'
 		}
 	});
 
 	notification.onclick = function(event) {
 		event.preventDefault();
 		window.focus();
-		window.location.href = 'www.liceoscientificocortese.edu.it/app/way/tmp/sostituzioni';
+		window.location.href = 'https://www.liceoscientificocortese.edu.it/app/way/tmp/sostituzioni';
 		notification.close();
 	};
 
