@@ -373,7 +373,6 @@
     }
 
     .notification-banner {
-        background: linear-gradient(135deg, var(--pico-primary) 0%, var(--pico-primary-hover) 100%);
         color: var(--pico-primary-inverse);
         border: none;
         margin-bottom: 2rem;
@@ -389,21 +388,7 @@
         opacity: 0.9;
     }
 
-    .enable-notifications-btn {
-        background-color: rgba(255, 255, 255, 0.2);
-        color: var(--pico-primary-inverse);
-        border: 1px solid rgba(255, 255, 255, 0.3);
-        border-radius: var(--pico-border-radius);
-        padding: 0.5rem 1rem;
-        font-weight: 500;
-        cursor: pointer;
-        transition: all 0.2s;
-    }
 
-    .enable-notifications-btn:hover {
-        background-color: rgba(255, 255, 255, 0.3);
-        border-color: rgba(255, 255, 255, 0.5);
-    }
 
     @media (max-width: 768px) {
         table {
