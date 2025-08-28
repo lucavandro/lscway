@@ -96,6 +96,9 @@
 				<li>{day}</li>
 				<li>{schoolHour}</li>
 				{#if $userEmail}
+					<!-- svelte-ignore a11y-missing-attribute -->
+					<!-- svelte-ignore a11y-click-events-have-key-events -->
+					<!-- svelte-ignore a11y-no-static-element-interactions -->
 					<li><a on:click={logout}>Disconnetti</a></li>
 				{:else}
 					<li><a href="signin">Accedi</a></li>
