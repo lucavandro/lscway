@@ -88,10 +88,8 @@
     ],
     "scope_extensions": [
         {
-            "origin": "*.liceoscientificocortese.edu.it"
-        },
-        {
-            "origin": "liceoscientificocortese.edu.it"
+            "type": "origin",
+            "origin": "https://www.liceoscientificocortese.edu.it"
         }
     ]
 }
