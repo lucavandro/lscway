@@ -3,8 +3,9 @@
 	import { onDestroy, onMount } from "svelte";
 	import PwaButton from "./PWAButton.svelte";
 	import Tabs from "./Tabs.svelte";
-	import { userEmail, loadUserFromStorage } from "$lib/stores.js";
+	import { userEmail } from "$lib/stores.js";
 	import { requestNotificationPermission, checkSubstitutionsForNotifications, clearNotifiedSubstitutions, setupBackgroundSync, checkNotificationPermission, syncUserEmailWithServiceWorker, clearUserFromServiceWorker } from "$lib/notifications.js";
+	import { requestLogout } from "$lib/data.js";
 
 	let day, schoolHour, timeInterval, substitutionInterval;
 
@@ -29,7 +30,7 @@
 	}
 
 	function logout() {
-		userEmail.set("");
+		requestLogout();
 		clearNotifiedSubstitutions();
 		clearUserFromServiceWorker();
 		if (substitutionInterval) {
@@ -42,7 +43,7 @@
 	// Lifecycle's events
 	onMount(async () => {
 		timeInterval = setInterval(updateTime, 1000);
-		loadUserFromStorage();
+	
 		
 		// Controlla lo stato delle notifiche
 		checkNotificationPermission();
