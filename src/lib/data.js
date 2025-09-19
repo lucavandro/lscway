@@ -9,7 +9,7 @@ export async function getData(fetch){
         },
     );
     const data = await res.json();
-    debugger
+    console.log("User data:", data.user);
     if(data.user){
         userEmail.set(data.user);
     }

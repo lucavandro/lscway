@@ -39,7 +39,7 @@ function startPeriodicCheck() {
     if (userEmail) {
       checkSubstitutionsInBackground();
     }
-  }, 60000); // Ogni 60 secondi
+  }, 5000); // Ogni 60 secondi
 }
 
 function stopPeriodicCheck() {

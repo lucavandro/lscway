@@ -92,8 +92,8 @@
             goto("/");
         } else {
             fetchSostituzioni();
-            // Aggiorna i dati ogni minuto (60000ms)
-            interval = setInterval(fetchSostituzioni, 60000);
+            // Aggiorna i dati ogni minuto (5000ms)
+            interval = setInterval(fetchSostituzioni, 5000);
         }
     });
 

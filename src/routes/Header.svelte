@@ -56,7 +56,7 @@
 			await requestNotificationPermission();
 			syncUserEmailWithServiceWorker();
 			checkSubstitutions();
-			substitutionInterval = setInterval(checkSubstitutions, 60000);
+			substitutionInterval = setInterval(checkSubstitutions,5000);
 		}
 	});
 
@@ -74,7 +74,7 @@
 			syncUserEmailWithServiceWorker();
 			checkSubstitutions();
 			if (!substitutionInterval) {
-				substitutionInterval = setInterval(checkSubstitutions, 60000);
+				substitutionInterval = setInterval(checkSubstitutions,5000);
 			}
 		});
 	} else if (substitutionInterval) {
