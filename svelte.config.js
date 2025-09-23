@@ -11,7 +11,7 @@ const config = {
 			// these options are set automatically — see below
 			pages: 'build',
 			assets: 'build',
-			fallback: true,
+			fallback: undefined,
 			precompress: false,
 			strict: true
 		}),

@@ -5,7 +5,6 @@
         setTimeout(()=>location.reload(), 1000)
         
     }
-    import {userEmail} from "$lib/stores.js"
 
 </script>
 {#if isLoading}
@@ -17,7 +16,7 @@
 {/if}
 
 <footer>
-    <div><p>{$userEmail}</p>
+    <div>
         <p>Developed with 💙 by Liceo Scientifico Cortese</p>
     </div>
 </footer>
