@@ -21,5 +21,8 @@
 		"workbox-precaching": "^7.1.0",
 		"workbox-recipes": "^7.1.0"
 	},
-	"type": "module"
+	"type": "module",
+	"dependencies": {
+		"@svelte-share/button": "^0.0.1"
+	}
 }
