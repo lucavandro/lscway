@@ -35,7 +35,7 @@
     <th class="fixed">{hourIndex + 1}</th>
 
     {#each weekdays.slice(0, 6) as weekday}
-        {#if filterdRowData[weekday].length === 1}
+        {#if filterdRowData[weekday].length === 1 || filterdRowData[weekday].length > 2}
             <td
                 class:active={hourIndex === currentHour - 1 &&
                     currentDay === weekday}

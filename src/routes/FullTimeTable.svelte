@@ -30,6 +30,7 @@
             {/each}
         </tbody>
     </table>
+   
 </div>
 
 <style>

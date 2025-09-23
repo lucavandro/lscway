@@ -5,6 +5,7 @@
         setTimeout(()=>location.reload(), 1000)
         
     }
+
 </script>
 {#if isLoading}
 <div class="container">

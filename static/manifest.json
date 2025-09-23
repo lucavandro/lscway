@@ -46,6 +46,7 @@
             "src": "ss_3.png",
             "sizes": "1592x1029",
             "type": "image/png",
+            "form_factor": "wide",
             "description": "Schermata aula"
         }
     ],
@@ -88,10 +89,8 @@
     ],
     "scope_extensions": [
         {
-            "origin": "*.liceoscientificocortese.edu.it"
-        },
-        {
-            "origin": "liceoscientificocortese.edu.it"
+            "type": "origin",
+            "origin": "https://www.liceoscientificocortese.edu.it"
         }
     ]
 }

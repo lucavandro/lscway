@@ -32,4 +32,20 @@ export function getDataByHourIndex(data, hour){
     data.filter( e=> e.ora === hours[i])
 }
 
+// Funzione per validare l'email
+export function validateEmail(email) {
+  return email && typeof email === 'string' && email.endsWith('@lscortese.com');
+}
+
+// Funzione per ottenere la data odierna in formato YYYY-MM-DD
+export function getTodayDate() {
+  const today = new Date();
+  return today.toISOString().split('T')[0];
+}
+
+// Funzione per confrontare le date
+export function isDateBefore(date1, date2) {
+  return new Date(date1) < new Date(date2);
+}
+
 

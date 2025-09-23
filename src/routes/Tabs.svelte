@@ -30,6 +30,9 @@
 					>Hotspot</a
 				>
 			</li>
+			<li>
+				<a href="sostituzioni" class:active={$page.route.id === '/sostituzioni'}>Sostituzioni</a>
+			</li>
 		{/if}
 		
 		
