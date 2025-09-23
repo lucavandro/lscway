@@ -1,0 +1,2 @@
+
+SELECT sostituzioni.*, docenti.email FROM `sostituzioni` JOIN docenti ON docDest = docenti.nome WHERE docenti.email = 
