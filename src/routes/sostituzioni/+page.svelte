@@ -23,7 +23,6 @@
     async function fetchSostituzioni() {
         if (!$userEmail) return;
 
-        loading = true && sostituzioni.length > 0;
         error = null;
 
         try {
@@ -40,8 +39,6 @@
         } catch (err) {
             error = "Errore di connessione";
             console.error("Errore fetch sostituzioni:", err);
-        } finally {
-            loading = false;
         }
     }
 
@@ -128,9 +125,7 @@
             </article>
         {/if}
 
-        {#if loading}
-            <p aria-busy="true">Caricamento sostituzioni...</p>
-        {:else if error}
+        {#if error}
             <article class="error">
                 <p>{error}</p>
                 <button on:click={fetchSostituzioni}>Riprova</button>

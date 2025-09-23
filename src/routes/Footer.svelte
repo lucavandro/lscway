@@ -12,7 +12,10 @@
     <progress />
 </div>
 {:else}
-<div><button on:click={reload}>↻</button></div>
+<div>
+    <button on:click={reload}>↻</button>
+    <a role="button" href="qr"><img width="18" src="/app/way/tmp/qr-icon.png" alt=""></a>
+</div>
 {/if}
 
 <footer>
