@@ -4,12 +4,13 @@
     export let hourIndex;
     import { hours, getHourNum } from "$lib/dateutils.js";
     import { onMount, onDestroy } from "svelte";
+    import { inclusioneInFondo } from "$lib/utils.js";
 
     let currentHour = getHourNum();
     let interval;
 
     $: hour = hours[hourIndex];
-    $: rowData = data.filter((e) => e.ora == hour);
+    $: rowData = data.filter((e) => e.ora == hour).sort(inclusioneInFondo);
 
     onMount(() => {
         interval = setInterval(() => {

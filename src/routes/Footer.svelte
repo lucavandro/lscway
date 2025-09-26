@@ -1,45 +1,78 @@
 <script>
-    let isLoading = false;
-    function reload(){
-        isLoading = true
-        setTimeout(()=>location.reload(), 1000)
-        
-    }
-
+  let isLoading = false;
+  function reload() {
+    isLoading = true;
+    setTimeout(() => location.reload(), 1000);
+  }
+  import ShareIcon from "../icons/ShareIcon.svelte";
+  import ReloadIcon from "../icons/ReloadIcon.svelte";
+  import { page } from "$app/stores";
+  import { base } from "$app/paths";
 </script>
+
 {#if isLoading}
-<div class="container">
+  <div class="container">
     <progress />
-</div>
+  </div>
 {:else}
-<div>
-    <button on:click={reload}>↻</button>
-    <a role="button" href="qr"><img width="18" src="/app/way/tmp/qr-icon.png" alt=""></a>
-</div>
+  <div></div>
 {/if}
 
 <footer>
-    <div>
-        <p>Developed with 💙 by Liceo Scientifico Cortese</p>
-    </div>
+  {#if isLoading}
+    <progress />
+  {/if}
+  <div class="container">
+    <button on:click={reload}>
+      <ReloadIcon />
+      <div>Ricarica</div>
+    </button>
+    <a
+      role="button"
+      href="qr"
+      class:active={$page.url.pathname === base + "/qr"}
+    >
+      <ShareIcon />
+      <div>Condividi</div>
+    </a>
+  </div>
 </footer>
 
 <style>
-    footer {
-        position: relative;
-        left: 0;
-        bottom: 0;
-        width: 100%;
-        padding: 12px;
-    }
+  footer {
+    position: fixed;
+    left: 0;
+    bottom: 0;
+    width: 100%;
+    background-color: var(--pico-muted-border-color);
+  }
 
-    footer p {
-        max-width: fit-content;
-        margin: auto;
-        padding: 6px 0;
+  footer .container {
+    display: flex;
+    justify-content: space-around;
+  }
+  footer button,
+  footer [role="button"] {
+    background: none;
+    border: none;
+    font-size: 0.7em;
+    cursor: pointer;
+    color: var(--pico-primary-background);
+    padding: 10px 6px;
+  }
+  @media (prefers-color-scheme: dark) {
+    footer button,
+    footer [role="button"] {
+      color: white;
     }
+  }
+  div {
+    text-align: center;
+  }
+  a.active {
+		font-weight: bold;
+		color: var(--pico-primary);
+	}
 
-    div {
-        text-align: center;
-    }
+   
 </style>

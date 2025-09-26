@@ -5,18 +5,18 @@
     import { getDay, getHourNum } from "$lib/dateutils.js";
     import { onMount, onDestroy } from "svelte";
     import { weekdays } from "$lib/dateutils.js";
-
+    import { inclusioneInFondo } from "$lib/utils.js";
     let currentDay = getDay();
     let currentHour = getHourNum();
     let interval;
-
+ 
     $: filterdRowData = {
-        LUN: rowData.filter((e) => e.day === "LUN"),
-        MAR: rowData.filter((e) => e.day === "MAR"),
-        MER: rowData.filter((e) => e.day === "MER"),
-        GIO: rowData.filter((e) => e.day === "GIO"),
-        VEN: rowData.filter((e) => e.day === "VEN"),
-        SAB: rowData.filter((e) => e.day === "SAB"),
+        LUN: rowData.filter((e) => e.day === "LUN").sort(inclusioneInFondo),
+        MAR: rowData.filter((e) => e.day === "MAR").sort(inclusioneInFondo),
+        MER: rowData.filter((e) => e.day === "MER").sort(inclusioneInFondo),
+        GIO: rowData.filter((e) => e.day === "GIO").sort(inclusioneInFondo),
+        VEN: rowData.filter((e) => e.day === "VEN").sort(inclusioneInFondo),
+        SAB: rowData.filter((e) => e.day === "SAB").sort(inclusioneInFondo),
     };
 
     onMount(() => {
@@ -35,13 +35,13 @@
     <th class="fixed">{hourIndex + 1}</th>
 
     {#each weekdays.slice(0, 6) as weekday}
-        {#if filterdRowData[weekday].length === 1 || filterdRowData[weekday].length > 2}
+        {#if filterdRowData[weekday].length > 0}
             <td
                 class:active={hourIndex === currentHour - 1 &&
                     currentDay === weekday}
             >
-                {#each fields as field}
-                    <div>{filterdRowData[weekday][0][field]}</div>
+                {#each filterdRowData[weekday] as entry}
+                    <div><b>{entry["docente"]}</b> ({entry["materia"]})</div>
                 {/each}
             </td>
         {:else if filterdRowData[weekday].length === 2}
