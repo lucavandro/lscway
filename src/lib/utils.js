@@ -49,3 +49,5 @@ export function isDateBefore(date1, date2) {
 }
 
 
+export    const inclusioneInFondo = (a, b) => a.materia === "INC" ? 1 : -1
+

@@ -4,12 +4,13 @@
     export let hourIndex;
     import { hours, getHourNum } from "$lib/dateutils.js";
     import { onMount, onDestroy } from "svelte";
+    import { inclusioneInFondo } from "$lib/utils.js";
 
     let currentHour = getHourNum();
     let interval;
 
     $: hour = hours[hourIndex];
-    $: rowData = data.filter((e) => e.ora == hour);
+    $: rowData = data.filter((e) => e.ora == hour).sort(inclusioneInFondo);
 
     onMount(() => {
         interval = setInterval(() => {
@@ -49,39 +50,29 @@
             {/each}
         </tr>
     {/each}
-{:else if rowData.length == 2}
+{:else if rowData.length > 1}
     <tr class:active={hourIndex === currentHour - 1}>
         <th>{hourIndex + 1}</th>
         {#each fields as field}
             <td>
-                {#if field === "aula"}
-                    <a href={`./aula/?q=${rowData[0][field]}`}
-                        >{rowData[0][field]}</a
-                    >
-                    <hr />
-                    <a href={`./aula/?q=${rowData[1][field]}`}
-                        >{rowData[1][field]}</a
-                    >
-                {:else if field === "docente"}
-                    <a href={`./docente?q=${rowData[0][field]}`}
-                        >{rowData[0][field]}</a
-                    >
-                    <hr />
-                    <a href={`./docente?q=${rowData[1][field]}`}
-                        >{rowData[1][field]}</a
-                    >
-                {:else if field === "classe"}
-                    <a href={`./?q=${rowData[0][field]}`}>{rowData[0][field]}</a
-                    >
-                    <hr />
-                    <a href={`./?q=${rowData[1][field]}`}>{rowData[1][field]}</a
-                    >
-                {:else}
-                    {rowData[0][field]}
-                    <hr />
-                    {rowData[1][field]}
-                {/if}
-            </td>
+             
+                    {#each rowData as rd, index}
+                        {#if field === "aula"}
+                        <a href={`./aula?q=${rd[field]}`}>{rd[field]}   </a>
+                        {:else if field === "docente"}
+                        <a href={`./docente?q=${rd[field]}`}>{rd[field]}   </a>
+                        {:else if field === "classe"}
+                        <a href={`./?q=${rd[field]}`}>{rd[field]}   </a>
+                        {:else}
+                        {rd[field]}   
+                        {/if}
+                                
+                    
+                        {#if index < rowData.length - 1 && field !== 'aula'}
+                            <hr />
+                        {/if}
+                    {/each}
+                
         {/each}
     </tr>
 {:else}
