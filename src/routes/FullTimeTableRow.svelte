@@ -1,6 +1,7 @@
 <script>
     export let rowData = [];
     export let hourIndex;
+    export let fields;
     import { getDay, getHourNum } from "$lib/dateutils.js";
     import { onMount, onDestroy } from "svelte";
     import { weekdays } from "$lib/dateutils.js";
@@ -17,11 +18,11 @@
         VEN: rowData.filter((e) => e.day === "VEN").sort(inclusioneInFondo),
         SAB: rowData.filter((e) => e.day === "SAB").sort(inclusioneInFondo),
     };
-    function singleClassroomExtraction(dayData) {
+    function singleInfoExtraction(dayData, field) {
         let classrooms = new Set();
         dayData.forEach((entry) => {
-            if (entry["aula"]) {
-                classrooms.add(entry["aula"]);
+            if (entry[field]) {
+                classrooms.add(entry[field]);
             }
         });
         return Array.from(classrooms).join(", ");
@@ -47,11 +48,18 @@
                 class:active={hourIndex === currentHour - 1 &&
                     currentDay === weekday}
             >
+            {#if fields.includes("docente")}
                 {#each filterdRowData[weekday] as entry}
                     <div><b>{entry["docente"]}</b> ({entry["materia"]})</div>
                 {/each}
-                <div>{singleClassroomExtraction(filterdRowData[weekday])}</div>
-            </td>
+            {/if}
+            {#if fields.includes("classe")}
+            <div>{singleInfoExtraction(filterdRowData[weekday], "classe")}</div>
+            {/if} 
+            {#if fields.includes("aula")}
+                    <div>{singleInfoExtraction(filterdRowData[weekday], "aula")}</div>
+            {/if} 
+        </td>
         
         {:else}
             <td>-</td>
