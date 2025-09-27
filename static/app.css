@@ -38,18 +38,20 @@ td hr{
 	height: 18px;
 	display: inline-block;
 	vertical-align: middle;
-	margin-bottom: 5px;
+	margin-bottom: 7px;
 }
 .icon path {
 	fill: var(--pico-primary);
+	stroke: var(--pico-primary);
 }
 
 @media (prefers-color-scheme: dark) {
 	.icon path {
 		fill: var(--pico-color);
+		stroke: var(--pico-color);
 	}
 }
 
  a.active .icon path {
       fill: var(--pico-primary);
-    }   
+      stroke: var(--pico-primary);}

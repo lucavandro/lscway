@@ -6,6 +6,7 @@
   }
   import ShareIcon from "../icons/ShareIcon.svelte";
   import ReloadIcon from "../icons/ReloadIcon.svelte";
+  import StarIcon from "../icons/StarIcon.svelte";
   import { page } from "$app/stores";
   import { base } from "$app/paths";
 </script>
@@ -35,6 +36,14 @@
       <ShareIcon />
       <div>Condividi</div>
     </a>
+    <a
+      role="button"
+      href="link"
+      class:active={$page.url.pathname === base + "/link"}
+    >
+      <StarIcon />
+      <div>Link utili</div>
+    </a>
   </div>
 </footer>
 
@@ -55,7 +64,7 @@
   footer [role="button"] {
     background: none;
     border: none;
-    font-size: 0.7em;
+    font-size: 0.8em;
     cursor: pointer;
     color: var(--pico-primary-background);
     padding: 10px 6px;
