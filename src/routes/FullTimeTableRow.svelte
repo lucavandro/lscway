@@ -81,4 +81,6 @@
         font-size: 0.75rem;
         white-space: nowrap;
     }
+
+
 </style>

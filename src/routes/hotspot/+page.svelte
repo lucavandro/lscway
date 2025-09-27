@@ -72,7 +72,7 @@
 	{:else}
 		<p>Non ci sono hotspot per questa aula</p>
 	{/if}
-	<p>Ci sono errori o non hai trovato il codice?Segui questa procedura</p> 
+	<p>Ci sono errori o non hai trovato il codice? Segui questa procedura</p> 
 	<ul>
 		<li>Dalla schermata iniziale della LIM seleziona la voce <b>"Multischermo"</b> o <b>"Mirroring"</b></li>
 		<li>Fai una foto di questa schermata e inviala <a href="mailto:lucavandro@lscortese.com">lucavandro@lscortese.com</a></li>

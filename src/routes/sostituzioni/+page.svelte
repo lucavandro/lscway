@@ -346,14 +346,7 @@
         word-break: break-word;
     }
 
-    /* Rimuovi gli stili della tabella obsoleti */
-    .overflow-auto {
-        display: none;
-    }
-
-    table {
-        display: none;
-    }
+    
 
     @media (max-width: 768px) {
         .history-cards {
@@ -476,15 +469,4 @@
     }
 
 
-
-    @media (max-width: 768px) {
-        table {
-            font-size: 0.875rem;
-        }
-
-        th,
-        td {
-            padding: 0.5rem 0.25rem;
-        }
-    }
 </style>

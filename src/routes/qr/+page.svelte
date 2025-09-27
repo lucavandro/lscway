@@ -2,7 +2,7 @@
     <img src="/app/way/tmp/qr.png" alt="">
     {#if canShare}
     <button on:click={share}>Condividi</button>
-    <a role="button" href="{appURL}qr.png" download="QR_WAY_CORTES.png">Scarica QR Code</a>
+    <a role="button" href="{appURL}qr.png" download="QR_WAY_CORTESE.png">Scarica QR Code</a>
     {:else}
     <input type="text" readonly value="https://www.liceoscientificocortese.edu.it/app/way/tmp/">
      <button on:click="{() => {navigator.clipboard.writeText('https://www.liceoscientificocortese.edu.it/app/way/tmp/'); showIns = true;}}">Copia link</button>
