@@ -36,6 +36,7 @@
       <ShareIcon />
       <div>Condividi</div>
     </a>
+    <!--
     <a
       role="button"
       href="link"
@@ -44,6 +45,7 @@
       <StarIcon />
       <div>Link utili</div>
     </a>
+    -->
   </div>
 </footer>
 
