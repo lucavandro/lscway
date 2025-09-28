@@ -26,7 +26,7 @@
   <div class="container">
     <button on:click={reload}>
       <ReloadIcon />
-      <div>Ricarica</div>
+      <div>Aggiorna</div>
     </button>
     <a
       role="button"

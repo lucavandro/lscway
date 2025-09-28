@@ -12,7 +12,7 @@
 
 	// Declarations
 
-	$: classrooms = data.aule.filter((e) => e != "");
+	$: classrooms = Object.keys(hotspot).map((name) => name.includes("_")? name.split("_")[0]: name);	
 	$: classroomHotspot = filterByPrefix(selectedClassroom);
 
 	function filterByPrefix(prefix) {
@@ -63,7 +63,7 @@
 					{#each Object.entries(classroomHotspot) as [name, code]}
 						<tr>
 							<td>{name}</td>
-							<td>{code}</td>
+							<td class="code">{code}</td>
 						</tr>
 					{/each}
 				</tbody>
@@ -72,12 +72,18 @@
 	{:else}
 		<p>Non ci sono hotspot per questa aula</p>
 	{/if}
-	<p>Ci sono errori o non hai trovato il codice? Segui questa procedura</p> 
+	<h5>Ci sono errori o non hai trovato il codice?</h5>
+	<p> Segui questa procedura:</p> 
 	<ul>
 		<li>Dalla schermata iniziale della LIM seleziona la voce <b>"Multischermo"</b> o <b>"Mirroring"</b></li>
-		<li>Fai una foto di questa schermata e inviala <a href="mailto:lucavandro@lscortese.com">lucavandro@lscortese.com</a></li>
+		<li>Fai una foto e inviala <a href="mailto:lucavandro@lscortese.com">lucavandro@lscortese.com</a></li>
 		<li>Se guardi bene nella schermata dovresti indivuiduare il codice corretto
 		</li>
 	</ul>
 	
 </div>
+<style>
+	.code{
+		text-transform: none;
+	}
+</style>

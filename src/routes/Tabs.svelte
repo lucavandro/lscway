@@ -1,83 +1,78 @@
 <script>
-	import { page } from "$app/stores";
-	import { base} from "$app/paths";
-	import { userEmail } from "$lib/stores.js";
-
+  import { page } from "$app/stores";
+  import { base } from "$app/paths";
+  import { userEmail } from "$lib/stores.js";
 </script>
 
 <nav id="tabs">
-	<ul>
-		<li>
-			<a href="." class:active={$page.url.pathname === base + "/"}
-				>Classe</a
-			>
-		</li>
-		<li>
-			<a
-				href="docente"
-				class:active={$page.url.pathname === base + "/docente"}
-				>Docente</a
-			>
-		</li>
-		<li>
-			<a href="aula" class:active={$page.url.pathname === base + "/aula"}
-				>Aula</a
-			>
-		</li>
-		{#if $userEmail}
-			<li>
-				<a href="hotspot" class:active={$page.url.pathname === base + "/hotspot"}
-					>Hotspot</a
-				>
-			</li>
-			<li>
-				<a href="sostituzioni" class:active={$page.route.id === '/sostituzioni'}>Sostituzioni</a>
-			</li>
-		{/if}
-		
-		
-	</ul>
+  <ul>
+    <li>
+      <a href="." class:active={$page.url.pathname === base + "/"}>Classe</a>
+    </li>
+    <li>
+      <a href="docente" class:active={$page.url.pathname === base + "/docente"}
+        >Docente</a
+      >
+    </li>
+    <li>
+      <a href="aula" class:active={$page.url.pathname === base + "/aula"}
+        >Aula</a
+      >
+    </li>
+    {#if $userEmail}
+      <li>
+        <a href="sostituzioni" class:active={$page.route.id === "/sostituzioni"}
+          >Sostituzioni</a
+        >
+      </li>
+      <li>
+        <a
+          href="hotspot"
+          class:active={$page.url.pathname === base + "/hotspot"}>Hotspot</a
+        >
+      </li>
+    {/if}
+  </ul>
 </nav>
 
 <style>
-	/* Stile di base per il contenitore dei tab */
-	#tabs {
-		display: flex;
-		justify-content: space-around;
-	}
+  /* Stile di base per il contenitore dei tab */
+  #tabs {
+    display: flex;
+    justify-content: space-around;
+  }
 
-	/* Rimuove lo stile predefinito della lista */
-	#tabs ul {
-		list-style-type: none;
-		padding: 0;
-		margin: 0;
-		display: flex;
-		width: 100%;
-	}
+  /* Rimuove lo stile predefinito della lista */
+  #tabs ul {
+    list-style-type: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    width: 100%;
+  }
 
-	/* Stile per ogni singolo tab */
-	#tabs li {
-		flex: 1;
-		text-align: center;
-		padding-bottom: 8px;
-	}
+  /* Stile per ogni singolo tab */
+  #tabs li {
+    flex: 1;
+    text-align: center;
+    padding-top: 8px;
+    padding-bottom: 8px;
+  }
 
-	/* Stile per i link all'interno dei tab */
-	#tabs a {
-		display: flex;
-		flex-direction: column;
-		align-items: center;
-		text-decoration: none;
-		border-radius: 0;
-		color: var(--pico-color)
-	}
+  /* Stile per i link all'interno dei tab */
+  #tabs a {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    border-radius: 0;
+    color: var(--pico-color);
+  }
 
-
-
-	/* Stile per il tab attivo */
-	#tabs .active {
-		font-weight: bold;
-		border-bottom: 2px solid var(--pico-color);
-		color: var(--pico-color);
-	}
+  /* Stile per il tab attivo */
+  #tabs .active {
+    font-weight: bold;
+    border-bottom: 2px solid var(--pico-color);
+    color: var(--pico-color);
+  }
 </style>

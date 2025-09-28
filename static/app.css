@@ -8,6 +8,7 @@ table td a {
 
 .app {
 	min-height: 100svh;
+	padding-bottom: 80px;
 }
 
 .error {
