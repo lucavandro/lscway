@@ -50,7 +50,7 @@
             >
             {#if fields.includes("docente")}
                 {#each filterdRowData[weekday] as entry}
-                    <div><b>{entry["docente"]}</b> ({entry["materia"]})</div>
+                    <div><b>{entry["docente_abbr"] || entry["docente"]}</b> ({entry["materia"]})</div>
                 {/each}
             {/if}
             {#if fields.includes("classe")}
