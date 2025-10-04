@@ -52,7 +52,10 @@
                 {#each filterdRowData[weekday] as entry}
                     <div><b>{entry["docente_abbr"] || entry["docente"]}</b> ({entry["materia"]})</div>
                 {/each}
+            {:else if fields.includes("materia") && singleInfoExtraction(filterdRowData[weekday], "materia") === "POT" }
+                 <div>{singleInfoExtraction(filterdRowData[weekday], "materia")}</div>
             {/if}
+           
             {#if fields.includes("classe")}
             <div>{singleInfoExtraction(filterdRowData[weekday], "classe")}</div>
             {/if} 
