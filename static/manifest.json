@@ -6,7 +6,7 @@
     "start_url": "/app/way/tmp",
     "scope": "/app/way/tmp",
     "display": "standalone",
-    "orientation": "portrait",
+    "orientation": "any",
     "theme_color": "#ffffff",
     "background_color": "#ffffff",
     "lang": "it-IT",
