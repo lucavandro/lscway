@@ -76,9 +76,7 @@
 	<p> Segui questa procedura:</p> 
 	<ul>
 		<li>Dalla schermata iniziale della LIM seleziona la voce <b>"Multischermo"</b> o <b>"Mirroring"</b></li>
-		<li>Fai una foto e inviala <a href="mailto:lucavandro@lscortese.com">lucavandro@lscortese.com</a></li>
-		<li>Se guardi bene nella schermata dovresti indivuiduare il codice corretto
-		</li>
+		<li>Se guardi bene nella schermata dovresti indivuiduare il codice corretto		</li>
 	</ul>
 	
 </div>
