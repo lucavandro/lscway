@@ -56,3 +56,13 @@ td hr{
  a.active .icon path {
       fill: var(--pico-primary);
       stroke: var(--pico-primary);}
+
+
+@media screen and (max-width: 700px) and (orientation: landscape) {
+	html{
+		zoom: 0.6;
+	}
+	header .container {
+		max-width: calc(100% - 80px);
+	}
+}

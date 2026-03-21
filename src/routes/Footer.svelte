@@ -11,13 +11,7 @@
   import { base } from "$app/paths";
 </script>
 
-{#if isLoading}
-  <div class="container">
-    <progress />
-  </div>
-{:else}
-  <div></div>
-{/if}
+
 
 <footer>
   {#if isLoading}
