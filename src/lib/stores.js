@@ -15,7 +15,10 @@ export const isTeacher = writable(false);
 
 userEmail.subscribe((value) => {
     const username = value ? value.split('@')[0] : null;
-    isTeacher.set(username && !username.contains('.'));
+    if(username){
+        console.log("Username:", username);
+        isTeacher.set(username && !username.includes('.'));
+    }
 })
 export const notificationPermission = writable(false);
 

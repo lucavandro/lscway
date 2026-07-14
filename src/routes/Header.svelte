@@ -3,7 +3,7 @@
 	import { onDestroy, onMount } from "svelte";
 	import PwaButton from "./PWAButton.svelte";
 	import Tabs from "./Tabs.svelte";
-	import { userEmail } from "$lib/stores.js";
+	import { userEmail, isTeacher } from "$lib/stores.js";
 	import { requestNotificationPermission, checkSubstitutionsForNotifications, clearNotifiedSubstitutions, setupBackgroundSync, checkNotificationPermission, syncUserEmailWithServiceWorker, clearUserFromServiceWorker } from "$lib/notifications.js";
 	import { requestLogout } from "$lib/data.js";
 
@@ -94,6 +94,7 @@
 				<li><PwaButton /></li>
 			</ul>
 			<ul>
+				<li><strong>{$isTeacher ? 'Docente' : 'Studente'}</strong></li>
 				<li>{day}</li>
 				<li>{schoolHour}</li>
 				{#if $userEmail}

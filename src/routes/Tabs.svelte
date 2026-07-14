@@ -1,7 +1,7 @@
 <script>
   import { page } from "$app/stores";
   import { base } from "$app/paths";
-  import { userEmail } from "$lib/stores.js";
+  import { userEmail, isTeacher } from "$lib/stores.js";
 </script>
 
 <nav id="tabs">
@@ -19,7 +19,7 @@
         >Aula</a
       >
     </li>
-    {#if $userEmail}
+    {#if $isTeacher}
       <li>
         <a href="sostituzioni" class:active={$page.route.id === "/sostituzioni"}
           >Sostituzioni</a
