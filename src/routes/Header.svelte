@@ -5,7 +5,6 @@
 	import Tabs from "./Tabs.svelte";
 	import { userEmail, isTeacher } from "$lib/stores.js";
 	import { requestNotificationPermission, checkSubstitutionsForNotifications, clearNotifiedSubstitutions, setupBackgroundSync, checkNotificationPermission, syncUserEmailWithServiceWorker, clearUserFromServiceWorker } from "$lib/notifications.js";
-	import { requestLogout } from "$lib/data.js";
 
 	let day, schoolHour, timeInterval, substitutionInterval;
 
@@ -30,7 +29,7 @@
 	}
 
 	function logout() {
-		requestLogout();
+		userEmail.set(null);
 		clearNotifiedSubstitutions();
 		clearUserFromServiceWorker();
 		if (substitutionInterval) {

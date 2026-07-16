@@ -1,4 +1,4 @@
-import { userEmail, isTeacher } from "./stores";
+import { userEmail } from "./stores";
 
 
 function decodeGoogleJwt(token) {
@@ -77,63 +77,6 @@ export async function googleAuth(credential) {
             message: error.message || "Impossibile completare l'accesso con Google."
         };
     }
-}
-
-export async function auth(email) {
-    const res = await fetch(
-        "https://www.liceoscientificocortese.edu.it/app/way/auth.php",
-        {
-            method: "POST",
-            mode: "cors",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ email: email })
-        }
-    );
-
-    const data = await res.json();
-    return data;
-}
-
-export async function confirm(email, code) {
-    const res = await fetch(
-        "https://www.liceoscientificocortese.edu.it/app/way/auth.php",
-        {
-            method: "POST",
-            mode: "cors",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ email: email, code: code })
-        }
-    );
-
-    const data = await res.json();
-    if(data.success){
-        userEmail.set(email);
-    }
-    return data;
-}
-
-export async function requestLogout() {
-    const res = await fetch(
-        "https://www.liceoscientificocortese.edu.it/app/way/auth.php",
-        {
-            method: "POST",
-            mode: "cors",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({ action: "logout" })
-        }
-    );
-
-    const data = await res.json();
-    if(data.success){
-        userEmail.set(null);
-    }
-    return data;
 }
 
 export async function inviaConfermaSostituzione(id){
