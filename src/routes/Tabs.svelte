@@ -10,10 +10,10 @@
       <li>
         <a href="." class:active={$page.url.pathname === base + "/"}>Classe</a>
       </li>
-      <li>
-        <a
+      <li >
+        <a class:active={$page.url.pathname === (base + "/docente")}
           href="docente"
-          class:active={$page.url.pathname === base + "/docente"}>Docente</a
+          >Docente</a
         >
       </li>
       <li>
@@ -53,9 +53,15 @@
     flex: 1;
     text-align: center;
     padding: 8px 0;
+    
   }
 
-  #tabs a,
+  #tabs li a{
+    color: var(--pico-color);
+  }
+  #tabs li a:hover {
+    text-decoration: none;
+  }
   #tabs .active {
     font-weight: bold;
     border-bottom: 2px solid var(--pico-color);

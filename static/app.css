@@ -12,12 +12,19 @@ table td a {
 }
 
 .error {
-	background: red;
+	background: var(--pico-del-color);
 
 }
 
+.red{
+	color: var(--pico-del-color);
+}
+.green{
+	color: var(--pico-ins-color);
+}
+
 .success {
-	background: green;
+	background: var(--pico-ins-color);
 }
 
 .error, .success {

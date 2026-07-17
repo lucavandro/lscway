@@ -11,12 +11,12 @@ const getInitialUserEmail = () => {
 
 export const userEmail = writable(getInitialUserEmail());
 export const isTeacher = writable(false);
+export const isLoading = writable(false);
 
 
 userEmail.subscribe((value) => {
     const username = value ? value.split('@')[0] : null;
     if(username){
-        console.log("Username:", username);
         isTeacher.set(username && !username.includes('.'));
     }
 })

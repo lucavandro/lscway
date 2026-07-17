@@ -7,6 +7,8 @@
   import Tabs from "./Tabs.svelte";
   import HeaderMenuPanel from "./HeaderMenuPanel.svelte";
   import { userEmail, isTeacher } from "$lib/stores.js";
+  import ShareIcon from "$icons/ShareIcon.svelte";
+  import { isLoading } from "$lib/stores.js";
   import {
     requestNotificationPermission,
     checkSubstitutionsForNotifications,
@@ -55,7 +57,7 @@
   // Lifecycle's events
   onMount(async () => {
     timeInterval = setInterval(updateTime, 1000);
-
+    isLoading.set(false);
     // Controlla lo stato delle notifiche
     checkNotificationPermission();
 
@@ -105,6 +107,11 @@
   $: if ($page.url.pathname) {
     open = false;
   }
+
+  function reload() {
+    isLoading.set(true);
+    setTimeout(() => location.reload(), 1000);
+  }
 </script>
 
 <header>
@@ -124,7 +131,7 @@
             </button>
 
             <HeaderMenuPanel
-              open={open}
+              {open}
               isTeacher={$isTeacher}
               currentPath={$page.url.pathname}
               onClose={closeMenu}
@@ -135,17 +142,35 @@
         <li><PwaButton /></li>
       </ul>
       <ul>
-        <li><strong>{$isTeacher ? "Docente" : "Studente"}</strong></li>
         <li>{day}</li>
         <li>{schoolHour}</li>
-        {#if $userEmail}
-          <!-- svelte-ignore a11y-missing-attribute -->
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <!-- svelte-ignore a11y-no-static-element-interactions -->
-          <li><a on:click={logout}>Logout</a></li>
-        {:else}
-          <li><a href="signin">Login</a></li>
-        {/if}
+        <li>
+          <details class="dropdown" id="more-menu">
+            <summary> ⋮ </summary>
+            <ul dir="rtl">
+              <!-- svelte-ignore a11y-missing-attribute -->
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
+              <!-- svelte-ignore a11y-missing-content -->
+              <!-- svelte-ignore a11y-no-static-element-interactions -->
+              <li><a on:click={reload}>Aggiorna<a></a></a></li>
+              <li><a href="qr">Condividi</a></li>
+              <!-- svelte-ignore a11y-missing-attribute -->
+              <!-- svelte-ignore a11y-click-events-have-key-events -->
+              <!-- svelte-ignore a11y-no-static-element-interactions -->
+              <li>
+                {#if $userEmail}<a on:click={logout} class="red">Logout</a>
+                {:else}
+                  <a href="signin">Login</a>
+                {/if}
+              </li>
+              {#if $userEmail} 
+                <li class="divider"></li>
+                <li>Accesso {$isTeacher ? 'Docente' : 'Studente'}</li>
+              {/if}
+             
+            </ul>
+          </details>
+        </li>
       </ul>
     </nav>
     <Tabs></Tabs>
@@ -182,5 +207,29 @@
     font-size: 1.2rem;
     line-height: 1;
     padding: 0.25rem 0.5rem;
+  }
+
+  #more-menu summary,
+  #more-menu summary:hover,
+  #more-menu summary:focus {
+    list-style: none;
+    cursor: pointer;
+    border: none;
+    background: none;
+    font-weight: bold;
+    color: var(--pico-color);
+    font-size: 1.2rem;
+    box-shadow: none;
+  }
+
+  #more-menu summary::after {
+    display: none;
+  }
+
+  #more-menu .divider{
+    border-top: 1px solid var(--pico-muted-border-color);
+    padding: 0;
+    margin: 0;
+    font-size: 0;
   }
 </style>

@@ -15,6 +15,9 @@ const config = {
 			precompress: false,
 			strict: true
 		}),
+		alias: {
+			$icons: 'src/icons'
+		},
 		paths: {
 			base: '/app/way/tmp'
 		}

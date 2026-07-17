@@ -1,7 +1,7 @@
 <script>
   import { base } from "$app/paths";
-  import  WifiIcon  from "../icons/WifiIcon.svelte";
-  import  HomeIcon  from "../icons/HomeIcon.svelte";
+  import  WifiIcon  from "$icons/WifiIcon.svelte";
+  import  HomeIcon  from "$icons/HomeIcon.svelte";
   export let open = false;
   export let isTeacher = false;
   export let currentPath = "";
