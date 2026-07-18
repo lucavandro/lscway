@@ -21,7 +21,7 @@
 	<script>
 		if ('serviceWorker' in navigator) {
 			window.addEventListener('load', () => {
-				navigator.serviceWorker.register('service-worker.js', { scope: '/app/way/tmp/' })
+				navigator.serviceWorker.register('%sveltekit.base%/service-worker.js', { scope: '%sveltekit.base%/' })
 			})
 		}
 	</script>
