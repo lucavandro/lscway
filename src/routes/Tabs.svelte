@@ -10,10 +10,10 @@
       <li>
         <a href="." class:active={$page.url.pathname === base + "/"}>Classe</a>
       </li>
-      <li >
-        <a class:active={$page.url.pathname === (base + "/docente")}
-          href="docente"
-          >Docente</a
+      <li>
+        <a
+          class:active={$page.url.pathname === base + "/docente"}
+          href="docente">Docente</a
         >
       </li>
       <li>
@@ -21,14 +21,6 @@
           >Aula</a
         >
       </li>
-      {#if $isTeacher}
-        <li>
-          <a
-            href="sostituzioni"
-            class:active={$page.route.id === "/sostituzioni"}>Sostituzioni</a
-          >
-        </li>
-      {/if}
     </ul>
   </nav>
 {/if}
@@ -53,10 +45,9 @@
     flex: 1;
     text-align: center;
     padding: 8px 0;
-    
   }
 
-  #tabs li a{
+  #tabs li a {
     color: var(--pico-color);
   }
   #tabs li a:hover {
