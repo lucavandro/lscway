@@ -8,7 +8,7 @@
   import HeaderMenuPanel from "./HeaderMenuPanel.svelte";
   import { userEmail, isTeacher } from "$lib/stores.js";
   import ShareIcon from "$icons/ShareIcon.svelte";
-  import { isLoading } from "$lib/stores.js";
+
   import {
     requestNotificationPermission,
     checkSubstitutionsForNotifications,
@@ -43,15 +43,6 @@
     }
   }
 
-  function logout() {
-    userEmail.set(null);
-    clearNotifiedSubstitutions();
-    clearUserFromServiceWorker();
-    if (substitutionInterval) {
-      clearInterval(substitutionInterval);
-      substitutionInterval = null;
-    }
-  }
   updateTime();
 
   // Lifecycle's events
@@ -107,70 +98,36 @@
   $: if ($page.url.pathname) {
     open = false;
   }
-
-  function reload() {
-    isLoading.set(true);
-    setTimeout(() => location.reload(), 1000);
-  }
 </script>
 
 <header>
   <div class="container-fluid">
     <nav>
       <ul>
-        {#if $userEmail}
-          <li class="menu">
-            <button
-              type="button"
-              class="menu-toggle"
-              aria-expanded={open}
-              aria-label="Apri menu"
-              on:click={() => (open = !open)}
-            >
-              ☰
-            </button>
+        <li class="menu">
+          <button
+            type="button"
+            class="menu-toggle"
+            aria-expanded={open}
+            aria-label="Apri menu"
+            on:click={() => (open = !open)}
+          >
+            ☰
+          </button>
 
-            <HeaderMenuPanel
-              {open}
-              isTeacher={$isTeacher}
-              currentPath={$page.url.pathname}
-              onClose={closeMenu}
-            />
-          </li>
-        {/if}
+          <HeaderMenuPanel
+            {open}
+            isTeacher={$isTeacher}
+            currentPath={$page.url.pathname}
+            onClose={closeMenu}
+          />
+        </li>
         <li><strong>WAY Cortese</strong></li>
         <li><PwaButton /></li>
       </ul>
       <ul>
         <li>{day}</li>
         <li>{schoolHour}</li>
-        <li>
-          <details class="dropdown" id="more-menu">
-            <summary> ⋮ </summary>
-            <ul dir="rtl">
-              <!-- svelte-ignore a11y-missing-attribute -->
-              <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <!-- svelte-ignore a11y-missing-content -->
-              <!-- svelte-ignore a11y-no-static-element-interactions -->
-              <li><a on:click={reload}>Aggiorna<a></a></a></li>
-              <li><a href="qr">Condividi</a></li>
-              <!-- svelte-ignore a11y-missing-attribute -->
-              <!-- svelte-ignore a11y-click-events-have-key-events -->
-              <!-- svelte-ignore a11y-no-static-element-interactions -->
-              <li>
-                {#if $userEmail}<a on:click={logout} class="red">Logout</a>
-                {:else}
-                  <a href="signin">Login</a>
-                {/if}
-              </li>
-              {#if $userEmail} 
-                <li class="divider"></li>
-                <li>Accesso {$isTeacher ? 'Docente' : 'Studente'}</li>
-              {/if}
-             
-            </ul>
-          </details>
-        </li>
       </ul>
     </nav>
     <Tabs></Tabs>
@@ -226,7 +183,7 @@
     display: none;
   }
 
-  #more-menu .divider{
+  #more-menu .divider {
     border-top: 1px solid var(--pico-muted-border-color);
     padding: 0;
     margin: 0;

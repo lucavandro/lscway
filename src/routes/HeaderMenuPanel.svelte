@@ -1,14 +1,31 @@
 <script>
   import { base } from "$app/paths";
-  import  WifiIcon  from "$icons/WifiIcon.svelte";
-  import  HomeIcon  from "$icons/HomeIcon.svelte";
+  import WifiIcon from "$icons/WifiIcon.svelte";
+  import HomeIcon from "$icons/HomeIcon.svelte";
+  import ShareIcon from "$icons/ShareIcon.svelte";
+  import LoginIcon from "$icons/LoginIcon.svelte";
+  import LogoutIcon from "$icons/LogoutIcon.svelte";
+  import ReloadIcon from "$icons/ReloadIcon.svelte";
+  import { isLoading, userEmail } from "$lib/stores.js";
   export let open = false;
   export let isTeacher = false;
   export let currentPath = "";
   export let onClose = () => {};
 
   let closing = false;
-
+  function reload() {
+    isLoading.set(true);
+    setTimeout(() => location.reload(), 1000);
+  }
+  function logout() {
+    userEmail.set(null);
+    clearNotifiedSubstitutions();
+    clearUserFromServiceWorker();
+    if (substitutionInterval) {
+      clearInterval(substitutionInterval);
+      substitutionInterval = null;
+    }
+  }
   function closeMenu() {
     if (!open) return;
 
@@ -25,36 +42,66 @@
 </script>
 
 {#if open || closing}
-  <button class="backdrop" type="button" aria-label="Chiudi menu" on:click={closeMenu}></button>
-  <aside class:panel={!closing} class:panel-closing={closing} role="dialog" aria-label="Menu laterale">
+  <button
+    class="backdrop"
+    type="button"
+    aria-label="Chiudi menu"
+    on:click={closeMenu}
+  ></button>
+  <aside
+    class:panel={!closing}
+    class:panel-closing={closing}
+    role="dialog"
+    aria-label="Menu laterale"
+  >
     <div class="header-row">
       <span class="title">WAY Cortese</span>
-      <button type="button" class="close" aria-label="Chiudi pannello" on:click={closeMenu}>×</button>
+      <button
+        type="button"
+        class="close"
+        aria-label="Chiudi pannello"
+        on:click={closeMenu}>×</button
+      >
     </div>
     {#if isTeacher}
-      <ul>
+      {$userEmail}
+    {/if}
+    <ul>
       <li>
-          <HomeIcon />
-          <a href={base} class:active={currentPath === base} on:click={closeMenu}>
-            Home
-          </a>
-        </li>
+        <HomeIcon />
+        <a href={base} class:active={currentPath === base} on:click={closeMenu}>
+          Home
+        </a>
+      </li>
+      {#if isTeacher}
         <li>
           <WifiIcon />
-          <a href="hotspot" class:active={currentPath === base + "/hotspot"} on:click={closeMenu}>
+          <a
+            href="hotspot"
+            class:active={currentPath === base + "/hotspot"}
+            on:click={closeMenu}
+          >
             Hotspot
           </a>
         </li>
-      </ul>
-    {/if}
+      {:else}
+        <li><LoginIcon /><a href="signin">Login</a></li>
+      {/if}
+
+      <li><ReloadIcon /><a on:click={reload}>Aggiorna<a></a></a></li>
+      <li><ShareIcon /><a href="qr">Condividi</a></li>
+      {#if isTeacher}
+        <li><LogoutIcon /><a on:click={logout} class="red">Logout</a></li>
+      {/if}
+    </ul>
   </aside>
 {/if}
 
 <style>
-button.close{
-  background: none;
-  border: none;
-}
+  button.close {
+    background: none;
+    border: none;
+  }
   .backdrop {
     position: fixed;
     inset: 0;
@@ -113,8 +160,8 @@ button.close{
     border-bottom: 1px solid var(--pico-muted-border-color);
   }
 
-  .panel li a{
-    color: var(--pico-secondary ) !important;
+  .panel li a {
+    color: var(--pico-secondary) !important;
     display: inline-block;
     margin-left: 0.5rem;
   }
@@ -124,7 +171,6 @@ button.close{
     color: var(--pico-primary) !important;
     font-weight: bold;
   }
-  
 
   @keyframes slide-in {
     from {

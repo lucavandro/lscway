@@ -39,7 +39,7 @@ export function getDay(){
 
 export function getSchoolHour() {
     const hourNum = getHourNum()
-    const lessonHourList = ["Fuori orario", "Prima ora", "Seconda ora", "Terza ora", "Quarta ora", "Quinta ora", "Sesta ora", "Settima ora"]
+    const lessonHourList = ["Fuori orario", "I ora", "II ora", "III ora", "IV ora", "V ora", "VI ora", "VII ora"]
     return lessonHourList[hourNum];
 }
 

@@ -18,6 +18,8 @@ userEmail.subscribe((value) => {
     const username = value ? value.split('@')[0] : null;
     if(username){
         isTeacher.set(username && !username.includes('.'));
+    } else {
+        isTeacher.set(false);
     }
 })
 export const notificationPermission = writable(false);
