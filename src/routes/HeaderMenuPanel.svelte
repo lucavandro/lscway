@@ -6,6 +6,7 @@
   import LoginIcon from "$icons/LoginIcon.svelte";
   import LogoutIcon from "$icons/LogoutIcon.svelte";
   import ReloadIcon from "$icons/ReloadIcon.svelte";
+  import SwapIcon from "$icons/SwapIcon.svelte";
   import { isLoading, userEmail } from "$lib/stores.js";
   export let open = false;
   export let isTeacher = false;
@@ -83,6 +84,10 @@
           >
             Hotspot
           </a>
+        </li>
+        <li>
+          <SwapIcon />
+          <a href="sostituzioni">Sostituzioni</a>
         </li>
       {:else}
         <li><LoginIcon /><a href="signin">Login</a></li>
