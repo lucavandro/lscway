@@ -16,7 +16,7 @@
             {/each}
         </thead>
         <tbody>
-            {#each {length: 6} as _, i}
+            {#each {length: 7} as _, i}
                <TimeTableRow hourIndex={i} bind:data={data} fields={fields} />
             {/each}
         </tbody>

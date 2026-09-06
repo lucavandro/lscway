@@ -21,6 +21,8 @@
   onDestroy(() => {
     clearInterval(interval);
   });
+
+  const queryValue = (value) => encodeURIComponent(value ?? "");
 </script>
 
 {#if rowData.length == 1}
@@ -30,9 +32,9 @@
       {#each fields as field}
         <td>
           {#if field === "aula"}
-            <a href={`./aula/?q=${rd[field]}`}>{rd[field]}</a>
+            <a href={`./aula/?q=${queryValue(rd[field])}`}>{rd[field]}</a>
           {:else if field === "docente"}
-            <a href={`./docente?q=${rd[field]}`}>{rd["docente_abbr"] || rd["docente"]}</a>
+            <a href={`./docente?q=${queryValue(rd[field])}`}>{rd["docente_abbr"] || rd["docente"]}</a>
           {:else if field === "classe"}
             {#if rd["classe"] === ""}
               {#if rd["materia"] === "INC"}
@@ -41,7 +43,7 @@
                 -
               {/if}
             {:else}
-              <a href={`./?q=${rd[field]}`}>{rd[field]}</a>
+              <a href={`./?q=${queryValue(rd[field])}`}>{rd[field]}</a>
             {/if}
           {:else}
             {rd[field]}
@@ -57,11 +59,11 @@
       <td>
         {#each rowData as rd, index}
           {#if field === "aula"}
-            <a href={`./aula?q=${rd[field]}`}>{rd[field]} </a>
+            <a href={`./aula?q=${queryValue(rd[field])}`}>{rd[field]} </a>
           {:else if field === "docente"}
-            <a href={`./docente?q=${rd[field]}`}>{rd["docente_abbr"] || rd["docente"]} </a>
+            <a href={`./docente?q=${queryValue(rd[field])}`}>{rd["docente_abbr"] || rd["docente"]} </a>
           {:else if field === "classe"}
-            <a href={`./?q=${rd[field]}`}>{rd[field]} </a>
+            <a href={`./?q=${queryValue(rd[field])}`}>{rd[field]} </a>
           {:else}
             {rd[field]}
           {/if}

@@ -12,6 +12,7 @@
         tableData.filter((e) => e.ora === "11:15"),
         tableData.filter((e) => e.ora === "12:15"),
         tableData.filter((e) => e.ora === "13:15"),
+        tableData.filter((e) => e.ora === "14:15"),
     ]
 </script>
 
@@ -25,7 +26,7 @@
             {/each}
         </thead>
         <tbody>
-            {#each {length: 6} as _, i}
+            {#each {length: 7} as _, i}
                <FullTimeTableRow hourIndex={i} bind:rowData={rowsData[i]} fields={fields} />
             {/each}
         </tbody>

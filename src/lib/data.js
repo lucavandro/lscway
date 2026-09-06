@@ -19,9 +19,14 @@ function decodeGoogleJwt(token) {
     return JSON.parse(normalized);
 }
 
+const API_URL =
+    import.meta.env.VITE_API_URL ||
+    import.meta.env.VITE_ORARIO_API_URL ||
+    "https://www.liceoscientificocortese.edu.it/app/orario/api/v0";
+
 export async function getData(fetch){
     const res = await fetch(
-        "https://www.liceoscientificocortese.edu.it/app/way/api.php",
+        API_URL,
         {
             mode: "cors",
             cache: 'no-cache',

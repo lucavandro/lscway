@@ -12,7 +12,7 @@
 		"@sveltejs/adapter-auto": "^3.0.0",
 		"@sveltejs/adapter-static": "^3.0.9",
 		"@sveltejs/kit": "^2.0.0",
-		"@sveltejs/vite-plugin-svelte": "^3.0.0",
+		"@sveltejs/vite-plugin-svelte": "^3.1.2",
 		"@vite-pwa/sveltekit": "^0.6.5",
 		"fast-glob": "^3.3.2",
 		"svelte": "^4.2.7",

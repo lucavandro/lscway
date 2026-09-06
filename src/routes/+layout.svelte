@@ -2,13 +2,18 @@
 	import Header from "./Header.svelte";
 	import { getDay } from "$lib/dateutils.js";
 	import { onDestroy, onMount } from "svelte";
-    import Footer from "./Footer.svelte";
+	import Footer from "./Footer.svelte";
+	import { base } from "$app/paths";
 
 	let day = getDay();
 	let intervalTimer;
 
 	// Lifecycle events
 	onMount(() => {
+		if ('serviceWorker' in navigator) {
+			navigator.serviceWorker.register(`${base}/service-worker.js`, { scope: `${base}/` });
+		}
+
 		intervalTimer = setInterval(() => {
 			day = getDay();
 		}, 60 * 1000);

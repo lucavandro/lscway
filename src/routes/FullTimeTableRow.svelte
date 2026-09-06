@@ -15,8 +15,7 @@
         MAR: rowData.filter((e) => e.day === "MAR").sort(inclusioneInFondo),
         MER: rowData.filter((e) => e.day === "MER").sort(inclusioneInFondo),
         GIO: rowData.filter((e) => e.day === "GIO").sort(inclusioneInFondo),
-        VEN: rowData.filter((e) => e.day === "VEN").sort(inclusioneInFondo),
-        SAB: rowData.filter((e) => e.day === "SAB").sort(inclusioneInFondo),
+        VEN: rowData.filter((e) => e.day === "VEN").sort(inclusioneInFondo)
     };
     function singleInfoExtraction(dayData, field) {
         let classrooms = new Set();

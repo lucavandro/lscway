@@ -18,13 +18,7 @@
 	<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#202632" />
 	<!-- Orientation  -->
 	<meta name="screen-orientation" content="portrait">
-	<script>
-		if ('serviceWorker' in navigator) {
-			window.addEventListener('load', () => {
-				navigator.serviceWorker.register('%sveltekit.base%/service-worker.js', { scope: '%sveltekit.base%/' })
-			})
-		}
-	</script>
+
 	%sveltekit.head%
 </head>
 
