@@ -46,6 +46,11 @@ export async function getData(fetch){
             if(!e.aula)
                 e.aula = "-"
         }
+        if(e.materia == "sub_potenziamento"){
+            e.materia = "POT";
+            e.aula = ""
+        }
+            
         return e
     })
     
