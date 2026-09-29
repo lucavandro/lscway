@@ -36,6 +36,32 @@
     }
   }
 
+  // Visual viewport tracking for mobile virtual keyboard
+  let viewportHeight = 0;
+  let viewportOffsetTop = 0;
+
+  function handleVisualViewport() {
+    if (typeof window !== "undefined" && window.visualViewport) {
+      viewportHeight = Math.round(window.visualViewport.height);
+      viewportOffsetTop = Math.round(window.visualViewport.offsetTop);
+    }
+  }
+
+  function attachViewportListeners() {
+    if (typeof window !== "undefined" && window.visualViewport) {
+      handleVisualViewport();
+      window.visualViewport.addEventListener("resize", handleVisualViewport);
+      window.visualViewport.addEventListener("scroll", handleVisualViewport);
+    }
+  }
+
+  function detachViewportListeners() {
+    if (typeof window !== "undefined" && window.visualViewport) {
+      window.visualViewport.removeEventListener("resize", handleVisualViewport);
+      window.visualViewport.removeEventListener("scroll", handleVisualViewport);
+    }
+  }
+
   onMount(() => {
     checkMobile();
     window.addEventListener("resize", checkMobile);
@@ -44,6 +70,7 @@
   onDestroy(() => {
     if (typeof window !== "undefined") {
       window.removeEventListener("resize", checkMobile);
+      detachViewportListeners();
       document.body.style.overflow = "";
     }
   });
@@ -58,13 +85,29 @@
 
     if (isMobile) {
       document.body.style.overflow = "hidden";
+      attachViewportListeners();
       searchInputMobile?.focus();
+
+      // Scroll selected item into view if present
+      await tick();
+      const selectedEl = document.querySelector(".sheet-option-item.is-selected");
+      if (selectedEl && typeof selectedEl.scrollIntoView === "function") {
+        selectedEl.scrollIntoView({ block: "center" });
+      }
     } else {
       searchInputDesktop?.focus();
     }
   }
 
   function closeSelect() {
+    if (isMobile) {
+      searchInputMobile?.blur();
+      detachViewportListeners();
+      viewportHeight = 0;
+      viewportOffsetTop = 0;
+    } else {
+      searchInputDesktop?.blur();
+    }
     isOpen = false;
     searchQuery = "";
     if (typeof document !== "undefined") {
@@ -277,9 +320,13 @@
   </div>
 </div>
 
-<!-- Option B: Mobile Bottom Sheet Modal (< 640px) mounted to body -->
+<!-- Option B: Mobile Sheet Modal (< 640px) mounted to body -->
 {#if isOpen && isMobile}
-  <div use:portal class="mobile-sheet-portal">
+  <div
+    use:portal
+    class="mobile-sheet-portal"
+    style={viewportHeight ? `top: ${viewportOffsetTop}px; height: ${viewportHeight}px; bottom: auto;` : ""}
+  >
     <!-- Backdrop covering the viewport -->
     <button
       type="button"
@@ -289,7 +336,13 @@
     ></button>
 
     <!-- Mobile Sheet Modal attached to the top -->
-    <div class="mobile-sheet" role="dialog" aria-modal="true" aria-label="Seleziona {label}">
+    <div
+      class="mobile-sheet"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Seleziona {label}"
+      style={viewportHeight ? `height: ${viewportHeight}px; max-height: ${viewportHeight}px;` : ""}
+    >
       <!-- Sheet Header -->
       <div class="sheet-header">
         <div class="sheet-title-wrap">
@@ -349,6 +402,7 @@
             <button
               type="button"
               class="clear-btn"
+              on:pointerdown|preventDefault
               on:click|stopPropagation={() => {
                 searchQuery = "";
                 searchInputMobile?.focus();
@@ -713,9 +767,8 @@
     border-radius: 0;
     box-shadow: 0 4px 28px rgba(0, 0, 0, 0.25);
     height: 100%;
-    height: 100dvh;
-    min-height: 100dvh;
-    max-height: 100dvh;
+    min-height: 0;
+    max-height: 100%;
     width: 100%;
     display: flex;
     flex-direction: column;
@@ -723,7 +776,7 @@
     animation: sheet-slide-up 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     box-sizing: border-box;
     padding-top: env(safe-area-inset-top, 0px);
-    padding-bottom: env(safe-area-inset-bottom, 0px);
+    padding-bottom: 0;
   }
 
   @keyframes sheet-slide-up {
@@ -814,10 +867,12 @@
 
   .sheet-options-list {
     flex: 1;
+    min-height: 0;
     overflow-y: auto;
     overscroll-behavior: contain;
-    padding: 0.5rem 0.75rem 1.25rem;
+    padding: 0.5rem 0.75rem calc(2.5rem + env(safe-area-inset-bottom, 0px));
     -webkit-overflow-scrolling: touch;
+    scroll-padding-bottom: 2.5rem;
   }
 
   .sheet-option-item {
