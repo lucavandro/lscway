@@ -54,38 +54,43 @@
       {#if dayEntries.length > 0}
         <div class="slot-stack">
           {#each dayEntries as entry, idx}
+            {@const hasPrimary = (fields.includes("classe") && entry["classe"]) || (fields.includes("docente") && entry["docente"])}
             <div class="entry-micro">
-              <!-- Line 1: Primary identifiers -->
+              <!-- Line 1: Primary identifier (Docente in class view, Classe in teacher/room view) -->
               <div class="line-primary">
                 {#if fields.includes("classe") && entry["classe"]}
-                  <span class="class-label">{entry["classe"]}</span>
+                  <span class="primary-label class-label">{entry["classe"]}</span>
                 {/if}
 
-                {#if entry["materia"]}
-                  <span class="subj-tag" class:is-pot={entry["materia"] === "POT" || entry["materia"] === "RIC"}>
-                    {entry["materia"]}
-                  </span>
-                {/if}
-
-                {#if fields.includes("docente") && !fields.includes("classe")}
-                  <span class="teacher-label" title={entry["docente"]}>
-                    {entry["docente_abbr"] || entry["docente"]}
-                  </span>
-                {/if}
-              </div>
-
-              <!-- Line 2: Secondary info (Room or Teacher when class is primary) -->
-              <div class="line-secondary">
-                {#if fields.includes("docente") && fields.includes("classe")}
-                  <span class="teacher-sub" title={entry["docente"]}>
+                {#if fields.includes("docente") && entry["docente"]}
+                  <span class="primary-label teacher-label" title={entry["docente"]}>
                     {entry["docente_abbr"] || entry["docente"]}
                   </span>
                 {/if}
 
-                {#if fields.includes("aula") && entry["aula"] && entry["aula"] !== "-"}
-                  <span class="room-sub">{entry["aula"]}</span>
+                {#if !hasPrimary && entry["materia"]}
+                  <span class="primary-label fallback-label">{entry["materia"]}</span>
                 {/if}
               </div>
+
+              <!-- Line 2: Secondary info (Materia and Aula side by side, duly separated) -->
+              {#if (hasPrimary && entry["materia"]) || (fields.includes("aula") && entry["aula"] && entry["aula"] !== "-")}
+                <div class="line-secondary">
+                  {#if hasPrimary && entry["materia"]}
+                    <span class="subj-tag" class:is-pot={entry["materia"] === "POT" || entry["materia"] === "RIC"}>
+                      {entry["materia"]}
+                    </span>
+                  {/if}
+
+                  {#if hasPrimary && entry["materia"] && fields.includes("aula") && entry["aula"] && entry["aula"] !== "-"}
+                    <span class="sec-sep" aria-hidden="true">•</span>
+                  {/if}
+
+                  {#if fields.includes("aula") && entry["aula"] && entry["aula"] !== "-"}
+                    <span class="room-sub">{entry["aula"]}</span>
+                  {/if}
+                </div>
+              {/if}
             </div>
 
             {#if idx < dayEntries.length - 1}
@@ -184,70 +189,82 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 0.2rem;
+    gap: 0.25rem;
     flex-wrap: wrap;
-    font-size: 0.725rem;
+    width: 100%;
+  }
+
+  .primary-label {
+    font-weight: 700;
+    color: var(--brand-text);
+    line-height: 1.2;
+    white-space: nowrap;
   }
 
   .class-label {
-    font-weight: 700;
-    color: var(--brand-text);
-  }
-
-  .subj-tag {
-    font-size: 0.65rem;
-    font-weight: 700;
-    padding: 0.05rem 0.25rem;
-    border-radius: 3px;
-    background: var(--brand-surface-subtle);
-    border: 1px solid var(--brand-border);
-    color: var(--brand-primary);
-    white-space: nowrap;
-  }
-
-  .subj-tag.is-pot {
-    background: rgba(245, 158, 11, 0.12);
-    color: #f59e0b;
-    border-color: rgba(245, 158, 11, 0.25);
+    font-size: 0.775rem;
+    font-weight: 800;
+    letter-spacing: -0.01em;
   }
 
   .teacher-label {
-    font-weight: 600;
-    font-size: 0.7rem;
-    color: var(--brand-text);
-    white-space: nowrap;
+    font-size: 0.725rem;
+    font-weight: 700;
     overflow: hidden;
     text-overflow: ellipsis;
     max-width: 68px;
   }
 
+  .fallback-label {
+    font-size: 0.725rem;
+    font-weight: 700;
+  }
+
   .line-secondary {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     gap: 0.25rem;
-    font-size: 0.65rem;
-    color: var(--brand-text-muted);
-    margin-top: 0.05rem;
+    margin-top: 0.15rem;
+    max-width: 100%;
   }
 
-  .teacher-sub {
+  .subj-tag {
     font-size: 0.65rem;
-    color: var(--brand-text-muted);
+    font-weight: 600;
+    padding: 0.05rem 0.25rem;
+    border-radius: 3px;
+    background: color-mix(in srgb, var(--brand-primary) 10%, transparent);
+    border: 1px solid color-mix(in srgb, var(--brand-primary) 22%, transparent);
+    color: var(--brand-primary);
     white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: 58px;
+    line-height: 1.15;
+  }
+
+  .subj-tag.is-pot {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+    border-color: rgba(245, 158, 11, 0.3);
   }
 
   .room-sub {
     font-size: 0.65rem;
     font-weight: 600;
-    color: #10b981;
-    background: rgba(16, 185, 129, 0.08);
+    color: #059669;
+    background: rgba(16, 185, 129, 0.1);
+    border: 1px solid rgba(16, 185, 129, 0.25);
     padding: 0.05rem 0.25rem;
     border-radius: 3px;
     white-space: nowrap;
+    line-height: 1.15;
+  }
+
+  .sec-sep {
+    font-size: 0.65rem;
+    color: var(--brand-text-muted);
+    opacity: 0.6;
+    line-height: 1;
+    user-select: none;
   }
 
   .micro-sep {
@@ -286,35 +303,36 @@
     }
     .line-primary {
       gap: 0.35rem;
-      font-size: 0.825rem;
     }
     .class-label {
-      font-size: 0.85rem;
+      font-size: 0.875rem;
       font-weight: 800;
+    }
+    .teacher-label {
+      font-size: 0.825rem;
+      font-weight: 700;
+      max-width: 110px;
+    }
+    .fallback-label {
+      font-size: 0.825rem;
+    }
+    .line-secondary {
+      gap: 0.35rem;
+      margin-top: 0.2rem;
     }
     .subj-tag {
       font-size: 0.75rem;
       padding: 0.1rem 0.35rem;
       border-radius: 4px;
     }
-    .teacher-label {
-      font-size: 0.8rem;
-      max-width: 110px;
-    }
-    .line-secondary {
-      gap: 0.35rem;
-      font-size: 0.775rem;
-      margin-top: 0.15rem;
-    }
-    .teacher-sub {
-      font-size: 0.75rem;
-      max-width: 95px;
-    }
     .room-sub {
       font-size: 0.75rem;
       font-weight: 700;
       padding: 0.1rem 0.35rem;
       border-radius: 4px;
+    }
+    .sec-sep {
+      font-size: 0.75rem;
     }
   }
 
@@ -339,32 +357,33 @@
     }
     .line-primary {
       gap: 0.45rem;
-      font-size: 0.9rem;
     }
     .class-label {
-      font-size: 0.925rem;
-    }
-    .subj-tag {
-      font-size: 0.825rem;
-      padding: 0.15rem 0.45rem;
-      border-radius: 5px;
+      font-size: 0.95rem;
     }
     .teacher-label {
-      font-size: 0.85rem;
+      font-size: 0.875rem;
       max-width: none;
+    }
+    .fallback-label {
+      font-size: 0.875rem;
     }
     .line-secondary {
-      gap: 0.45rem;
-      font-size: 0.825rem;
-      margin-top: 0.2rem;
+      gap: 0.4rem;
+      margin-top: 0.25rem;
     }
-    .teacher-sub {
-      font-size: 0.825rem;
-      max-width: none;
+    .subj-tag {
+      font-size: 0.8rem;
+      padding: 0.12rem 0.45rem;
+      border-radius: 5px;
     }
     .room-sub {
-      font-size: 0.825rem;
-      padding: 0.15rem 0.45rem;
+      font-size: 0.8rem;
+      padding: 0.12rem 0.45rem;
+      border-radius: 5px;
+    }
+    .sec-sep {
+      font-size: 0.8rem;
     }
     .day-slot:hover {
       background: color-mix(in srgb, var(--brand-primary) 6%, var(--brand-surface-card));
