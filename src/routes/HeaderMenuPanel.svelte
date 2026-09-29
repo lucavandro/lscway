@@ -12,7 +12,7 @@
   import SunIcon from "$icons/SunIcon.svelte";
   import MoonIcon from "$icons/MoonIcon.svelte";
   import { isLoading, userEmail, isTeacher, isMenuOpen } from "$lib/stores.js";
-  import { theme, themePreference, toggleTheme, setTheme } from "$lib/theme.js";
+  import { theme, themePreference, toggleTheme } from "$lib/theme.js";
   import { onDestroy } from "svelte";
 
   let closing = false;
@@ -239,17 +239,6 @@
                 <span class="theme-switch-thumb"></span>
               </span>
             </button>
-            {#if $themePreference !== 'system'}
-              <div class="theme-reset-row">
-                <button
-                  type="button"
-                  class="theme-reset-btn"
-                  on:click={() => setTheme('system')}
-                >
-                  Ripristina tema di sistema
-                </button>
-              </div>
-            {/if}
           </li>
           <li>
             <button type="button" class="nav-action-btn" on:click={reload}>
@@ -599,27 +588,6 @@
     text-transform: uppercase;
     letter-spacing: 0.03em;
     line-height: 1.2;
-  }
-
-  .theme-reset-row {
-    display: block;
-    padding: 0.15rem 0.75rem 0.25rem 2.25rem;
-  }
-
-  .theme-reset-btn {
-    background: transparent;
-    border: none;
-    padding: 0;
-    color: var(--brand-text-muted);
-    font-size: 0.7rem;
-    text-decoration: underline;
-    cursor: pointer;
-    line-height: 1.2;
-    transition: color 0.15s ease;
-  }
-
-  .theme-reset-btn:hover {
-    color: var(--brand-primary);
   }
 
   .drawer-footer {
