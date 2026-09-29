@@ -412,8 +412,14 @@
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--brand-text-muted);
-    padding: 0.45rem 0.55rem 0.25rem;
-    margin-top: 0.35rem;
+    padding: 0.35rem 0.75rem;
+    margin-top: 0.75rem;
+    margin-bottom: 0.4rem;
+    line-height: 1.3;
+  }
+
+  .drawer-nav > .nav-section-label:first-child {
+    margin-top: 0.2rem;
   }
 
   .nav-list {
