@@ -1,6 +1,7 @@
 <script>
   import { base } from "$app/paths";
   import { page } from "$app/stores";
+  import { afterNavigate } from "$app/navigation";
   import WifiIcon from "$icons/WifiIcon.svelte";
   import HomeIcon from "$icons/HomeIcon.svelte";
   import ShareIcon from "$icons/ShareIcon.svelte";
@@ -58,10 +59,12 @@
     }
   }
 
-  // Close when path changes
-  $: if ($page.url.pathname && $isMenuOpen && !closing) {
-    closeMenu();
-  }
+  // Safely close only when genuine page navigation occurs
+  afterNavigate(() => {
+    if ($isMenuOpen) {
+      closeMenu();
+    }
+  });
 
   onDestroy(() => {
     if (typeof document !== "undefined") {

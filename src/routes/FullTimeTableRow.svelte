@@ -20,16 +20,6 @@
     VEN: rowData.filter((e) => e.day === "VEN").sort(inclusioneInFondo),
   };
 
-  function singleInfoExtraction(dayData, field) {
-    let items = new Set();
-    dayData.forEach((entry) => {
-      if (entry[field]) {
-        items.add(entry[field]);
-      }
-    });
-    return Array.from(items).join(", ");
-  }
-
   onMount(() => {
     interval = setInterval(() => {
       currentDay = getDay();
@@ -42,11 +32,10 @@
   });
 </script>
 
-<tr class="full-row">
+<tr class="compact-row">
   <!-- Sticky Hour cell on the left -->
   <th class="hour-fixed-col" scope="row">
     <span class="hour-num">{hourIndex + 1}ª</span>
-    <span class="hour-sub">{hour}</span>
   </th>
 
   {#each weekdays as weekday}
@@ -60,59 +49,57 @@
       class:is-active-slot={isActiveSlot}
     >
       {#if dayEntries.length > 0}
-        <div class="slot-content">
-          {#if fields.includes("docente")}
-            {#each dayEntries as entry}
-              <div class="entry-card">
-                <span class="teacher-name">{entry["docente_abbr"] || entry["docente"]}</span>
+        <div class="slot-stack">
+          {#each dayEntries as entry, idx}
+            <div class="entry-micro">
+              <!-- Line 1: Primary identifiers -->
+              <div class="line-primary">
+                {#if fields.includes("classe") && entry["classe"]}
+                  <span class="class-label">{entry["classe"]}</span>
+                {/if}
+
                 {#if entry["materia"]}
-                  <span class="subject-pill">{entry["materia"]}</span>
+                  <span class="subj-tag" class:is-pot={entry["materia"] === "POT" || entry["materia"] === "RIC"}>
+                    {entry["materia"]}
+                  </span>
+                {/if}
+
+                {#if fields.includes("docente") && !fields.includes("classe")}
+                  <span class="teacher-label" title={entry["docente"]}>
+                    {entry["docente_abbr"] || entry["docente"]}
+                  </span>
                 {/if}
               </div>
-            {/each}
-          {:else if fields.includes("materia") && (singleInfoExtraction(dayEntries, "materia") === "POT" || singleInfoExtraction(dayEntries, "materia") === "RIC")}
-            <div class="entry-card">
-              <span class="subject-pill">{singleInfoExtraction(dayEntries, "materia")}</span>
+
+              <!-- Line 2: Secondary info (Room or Teacher when class is primary) -->
+              <div class="line-secondary">
+                {#if fields.includes("docente") && fields.includes("classe")}
+                  <span class="teacher-sub" title={entry["docente"]}>
+                    {entry["docente_abbr"] || entry["docente"]}
+                  </span>
+                {/if}
+
+                {#if fields.includes("aula") && entry["aula"] && entry["aula"] !== "-"}
+                  <span class="room-sub">A.{entry["aula"]}</span>
+                {/if}
+              </div>
             </div>
-          {/if}
 
-          {#if fields.includes("classe")}
-            {@const classVal = singleInfoExtraction(dayEntries, "classe")}
-            {#if classVal}
-              <div class="meta-row class-row">
-                <span class="meta-badge class-badge">{classVal}</span>
-              </div>
+            {#if idx < dayEntries.length - 1}
+              <div class="micro-sep"></div>
             {/if}
-          {/if}
-
-          {#if fields.includes("aula")}
-            {@const roomVal = singleInfoExtraction(dayEntries, "aula")}
-            {#if roomVal && roomVal !== "-"}
-              <div class="meta-row room-row">
-                <span class="meta-badge room-badge">Aula {roomVal}</span>
-              </div>
-            {/if}
-          {/if}
-
-          {#if fields.includes("materia") && !fields.includes("docente")}
-            {@const subjVal = singleInfoExtraction(dayEntries, "materia")}
-            {#if subjVal && subjVal !== "POT" && subjVal !== "RIC"}
-              <div class="meta-row">
-                <span class="subject-pill">{subjVal}</span>
-              </div>
-            {/if}
-          {/if}
+          {/each}
         </div>
       {:else}
-        <span class="empty-dash">—</span>
+        <span class="empty-dot">·</span>
       {/if}
     </td>
   {/each}
 </tr>
 
 <style>
-  .full-row:not(:last-child) td,
-  .full-row:not(:last-child) th {
+  .compact-row:not(:last-child) td,
+  .compact-row:not(:last-child) th {
     border-bottom: 1px solid var(--brand-border);
   }
 
@@ -122,34 +109,28 @@
     z-index: 2;
     background: var(--brand-surface-card);
     border-right: 1px solid var(--brand-border);
-    padding: 0.5rem 0.25rem;
+    padding: 0.25rem 0.15rem;
     text-align: center;
-    width: 48px;
-    min-width: 48px;
+    width: 36px;
+    min-width: 36px;
+    max-width: 36px;
+    vertical-align: middle;
   }
 
   .hour-num {
-    display: block;
-    font-size: 0.95rem;
+    font-size: 0.8rem;
     font-weight: 700;
     color: var(--brand-text);
     line-height: 1;
   }
 
-  .hour-sub {
-    display: block;
-    font-size: 0.65rem;
-    color: var(--brand-text-muted);
-    margin-top: 0.15rem;
-  }
-
   .day-slot {
-    padding: 0.5rem 0.4rem;
+    padding: 0.25rem 0.2rem;
     text-align: center;
     vertical-align: middle;
     border-right: 1px solid var(--brand-border);
     transition: background-color 0.15s ease;
-    min-width: 130px;
+    overflow: hidden;
   }
 
   .day-slot.is-today {
@@ -161,65 +142,105 @@
     box-shadow: inset 0 0 0 2px var(--brand-primary);
   }
 
-  .slot-content {
+  .slot-stack {
     display: flex;
     flex-direction: column;
-    gap: 0.35rem;
+    gap: 0.15rem;
     align-items: center;
     justify-content: center;
+    width: 100%;
   }
 
-  .entry-card {
-    display: inline-flex;
+  .entry-micro {
+    display: flex;
+    flex-direction: column;
     align-items: center;
-    gap: 0.35rem;
+    justify-content: center;
+    width: 100%;
+    line-height: 1.15;
+  }
+
+  .line-primary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.2rem;
     flex-wrap: wrap;
-    justify-content: center;
+    font-size: 0.725rem;
   }
 
-  .teacher-name {
-    font-weight: 600;
-    font-size: 0.825rem;
+  .class-label {
+    font-weight: 700;
     color: var(--brand-text);
   }
 
-  .subject-pill {
-    display: inline-block;
-    padding: 0.15rem 0.4rem;
-    border-radius: 4px;
+  .subj-tag {
+    font-size: 0.65rem;
+    font-weight: 700;
+    padding: 0.05rem 0.25rem;
+    border-radius: 3px;
     background: var(--brand-surface-subtle);
     border: 1px solid var(--brand-border);
-    font-size: 0.725rem;
-    font-weight: 700;
     color: var(--brand-primary);
+    white-space: nowrap;
   }
 
-  .meta-row {
-    display: flex;
-    justify-content: center;
+  .subj-tag.is-pot {
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+    border-color: rgba(245, 158, 11, 0.25);
   }
 
-  .meta-badge {
-    display: inline-block;
-    padding: 0.15rem 0.45rem;
-    border-radius: 4px;
-    font-size: 0.725rem;
+  .teacher-label {
     font-weight: 600;
-  }
-
-  .class-badge {
-    background: color-mix(in srgb, var(--brand-text) 8%, transparent);
+    font-size: 0.7rem;
     color: var(--brand-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 68px;
   }
 
-  .room-badge {
-    background: rgba(16, 185, 129, 0.12);
-    color: #10b981;
-  }
-
-  .empty-dash {
+  .line-secondary {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.25rem;
+    font-size: 0.65rem;
     color: var(--brand-text-muted);
-    opacity: 0.35;
+    margin-top: 0.05rem;
+  }
+
+  .teacher-sub {
+    font-size: 0.65rem;
+    color: var(--brand-text-muted);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 58px;
+  }
+
+  .room-sub {
+    font-size: 0.65rem;
+    font-weight: 600;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.08);
+    padding: 0.05rem 0.25rem;
+    border-radius: 3px;
+    white-space: nowrap;
+  }
+
+  .micro-sep {
+    width: 60%;
+    height: 1px;
+    background: var(--brand-border);
+    margin: 0.1rem auto;
+  }
+
+  .empty-dot {
+    color: var(--brand-text-muted);
+    opacity: 0.3;
     font-size: 0.9rem;
+    line-height: 1;
   }
 </style>

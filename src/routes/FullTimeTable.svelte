@@ -25,20 +25,20 @@
 </script>
 
 <div
-  class="table-scroll-container"
+  class="table-scroll-container compact-scroll"
   class:scrolled-right={isScrolledEnd}
   on:scroll={handleScroll}
 >
-  <table class="full-timetable">
+  <table class="compact-timetable">
     <thead>
       <tr>
-        <th class="col-hour fixed-col" scope="col">Ora</th>
+        <th class="col-hour fixed-col" scope="col">#</th>
         {#each weekdays as weekday}
           <th scope="col" class="weekday-header" class:is-today={weekday === currentDay}>
-            <div class="weekday-header-inner">
-              <span>{weekday}</span>
+            <div class="weekday-cell">
+              <span class="weekday-name">{weekday}</span>
               {#if weekday === currentDay}
-                <span class="today-tag">Oggi</span>
+                <span class="today-dot" title="Oggi"></span>
               {/if}
             </div>
           </th>
@@ -54,12 +54,18 @@
 </div>
 
 <style>
-  .full-timetable {
+  .compact-scroll {
+    border-radius: 10px;
+    background: var(--brand-surface-card);
+  }
+
+  .compact-timetable {
     width: 100%;
+    table-layout: fixed;
     border-collapse: separate;
     border-spacing: 0;
     margin: 0;
-    font-size: 0.85rem;
+    font-size: 0.75rem;
   }
 
   thead {
@@ -70,11 +76,10 @@
   }
 
   th {
-    padding: 0.65rem 0.5rem;
+    padding: 0.4rem 0.2rem;
     font-size: 0.75rem;
     font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.02em;
     color: var(--brand-text-muted);
     border-bottom: 2px solid var(--brand-border);
     white-space: nowrap;
@@ -87,35 +92,45 @@
     z-index: 4;
     background: var(--brand-surface-subtle);
     border-right: 1px solid var(--brand-border);
-    width: 48px;
-    min-width: 48px;
+    width: 36px;
+    min-width: 36px;
+    max-width: 36px;
+    font-size: 0.75rem;
   }
 
   .weekday-header {
-    min-width: 130px;
+    min-width: 76px;
     border-right: 1px solid var(--brand-border);
     transition: background-color 0.15s ease;
   }
 
+  @media (min-width: 640px) {
+    .weekday-header {
+      min-width: 90px;
+    }
+  }
+
   .weekday-header.is-today {
     color: var(--brand-primary);
-    background: color-mix(in srgb, var(--brand-primary) 8%, var(--brand-surface-subtle));
+    background: color-mix(in srgb, var(--brand-primary) 10%, var(--brand-surface-subtle));
   }
 
-  .weekday-header-inner {
-    display: flex;
-    flex-direction: column;
+  .weekday-cell {
+    display: inline-flex;
     align-items: center;
-    gap: 0.2rem;
+    justify-content: center;
+    gap: 0.25rem;
   }
 
-  .today-tag {
-    font-size: 0.6rem;
-    font-weight: 700;
-    background: var(--brand-primary);
-    color: white;
-    padding: 0.1rem 0.35rem;
-    border-radius: 9999px;
-    line-height: 1.1;
+  .weekday-name {
+    line-height: 1;
+  }
+
+  .today-dot {
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background-color: var(--brand-primary);
+    display: inline-block;
   }
 </style>
