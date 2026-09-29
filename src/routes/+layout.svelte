@@ -1,5 +1,6 @@
 <script>
 	import Header from "./Header.svelte";
+	import HeaderMenuPanel from "./HeaderMenuPanel.svelte";
 	import { getDay } from "$lib/dateutils.js";
 	import { onDestroy, onMount } from "svelte";
 	import Footer from "./Footer.svelte";
@@ -61,6 +62,8 @@
 
 	<Footer />
 </div>
+
+<HeaderMenuPanel />
 
 <style>
 	.app {

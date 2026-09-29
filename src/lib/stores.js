@@ -12,6 +12,7 @@ const getInitialUserEmail = () => {
 export const userEmail = writable(getInitialUserEmail());
 export const isTeacher = writable(false);
 export const isLoading = writable(false);
+export const isMenuOpen = writable(false);
 
 
 userEmail.subscribe((value) => {

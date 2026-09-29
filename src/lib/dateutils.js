@@ -1,5 +1,5 @@
 export const weekdays = ["LUN", "MAR", "MER", "GIO", "VEN"];
-export const hours = ["07:00", "08:55", "09:50", "10:45", "11:40", "12:35", "13:30", "14:25"]; // Aggiunta l'ora "14:15" come ultima lezione
+export const hours = ["08:00", "08:55", "09:50", "10:45", "11:40", "12:35", "13:30", "14:25"]; // Aggiunta l'ora "14:15" come ultima lezione
 
 // Funzione di supporto per convertire "HH:MM" in minuti dalla mezzanotte
 const timeToMinutes = (timeStr) => {

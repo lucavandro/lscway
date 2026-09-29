@@ -5,8 +5,7 @@
   import { onDestroy, onMount } from "svelte";
   import PwaButton from "./PWAButton.svelte";
   import Tabs from "./Tabs.svelte";
-  import HeaderMenuPanel from "./HeaderMenuPanel.svelte";
-  import { userEmail, isTeacher, isLoading } from "$lib/stores.js";
+  import { userEmail, isTeacher, isLoading, isMenuOpen } from "$lib/stores.js";
 
   import {
     requestNotificationPermission,
@@ -22,7 +21,6 @@
   let schoolHour = getSchoolHour();
   let timeInterval;
   let substitutionInterval;
-  let open = false;
 
   function updateTime() {
     schoolHour = getSchoolHour();
@@ -81,14 +79,6 @@
     clearNotifiedSubstitutions();
     clearUserFromServiceWorker();
   }
-
-  function closeMenu() {
-    open = false;
-  }
-
-  $: if ($page.url.pathname) {
-    open = false;
-  }
 </script>
 
 <header class="app-header">
@@ -99,9 +89,9 @@
         <button
           type="button"
           class="hamburger-btn"
-          aria-expanded={open}
+          aria-expanded={$isMenuOpen}
           aria-label="Apri menu principale"
-          on:click={() => (open = !open)}
+          on:click={() => ($isMenuOpen = !$isMenuOpen)}
         >
           <span class="bar"></span>
           <span class="bar"></span>
@@ -137,13 +127,6 @@
     <!-- Navigation Tabs -->
     <Tabs />
   </div>
-
-  <HeaderMenuPanel
-    {open}
-    isTeacher={$isTeacher}
-    currentPath={$page.url.pathname}
-    onClose={closeMenu}
-  />
 </header>
 
 <style>
