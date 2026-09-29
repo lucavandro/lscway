@@ -288,13 +288,8 @@
       aria-label="Chiudi selettore"
     ></button>
 
-    <!-- Bottom Sheet Modal -->
+    <!-- Mobile Sheet Modal attached to the top -->
     <div class="mobile-sheet" role="dialog" aria-modal="true" aria-label="Seleziona {label}">
-      <!-- Sheet Handle bar -->
-      <div class="sheet-handle-wrap" aria-hidden="true">
-        <div class="sheet-handle"></div>
-      </div>
-
       <!-- Sheet Header -->
       <div class="sheet-header">
         <div class="sheet-title-wrap">
@@ -681,10 +676,14 @@
   .mobile-sheet-portal {
     position: fixed;
     inset: 0;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
     z-index: 99999;
     display: flex;
     flex-direction: column;
-    justify-content: flex-end;
+    justify-content: flex-start;
   }
 
   .sheet-backdrop {
@@ -711,17 +710,20 @@
     position: relative;
     z-index: 2;
     background: var(--brand-surface-card);
-    border-top-left-radius: 20px;
-    border-top-right-radius: 20px;
-    box-shadow: 0 -4px 28px rgba(0, 0, 0, 0.25);
-    max-height: 82dvh;
-    min-height: 48dvh;
+    border-radius: 0;
+    box-shadow: 0 4px 28px rgba(0, 0, 0, 0.25);
+    height: 100%;
+    height: 100dvh;
+    min-height: 100dvh;
+    max-height: 100dvh;
+    width: 100%;
     display: flex;
     flex-direction: column;
     overflow: hidden;
     animation: sheet-slide-up 0.22s cubic-bezier(0.16, 1, 0.3, 1);
     box-sizing: border-box;
-    padding-bottom: env(safe-area-inset-bottom, 0.75rem);
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 
   @keyframes sheet-slide-up {
@@ -733,27 +735,11 @@
     }
   }
 
-  .sheet-handle-wrap {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding-top: 0.5rem;
-    padding-bottom: 0.2rem;
-  }
-
-  .sheet-handle {
-    width: 40px;
-    height: 4.5px;
-    background: var(--brand-border);
-    border-radius: 9999px;
-    opacity: 0.7;
-  }
-
   .sheet-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 0.4rem 1rem 0.65rem;
+    padding: 0.6rem 1rem;
     border-bottom: 1px solid var(--brand-border);
   }
 
