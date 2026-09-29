@@ -7,6 +7,14 @@
   let isScrolledEnd = false;
   let currentDay = getDay();
 
+  const weekdayFullNames = {
+    LUN: "Lunedì",
+    MAR: "Martedì",
+    MER: "Mercoledì",
+    GIO: "Giovedì",
+    VEN: "Venerdì",
+  };
+
   $: rowsData = [
     tableData.filter((e) => e.ora === hours[0]),
     tableData.filter((e) => e.ora === hours[1]),
@@ -36,7 +44,8 @@
         {#each weekdays as weekday}
           <th scope="col" class="weekday-header" class:is-today={weekday === currentDay}>
             <div class="weekday-cell">
-              <span class="weekday-name">{weekday}</span>
+              <span class="weekday-short">{weekday}</span>
+              <span class="weekday-long">{weekdayFullNames[weekday]}</span>
               {#if weekday === currentDay}
                 <span class="today-dot" title="Oggi"></span>
               {/if}
@@ -55,8 +64,10 @@
 
 <style>
   .compact-scroll {
-    border-radius: 10px;
+    border-radius: 12px;
     background: var(--brand-surface-card);
+    border: 1px solid var(--brand-border);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   }
 
   .compact-timetable {
@@ -76,7 +87,7 @@
   }
 
   th {
-    padding: 0.4rem 0.2rem;
+    padding: 0.45rem 0.2rem;
     font-size: 0.75rem;
     font-weight: 700;
     letter-spacing: 0.02em;
@@ -104,10 +115,14 @@
     transition: background-color 0.15s ease;
   }
 
-  @media (min-width: 640px) {
-    .weekday-header {
-      min-width: 90px;
-    }
+  .weekday-short {
+    display: inline;
+    line-height: 1;
+  }
+
+  .weekday-long {
+    display: none;
+    line-height: 1;
   }
 
   .weekday-header.is-today {
@@ -119,18 +134,62 @@
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.25rem;
-  }
-
-  .weekday-name {
-    line-height: 1;
+    gap: 0.35rem;
   }
 
   .today-dot {
-    width: 5px;
-    height: 5px;
+    width: 6px;
+    height: 6px;
     border-radius: 50%;
     background-color: var(--brand-primary);
     display: inline-block;
+  }
+
+  @media (min-width: 640px) {
+    .compact-timetable {
+      font-size: 0.85rem;
+    }
+    th {
+      padding: 0.65rem 0.4rem;
+      font-size: 0.875rem;
+    }
+    .col-hour.fixed-col {
+      width: 58px;
+      min-width: 58px;
+      max-width: 58px;
+      font-size: 0.825rem;
+    }
+    .weekday-header {
+      min-width: 100px;
+    }
+    .weekday-short {
+      display: none;
+    }
+    .weekday-long {
+      display: inline;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .compact-timetable {
+      font-size: 0.9rem;
+    }
+    th {
+      padding: 0.8rem 0.5rem;
+      font-size: 0.925rem;
+    }
+    .col-hour.fixed-col {
+      width: 72px;
+      min-width: 72px;
+      max-width: 72px;
+      font-size: 0.875rem;
+    }
+    .weekday-header {
+      min-width: 120px;
+    }
+    .today-dot {
+      width: 7px;
+      height: 7px;
+    }
   }
 </style>

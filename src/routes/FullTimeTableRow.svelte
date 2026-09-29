@@ -35,7 +35,10 @@
 <tr class="compact-row">
   <!-- Sticky Hour cell on the left -->
   <th class="hour-fixed-col" scope="row">
-    <span class="hour-num">{hourIndex + 1}ª</span>
+    <div class="hour-wrap">
+      <span class="hour-num">{hourIndex + 1}ª</span>
+      <span class="hour-time-label">{hour}</span>
+    </div>
   </th>
 
   {#each weekdays as weekday}
@@ -80,7 +83,7 @@
                 {/if}
 
                 {#if fields.includes("aula") && entry["aula"] && entry["aula"] !== "-"}
-                  <span class="room-sub">A.{entry["aula"]}</span>
+                  <span class="room-sub">{entry["aula"]}</span>
                 {/if}
               </div>
             </div>
@@ -117,11 +120,28 @@
     vertical-align: middle;
   }
 
+  .hour-wrap {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
   .hour-num {
     font-size: 0.8rem;
     font-weight: 700;
     color: var(--brand-text);
     line-height: 1;
+  }
+
+  .hour-time-label {
+    display: none;
+    font-size: 0.65rem;
+    font-weight: 500;
+    color: var(--brand-text-muted);
+    line-height: 1.1;
+    margin-top: 0.15rem;
+    white-space: nowrap;
   }
 
   .day-slot {
@@ -242,5 +262,112 @@
     opacity: 0.3;
     font-size: 0.9rem;
     line-height: 1;
+  }
+
+  @media (min-width: 640px) {
+    .hour-fixed-col {
+      width: 58px;
+      min-width: 58px;
+      max-width: 58px;
+      padding: 0.45rem 0.25rem;
+    }
+    .hour-num {
+      font-size: 0.9rem;
+      font-weight: 800;
+    }
+    .hour-time-label {
+      display: block;
+    }
+    .day-slot {
+      padding: 0.5rem 0.35rem;
+    }
+    .slot-stack {
+      gap: 0.25rem;
+    }
+    .line-primary {
+      gap: 0.35rem;
+      font-size: 0.825rem;
+    }
+    .class-label {
+      font-size: 0.85rem;
+      font-weight: 800;
+    }
+    .subj-tag {
+      font-size: 0.75rem;
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+    }
+    .teacher-label {
+      font-size: 0.8rem;
+      max-width: 110px;
+    }
+    .line-secondary {
+      gap: 0.35rem;
+      font-size: 0.775rem;
+      margin-top: 0.15rem;
+    }
+    .teacher-sub {
+      font-size: 0.75rem;
+      max-width: 95px;
+    }
+    .room-sub {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.1rem 0.35rem;
+      border-radius: 4px;
+    }
+  }
+
+  @media (min-width: 1024px) {
+    .hour-fixed-col {
+      width: 72px;
+      min-width: 72px;
+      max-width: 72px;
+      padding: 0.6rem 0.35rem;
+    }
+    .hour-num {
+      font-size: 1rem;
+    }
+    .hour-time-label {
+      font-size: 0.725rem;
+    }
+    .day-slot {
+      padding: 0.65rem 0.5rem;
+    }
+    .slot-stack {
+      gap: 0.35rem;
+    }
+    .line-primary {
+      gap: 0.45rem;
+      font-size: 0.9rem;
+    }
+    .class-label {
+      font-size: 0.925rem;
+    }
+    .subj-tag {
+      font-size: 0.825rem;
+      padding: 0.15rem 0.45rem;
+      border-radius: 5px;
+    }
+    .teacher-label {
+      font-size: 0.85rem;
+      max-width: none;
+    }
+    .line-secondary {
+      gap: 0.45rem;
+      font-size: 0.825rem;
+      margin-top: 0.2rem;
+    }
+    .teacher-sub {
+      font-size: 0.825rem;
+      max-width: none;
+    }
+    .room-sub {
+      font-size: 0.825rem;
+      padding: 0.15rem 0.45rem;
+    }
+    .day-slot:hover {
+      background: color-mix(in srgb, var(--brand-primary) 6%, var(--brand-surface-card));
+    }
   }
 </style>
