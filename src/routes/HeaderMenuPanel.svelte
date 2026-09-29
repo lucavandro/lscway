@@ -275,8 +275,7 @@
     background: var(--brand-surface-card);
     border-right: 1px solid var(--brand-border);
     box-shadow: 6px 0 32px rgba(0, 0, 0, 0.25);
-    display: flex;
-    flex-direction: column;
+    display: block;
     padding: calc(0.85rem + env(safe-area-inset-top, 0px)) 0.85rem calc(0.85rem + env(safe-area-inset-bottom, 0px));
     z-index: 99999;
     overflow-y: auto;
@@ -403,40 +402,45 @@
   }
 
   .drawer-nav {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    gap: 0.35rem;
+    display: block;
   }
 
   .nav-section-label {
-    font-size: 0.65rem;
+    display: block;
+    font-size: 0.675rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--brand-text-muted);
-    padding: 0.2rem 0.4rem 0.1rem;
+    padding: 0.45rem 0.55rem 0.25rem;
+    margin-top: 0.35rem;
   }
 
   .nav-list {
     list-style: none;
     padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
+    margin: 0 0 0.75rem 0;
+    display: block;
+  }
+
+  .nav-list li {
+    display: block;
+    margin: 0 0 0.3rem 0;
+    padding: 0;
+  }
+
+  .nav-list li:last-child {
+    margin-bottom: 0;
   }
 
   .nav-link,
   .nav-action-btn {
-    display: flex;
-    align-items: center;
-    gap: 0.55rem;
-    padding: 0.45rem 0.55rem;
-    border-radius: 6px;
+    display: block;
+    padding: 0.65rem 0.75rem;
+    border-radius: 8px;
     color: var(--brand-text);
     text-decoration: none;
-    font-size: 0.85rem;
+    font-size: 0.875rem;
     font-weight: 500;
     background: transparent;
     border: none;
@@ -462,18 +466,25 @@
   }
 
   .nav-icon {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
+    vertical-align: middle;
     color: var(--brand-text-muted);
     width: 18px;
     height: 18px;
+    margin-right: 0.65rem;
     flex-shrink: 0;
   }
 
   .nav-icon :global(.icon) {
     width: 16px;
     height: 16px;
+  }
+
+  .nav-text {
+    display: inline-block;
+    vertical-align: middle;
   }
 
   .nav-link.active .nav-icon {
@@ -494,14 +505,21 @@
   }
 
   .drawer-footer {
-    padding-top: 0.65rem;
+    padding-top: 0.75rem;
+    margin-top: 0.75rem;
     border-top: 1px solid var(--brand-border);
-    display: flex;
-    flex-direction: column;
-    gap: 0.15rem;
+    display: block;
     color: var(--brand-text-muted);
     font-size: 0.7rem;
-    flex-shrink: 0;
+  }
+
+  .drawer-footer small {
+    display: block;
+    line-height: 1.35;
+  }
+
+  .drawer-footer .version {
+    margin-top: 0.15rem;
   }
 
   @keyframes fade-backdrop {
