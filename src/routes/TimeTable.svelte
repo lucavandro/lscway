@@ -2,22 +2,9 @@
   import TimeTableRow from "./TimeTableRow.svelte";
   export let data = [];
   export let fields = [];
-
-  let scrollContainer;
-  let isScrolledEnd = false;
-
-  function handleScroll(e) {
-    const el = e.currentTarget;
-    isScrolledEnd = el.scrollLeft + el.clientWidth >= el.scrollWidth - 10;
-  }
 </script>
 
-<div
-  bind:this={scrollContainer}
-  class="table-scroll-container"
-  class:scrolled-right={isScrolledEnd}
-  on:scroll={handleScroll}
->
+<div class="daily-table-container">
   <table class="daily-timetable">
     <thead>
       <tr>
@@ -36,12 +23,22 @@
 </div>
 
 <style>
+  .daily-table-container {
+    width: 100%;
+    overflow-x: hidden; /* Guarantee no horizontal scroll on mobile */
+    border-radius: 12px;
+    border: 1px solid var(--brand-border);
+    background: var(--brand-surface-card);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+
   .daily-timetable {
     width: 100%;
+    table-layout: fixed;
     border-collapse: separate;
     border-spacing: 0;
     margin: 0;
-    font-size: 0.95rem;
+    font-size: 0.85rem;
   }
 
   thead {
@@ -52,24 +49,48 @@
   }
 
   thead th {
-    padding: 0.75rem 1rem;
-    font-size: 0.75rem;
+    padding: 0.55rem 0.35rem;
+    font-size: 0.725rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: 0.05em;
+    letter-spacing: 0.04em;
     color: var(--brand-text-muted);
     border-bottom: 2px solid var(--brand-border);
-    white-space: nowrap;
     text-align: center;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .col-hour {
-    width: 60px;
+    width: 44px;
+    min-width: 44px;
+    max-width: 48px;
     text-align: center;
-    position: sticky;
-    inset-inline-start: 0;
-    background: var(--brand-surface-subtle);
-    z-index: 4;
     border-right: 1px solid var(--brand-border);
+  }
+
+  :global(.col-aula) {
+    width: 22%;
+  }
+
+  :global(.col-materia) {
+    width: 25%;
+  }
+
+  :global(.col-docente),
+  :global(.col-classe) {
+    width: auto; /* Takes all remaining width */
+  }
+
+  @media (max-width: 400px) {
+    thead th {
+      padding: 0.45rem 0.2rem;
+      font-size: 0.675rem;
+    }
+    .col-hour {
+      width: 40px;
+      min-width: 40px;
+    }
   }
 </style>

@@ -53,11 +53,7 @@
             <div class="entry-item">
               {#if field === "aula"}
                 {#if rd[field] && rd[field] !== "-"}
-                  <a href="{base}/aula?q={queryValue(rd[field])}" class="link-chip room-chip">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                      <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
-                      <polyline points="9 22 9 12 15 12 15 22"></polyline>
-                    </svg>
+                  <a href="{base}/aula?q={queryValue(rd[field])}" class="link-chip room-chip" title="Aula {rd[field]}">
                     <span>{rd[field]}</span>
                   </a>
                 {:else}
@@ -65,11 +61,7 @@
                 {/if}
               {:else if field === "docente"}
                 {#if rd["docente"]}
-                  <a href="{base}/docente?q={queryValue(rd['docente'])}" class="link-chip teacher-chip">
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true">
-                      <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                      <circle cx="12" cy="7" r="4"></circle>
-                    </svg>
+                  <a href="{base}/docente?q={queryValue(rd['docente'])}" class="link-chip teacher-chip" title={rd["docente"]}>
                     <span>{rd["docente_abbr"] || rd["docente"]}</span>
                   </a>
                 {:else}
@@ -77,18 +69,18 @@
                 {/if}
               {:else if field === "classe"}
                 {#if rd["classe"]}
-                  <a href="{base}/?q={queryValue(rd['classe'])}" class="link-chip class-chip">
+                  <a href="{base}/?q={queryValue(rd['classe'])}" class="link-chip class-chip" title="Classe {rd['classe']}">
                     <span>{rd["classe"]}</span>
                   </a>
                 {:else if rd["materia"] === "INC"}
-                  <span class="badge-chip badge-amber">Inclusione</span>
+                  <span class="badge-chip badge-amber">INC</span>
                 {:else}
                   <span class="dash">—</span>
                 {/if}
               {:else if field === "materia"}
-                <span class="subject-tag">{rd[field]}</span>
+                <span class="subject-tag" title={rd[field]}>{rd[field]}</span>
               {:else}
-                <span>{rd[field]}</span>
+                <span class="cell-text">{rd[field]}</span>
               {/if}
             </div>
 
@@ -122,7 +114,7 @@
   }
 
   .timetable-row.is-active .hour-cell {
-    border-left: 4px solid var(--brand-primary);
+    border-left: 3px solid var(--brand-primary);
     background-color: color-mix(in srgb, var(--brand-primary) 12%, var(--brand-surface-card));
   }
 
@@ -135,10 +127,14 @@
     inset-inline-start: 0;
     z-index: 2;
     background: var(--brand-surface-card);
-    padding: 0.65rem 0.75rem;
+    padding: 0.4rem 0.2rem;
     text-align: center;
     border-right: 1px solid var(--brand-border);
     transition: background-color 0.15s ease;
+    width: 44px;
+    min-width: 44px;
+    max-width: 48px;
+    vertical-align: middle;
   }
 
   .hour-number-wrap {
@@ -146,49 +142,51 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.15rem;
+    gap: 0.1rem;
+    line-height: 1.1;
   }
 
   .hour-number {
-    font-size: 1.1rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: var(--brand-text);
-    line-height: 1;
   }
 
   .hour-time {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 500;
     color: var(--brand-text-muted);
   }
 
   .now-badge {
-    font-size: 0.65rem;
+    font-size: 0.575rem;
     font-weight: 700;
     text-transform: uppercase;
     background: var(--brand-primary);
     color: #ffffff;
-    padding: 0.1rem 0.35rem;
-    border-radius: 4px;
-    margin-top: 0.2rem;
+    padding: 0.05rem 0.25rem;
+    border-radius: 3px;
+    margin-top: 0.1rem;
+    line-height: 1.1;
   }
 
   .data-cell {
-    padding: 0.65rem 0.85rem;
+    padding: 0.35rem 0.25rem;
     text-align: center;
     vertical-align: middle;
+    overflow: hidden;
   }
 
   .empty-cell {
-    padding: 0.65rem 0.85rem;
+    padding: 0.35rem 0.25rem;
     text-align: center;
     color: var(--brand-text-muted);
   }
 
   .dash {
     color: var(--brand-text-muted);
-    opacity: 0.4;
-    font-weight: 300;
+    opacity: 0.35;
+    font-size: 0.85rem;
   }
 
   .cell-entries {
@@ -196,69 +194,111 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.4rem;
+    gap: 0.2rem;
+    width: 100%;
   }
 
   .entry-item {
     display: flex;
     align-items: center;
     justify-content: center;
+    width: 100%;
+    min-width: 0;
   }
 
   .entry-divider {
     width: 60%;
     height: 1px;
     background: var(--brand-border);
-    margin: 0.2rem auto;
+    margin: 0.1rem auto;
   }
 
-  /* Interactive Chips */
+  /* Compact Chips */
   .link-chip {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.35rem;
-    padding: 0.3rem 0.65rem;
-    border-radius: 8px;
-    font-size: 0.875rem;
+    display: inline-block;
+    max-width: 100%;
+    padding: 0.2rem 0.4rem;
+    border-radius: 6px;
+    font-size: 0.775rem;
     font-weight: 600;
     text-decoration: none;
-    transition: transform 0.12s ease, box-shadow 0.12s ease, background 0.12s ease;
+    transition: transform 0.12s ease, background 0.12s ease;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.25;
+    box-sizing: border-box;
   }
 
   .link-chip:hover {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.08);
     text-decoration: none;
+    transform: translateY(-1px);
   }
 
   .teacher-chip {
-    background: color-mix(in srgb, var(--brand-primary) 12%, transparent);
+    background: color-mix(in srgb, var(--brand-primary) 10%, transparent);
     color: var(--brand-primary);
-    border: 1px solid color-mix(in srgb, var(--brand-primary) 25%, transparent);
+    border: 1px solid color-mix(in srgb, var(--brand-primary) 20%, transparent);
   }
 
   .room-chip {
     background: rgba(16, 185, 129, 0.1);
     color: #10b981;
-    border: 1px solid rgba(16, 185, 129, 0.25);
+    border: 1px solid rgba(16, 185, 129, 0.2);
   }
 
   .class-chip {
-    background: color-mix(in srgb, var(--brand-text) 8%, transparent);
+    background: color-mix(in srgb, var(--brand-text) 6%, transparent);
     color: var(--brand-text);
     border: 1px solid var(--brand-border);
   }
 
   .subject-tag {
     display: inline-block;
-    padding: 0.25rem 0.55rem;
-    border-radius: 6px;
-    font-size: 0.85rem;
+    max-width: 100%;
+    padding: 0.15rem 0.35rem;
+    border-radius: 4px;
+    font-size: 0.725rem;
     font-weight: 700;
-    letter-spacing: 0.03em;
+    letter-spacing: 0.02em;
     background: var(--brand-surface-subtle);
     border: 1px solid var(--brand-border);
     color: var(--brand-text);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    line-height: 1.25;
+  }
+
+  .cell-text {
+    font-size: 0.775rem;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 400px) {
+    .hour-cell {
+      width: 40px;
+      min-width: 40px;
+      padding: 0.35rem 0.15rem;
+    }
+    .hour-number {
+      font-size: 0.85rem;
+    }
+    .hour-time {
+      font-size: 0.6rem;
+    }
+    .data-cell {
+      padding: 0.3rem 0.15rem;
+    }
+    .link-chip {
+      padding: 0.18rem 0.3rem;
+      font-size: 0.725rem;
+    }
+    .subject-tag {
+      padding: 0.12rem 0.25rem;
+      font-size: 0.675rem;
+    }
   }
 </style>

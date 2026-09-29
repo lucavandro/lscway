@@ -134,6 +134,12 @@ main.container-fluid {
   box-sizing: border-box;
 }
 
+@media (max-width: 480px) {
+  main.container-fluid {
+    padding: 0.65rem 0.5rem 2rem;
+  }
+}
+
 @media (min-width: 768px) {
   main.container-fluid {
     padding: 1.5rem 1.5rem 3rem;
