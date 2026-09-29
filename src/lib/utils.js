@@ -49,5 +49,11 @@ export function isDateBefore(date1, date2) {
 }
 
 
-export    const inclusioneInFondo = (a, b) => a.materia === "INC" ? 1 : -1
+export const inclusioneInFondo = (a, b) => {
+  const isA = a.materia === "INC" || a.materia === "MADISO";
+  const isB = b.materia === "INC" || b.materia === "MADISO";
+  if (isA && !isB) return 1;
+  if (!isA && isB) return -1;
+  return 0;
+};
 

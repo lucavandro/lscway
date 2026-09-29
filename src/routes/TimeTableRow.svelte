@@ -13,6 +13,21 @@
   $: hour = hours[hourIndex];
   $: rowData = data.filter((e) => e.ora == hour).sort(inclusioneInFondo);
   $: isActive = hourIndex === currentHour - 1;
+  $: isPotRow = rowData.some((e) => e.materia === "POT" || e.materia === "sub_potenziamento" || e.materia === "RIC");
+
+  function getFieldEntries(field, rows) {
+    if (!rows || rows.length <= 1) return rows;
+    const hasSostegno = rows.some((r) => r.materia === "MADISO" || r.materia === "INC");
+    if (hasSostegno) {
+      if (field === "aula") {
+        return [rows[0]];
+      }
+      if (field === "classe") {
+        return [rows[0]];
+      }
+    }
+    return rows;
+  }
 
   onMount(() => {
     interval = setInterval(() => {
@@ -27,7 +42,7 @@
   const queryValue = (value) => encodeURIComponent(value ?? "");
 </script>
 
-<tr class="timetable-row" class:is-active={isActive}>
+<tr class="timetable-row" class:is-active={isActive} class:is-pot-row={isPotRow}>
   <!-- Sticky Hour Header -->
   <th class="hour-cell" scope="row">
     <div class="hour-number-wrap">
@@ -47,9 +62,10 @@
     {/each}
   {:else}
     {#each fields as field}
+      {@const entries = getFieldEntries(field, rowData)}
       <td class="data-cell">
         <div class="cell-entries">
-          {#each rowData as rd, index}
+          {#each entries as rd, index}
             <div class="entry-item">
               {#if field === "aula"}
                 {#if rd[field] && rd[field] !== "-"}
@@ -72,19 +88,28 @@
                   <a href="{base}/?q={queryValue(rd['classe'])}" class="link-chip class-chip" title="Classe {rd['classe']}">
                     <span>{rd["classe"]}</span>
                   </a>
-                {:else if rd["materia"] === "INC"}
-                  <span class="badge-chip badge-amber">INC</span>
+                {:else if rd["materia"] === "POT" || rd["materia"] === "sub_potenziamento" || rd["materia"] === "RIC"}
+                  <span class="badge-chip badge-pot">Potenziamento</span>
+                {:else if rd["materia"] === "INC" || rd["materia"] === "MADISO"}
+                  <span class="badge-chip badge-sostegno">Sostegno</span>
                 {:else}
                   <span class="dash">—</span>
                 {/if}
               {:else if field === "materia"}
-                <span class="subject-tag" title={rd[field]}>{rd[field]}</span>
+                <span
+                  class="subject-tag"
+                  class:is-pot={rd[field] === "POT" || rd[field] === "sub_potenziamento" || rd[field] === "RIC"}
+                  class:is-sostegno={rd[field] === "MADISO" || rd[field] === "INC"}
+                  title={rd[field]}
+                >
+                  {rd[field]}
+                </span>
               {:else}
                 <span class="cell-text">{rd[field]}</span>
               {/if}
             </div>
 
-            {#if index < rowData.length - 1}
+            {#if index < entries.length - 1}
               <div class="entry-divider"></div>
             {/if}
           {/each}
@@ -120,6 +145,15 @@
 
   .timetable-row.is-active .hour-number {
     color: var(--brand-primary);
+  }
+
+  /* Potenziamento row highlight */
+  .timetable-row.is-pot-row {
+    background-color: color-mix(in srgb, #f59e0b 6%, var(--brand-surface-card));
+  }
+
+  .timetable-row.is-pot-row .hour-cell {
+    border-left: 3px solid #f59e0b;
   }
 
   .hour-cell {
@@ -268,6 +302,70 @@
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 1.25;
+  }
+
+  .subject-tag.is-pot {
+    background: rgba(245, 158, 11, 0.16);
+    color: #b45309;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    font-weight: 800;
+  }
+
+  :global([data-theme="dark"]) .subject-tag.is-pot,
+  :global(.dark) .subject-tag.is-pot {
+    color: #fbbf24;
+    background: rgba(245, 158, 11, 0.22);
+    border-color: rgba(245, 158, 11, 0.5);
+  }
+
+  .subject-tag.is-sostegno {
+    background: rgba(99, 102, 241, 0.12);
+    color: #4f46e5;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+    font-weight: 700;
+  }
+
+  :global([data-theme="dark"]) .subject-tag.is-sostegno,
+  :global(.dark) .subject-tag.is-sostegno {
+    color: #818cf8;
+    background: rgba(99, 102, 241, 0.22);
+    border-color: rgba(99, 102, 241, 0.45);
+  }
+
+  .badge-chip {
+    display: inline-block;
+    padding: 0.18rem 0.45rem;
+    border-radius: 6px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1.25;
+    white-space: nowrap;
+  }
+
+  .badge-chip.badge-pot {
+    background: rgba(245, 158, 11, 0.14);
+    color: #b45309;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+  }
+
+  :global([data-theme="dark"]) .badge-chip.badge-pot,
+  :global(.dark) .badge-chip.badge-pot {
+    color: #fbbf24;
+    background: rgba(245, 158, 11, 0.2);
+    border-color: rgba(245, 158, 11, 0.45);
+  }
+
+  .badge-chip.badge-sostegno {
+    background: rgba(99, 102, 241, 0.12);
+    color: #4f46e5;
+    border: 1px solid rgba(99, 102, 241, 0.3);
+  }
+
+  :global([data-theme="dark"]) .badge-chip.badge-sostegno,
+  :global(.dark) .badge-chip.badge-sostegno {
+    color: #818cf8;
+    background: rgba(99, 102, 241, 0.2);
+    border-color: rgba(99, 102, 241, 0.45);
   }
 
   .cell-text {

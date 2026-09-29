@@ -45,20 +45,27 @@
     {@const isToday = weekday === currentDay}
     {@const isActiveSlot = hourIndex === currentHour - 1 && isToday}
     {@const dayEntries = filteredRowData[weekday] || []}
+    {@const hasPot = dayEntries.some((e) => e.materia === "POT" || e.materia === "sub_potenziamento" || e.materia === "RIC")}
 
     <td
       class="day-slot"
       class:is-today={isToday}
       class:is-active-slot={isActiveSlot}
+      class:is-pot-slot={hasPot}
     >
       {#if dayEntries.length > 0}
         <div class="slot-stack">
           {#each dayEntries as entry, idx}
-            {@const hasPrimary = (fields.includes("classe") && entry["classe"]) || (fields.includes("docente") && entry["docente"])}
-            <div class="entry-micro">
+            {@const isSostegno = entry["materia"] === "MADISO" || entry["materia"] === "INC"}
+            {@const isPot = entry["materia"] === "POT" || entry["materia"] === "sub_potenziamento" || entry["materia"] === "RIC"}
+            {@const isSecondarySostegno = idx > 0 && isSostegno}
+            {@const hasPrimary = (fields.includes("classe") && entry["classe"] && !isSecondarySostegno) || (fields.includes("docente") && entry["docente"])}
+            {@const showAula = fields.includes("aula") && entry["aula"] && entry["aula"] !== "-" && !isSecondarySostegno}
+
+            <div class="entry-micro" class:is-pot-entry={isPot}>
               <!-- Line 1: Primary identifier (Docente in class view, Classe in teacher/room view) -->
               <div class="line-primary">
-                {#if fields.includes("classe") && entry["classe"]}
+                {#if fields.includes("classe") && entry["classe"] && !isSecondarySostegno}
                   <span class="primary-label class-label">{entry["classe"]}</span>
                 {/if}
 
@@ -68,25 +75,33 @@
                   </span>
                 {/if}
 
-                {#if !hasPrimary && entry["materia"]}
-                  <span class="primary-label fallback-label">{entry["materia"]}</span>
+                {#if !hasPrimary}
+                  {#if isPot}
+                    <span class="primary-label pot-hero">Potenziamento</span>
+                  {:else if entry["materia"]}
+                    <span class="primary-label fallback-label">{entry["materia"]}</span>
+                  {/if}
                 {/if}
               </div>
 
-              <!-- Line 2: Secondary info (Materia and Aula side by side, duly separated) -->
-              {#if (hasPrimary && entry["materia"]) || (fields.includes("aula") && entry["aula"] && entry["aula"] !== "-")}
+              <!-- Line 2: Secondary info (Materia and Aula, stacked on mobile, side-by-side on tablet/desktop) -->
+              {#if entry["materia"] || showAula}
                 <div class="line-secondary">
-                  {#if hasPrimary && entry["materia"]}
-                    <span class="subj-tag" class:is-pot={entry["materia"] === "POT" || entry["materia"] === "RIC"}>
+                  {#if entry["materia"]}
+                    <span
+                      class="subj-tag"
+                      class:is-pot={isPot}
+                      class:is-sostegno={isSostegno}
+                    >
                       {entry["materia"]}
                     </span>
                   {/if}
 
-                  {#if hasPrimary && entry["materia"] && fields.includes("aula") && entry["aula"] && entry["aula"] !== "-"}
+                  {#if entry["materia"] && showAula}
                     <span class="sec-sep" aria-hidden="true">•</span>
                   {/if}
 
-                  {#if fields.includes("aula") && entry["aula"] && entry["aula"] !== "-"}
+                  {#if showAula}
                     <span class="room-sub">{entry["aula"]}</span>
                   {/if}
                 </div>
@@ -220,13 +235,41 @@
     font-weight: 700;
   }
 
+  .day-slot.is-pot-slot {
+    background: color-mix(in srgb, #f59e0b 9%, var(--brand-surface-card));
+    border-left: 2px solid #f59e0b;
+  }
+
+  .day-slot.is-pot-slot.is-today {
+    background: color-mix(in srgb, #f59e0b 16%, var(--brand-surface-card));
+  }
+
+  .primary-label.pot-hero {
+    color: #b45309;
+    font-size: 0.725rem;
+    font-weight: 800;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+  }
+
+  :global([data-theme="dark"]) .primary-label.pot-hero,
+  :global(.dark) .primary-label.pot-hero {
+    color: #fbbf24;
+  }
+
+  /* Secondary line: Stacked vertically on mobile, row on tablet/desktop */
   .line-secondary {
-    display: inline-flex;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.25rem;
+    gap: 0.15rem;
     margin-top: 0.15rem;
-    max-width: 100%;
+    width: 100%;
+  }
+
+  .sec-sep {
+    display: none;
   }
 
   .subj-tag {
@@ -242,9 +285,31 @@
   }
 
   .subj-tag.is-pot {
-    background: rgba(245, 158, 11, 0.12);
-    color: #d97706;
-    border-color: rgba(245, 158, 11, 0.3);
+    background: rgba(245, 158, 11, 0.18);
+    color: #b45309;
+    border-color: rgba(245, 158, 11, 0.45);
+    font-weight: 700;
+  }
+
+  :global([data-theme="dark"]) .subj-tag.is-pot,
+  :global(.dark) .subj-tag.is-pot {
+    color: #fbbf24;
+    background: rgba(245, 158, 11, 0.22);
+    border-color: rgba(245, 158, 11, 0.5);
+  }
+
+  .subj-tag.is-sostegno {
+    background: rgba(99, 102, 241, 0.12);
+    color: #4f46e5;
+    border-color: rgba(99, 102, 241, 0.3);
+    font-weight: 700;
+  }
+
+  :global([data-theme="dark"]) .subj-tag.is-sostegno,
+  :global(.dark) .subj-tag.is-sostegno {
+    color: #818cf8;
+    background: rgba(99, 102, 241, 0.2);
+    border-color: rgba(99, 102, 241, 0.45);
   }
 
   .room-sub {
@@ -316,9 +381,15 @@
     .fallback-label {
       font-size: 0.825rem;
     }
+    .primary-label.pot-hero {
+      font-size: 0.825rem;
+    }
     .line-secondary {
+      display: inline-flex;
+      flex-direction: row;
       gap: 0.35rem;
       margin-top: 0.2rem;
+      width: auto;
     }
     .subj-tag {
       font-size: 0.75rem;
@@ -332,6 +403,7 @@
       border-radius: 4px;
     }
     .sec-sep {
+      display: inline;
       font-size: 0.75rem;
     }
   }
@@ -366,6 +438,9 @@
       max-width: none;
     }
     .fallback-label {
+      font-size: 0.875rem;
+    }
+    .primary-label.pot-hero {
       font-size: 0.875rem;
     }
     .line-secondary {
