@@ -12,7 +12,7 @@
   import SunIcon from "$icons/SunIcon.svelte";
   import MoonIcon from "$icons/MoonIcon.svelte";
   import { isLoading, userEmail, isTeacher, isMenuOpen } from "$lib/stores.js";
-  import { theme, themePreference, toggleTheme } from "$lib/theme.js";
+  import { theme, toggleTheme } from "$lib/theme.js";
   import { onDestroy } from "svelte";
 
   let closing = false;
@@ -231,9 +231,6 @@
               </span>
               <span class="nav-text">
                 {$theme === 'dark' ? 'Tema scuro' : 'Tema chiaro'}
-                {#if $themePreference === 'system'}
-                  <span class="theme-system-tag">Sistema</span>
-                {/if}
               </span>
               <span class="theme-switch" aria-hidden="true" class:active={$theme === 'dark'}>
                 <span class="theme-switch-thumb"></span>
@@ -572,22 +569,6 @@
 
   .theme-switch.active .theme-switch-thumb {
     transform: translateX(18px);
-  }
-
-  .theme-system-tag {
-    display: inline-block;
-    font-size: 0.625rem;
-    font-weight: 700;
-    color: var(--brand-text-muted);
-    background: var(--brand-surface-subtle);
-    border: 1px solid var(--brand-border);
-    padding: 0.05rem 0.3rem;
-    border-radius: 4px;
-    margin-left: 0.35rem;
-    vertical-align: middle;
-    text-transform: uppercase;
-    letter-spacing: 0.03em;
-    line-height: 1.2;
   }
 
   .drawer-footer {
