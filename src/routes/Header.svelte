@@ -84,7 +84,7 @@
 <header class="app-header">
   <div class="header-inner">
     <div class="header-row">
-      <!-- Left side: Hamburger & Logo/Title aligned -->
+      <!-- Left side: Hamburger & Title aligned -->
       <div class="left-cluster">
         <button
           type="button"
@@ -101,7 +101,6 @@
         </button>
 
         <a href={base || "/"} class="logo-link">
-          <div class="logo-icon">W</div>
           <div class="logo-text">
             <span class="brand-title">WAY Cortese</span>
             <span class="brand-subtitle">Liceo N. Cortese</span>
@@ -146,7 +145,7 @@
   .header-inner {
     max-width: 68rem;
     margin: 0 auto;
-    padding: 0.55rem 1rem 0;
+    padding: 0 1rem;
   }
 
   .header-row {
@@ -154,14 +153,15 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    padding-bottom: 0.45rem;
+    padding-top: 0.75rem;
+    padding-bottom: 0.65rem;
   }
 
-  /* Left cluster: perfect vertical alignment between button, logo icon, and title */
+  /* Left cluster: vertical alignment between button and title */
   .left-cluster {
     display: inline-flex;
     align-items: center;
-    gap: 0.55rem;
+    gap: 0.65rem;
     margin: 0;
     padding: 0;
   }
@@ -193,7 +193,6 @@
   .logo-link {
     display: inline-flex;
     align-items: center;
-    gap: 0.55rem;
     text-decoration: none;
     color: inherit;
     margin: 0;
@@ -203,23 +202,6 @@
 
   .logo-link:hover {
     text-decoration: none;
-  }
-
-  .logo-icon {
-    width: 34px;
-    height: 34px;
-    border-radius: 9px;
-    background: linear-gradient(135deg, var(--brand-primary), #1d4ed8);
-    color: #ffffff;
-    font-weight: 700;
-    font-size: 1.05rem;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
-    flex-shrink: 0;
-    margin: 0;
-    line-height: 1;
   }
 
   .logo-text {
@@ -308,6 +290,13 @@
     border-radius: 50%;
     background-color: var(--brand-text-muted);
     flex-shrink: 0;
+  }
+
+  @media (min-width: 640px) {
+    .header-row {
+      padding-top: 0.85rem;
+      padding-bottom: 0.75rem;
+    }
   }
 
   @media (max-width: 480px) {
