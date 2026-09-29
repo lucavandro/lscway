@@ -6,6 +6,7 @@
 	import Footer from "./Footer.svelte";
 	import { base } from "$app/paths";
 	import { onNavigate } from "$app/navigation";
+	import { initTheme } from "$lib/theme.js";
 
 	let day = getDay();
 	let intervalTimer;
@@ -24,6 +25,7 @@
 
 	// Lifecycle events
 	onMount(() => {
+		initTheme();
 		if ('serviceWorker' in navigator) {
 			navigator.serviceWorker.register(`${base}/service-worker.js`, { scope: `${base}/` });
 		}

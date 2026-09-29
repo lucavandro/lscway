@@ -16,8 +16,17 @@
 	<meta name="Cross-Origin-Opener-Policy" content="same-origin-allow-popups">
 	<meta name="theme-color" media="(prefers-color-scheme: light)" content="#e7eaf0" />
 	<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#202632" />
-	<!-- Orientation  -->
-	<meta name="screen-orientation" content="portrait">
+	<script>
+		(function() {
+			try {
+				var saved = localStorage.getItem('theme');
+				var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+				var theme = saved === 'dark' || saved === 'light' ? saved : (prefersDark ? 'dark' : 'light');
+				document.documentElement.setAttribute('data-theme', theme);
+				document.documentElement.style.colorScheme = theme;
+			} catch (e) {}
+		})();
+	</script>
 
 	%sveltekit.head%
 </head>

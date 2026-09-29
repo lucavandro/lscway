@@ -60,6 +60,38 @@
   }
 }
 
+:root[data-theme="light"],
+[data-theme="light"] {
+  color-scheme: light;
+  --brand-primary: var(--brand-primary-light);
+  --brand-primary-hover: var(--brand-primary-hover-light);
+  --brand-surface: var(--brand-surface-light);
+  --brand-surface-subtle: var(--brand-surface-subtle-light);
+  --brand-surface-card: var(--brand-surface-card-light);
+  --brand-border: var(--brand-border-light);
+  --brand-text: var(--brand-text-light);
+  --brand-text-muted: var(--brand-text-muted-light);
+  --brand-active-glow: rgba(37, 99, 235, 0.15);
+  --scrollbar-thumb: #cbd5e1;
+  --scrollbar-track: #f1f5f9;
+}
+
+:root[data-theme="dark"],
+[data-theme="dark"] {
+  color-scheme: dark;
+  --brand-primary: var(--brand-primary-dark);
+  --brand-primary-hover: var(--brand-primary-hover-dark);
+  --brand-surface: var(--brand-surface-dark);
+  --brand-surface-subtle: var(--brand-surface-subtle-dark);
+  --brand-surface-card: var(--brand-surface-card-dark);
+  --brand-border: var(--brand-border-dark);
+  --brand-text: var(--brand-text-dark);
+  --brand-text-muted: var(--brand-text-muted-dark);
+  --brand-active-glow: rgba(59, 130, 246, 0.25);
+  --scrollbar-thumb: #334155;
+  --scrollbar-track: #0f172a;
+}
+
 /* Progressive enhancement with light-dark() where supported */
 @supports (color: light-dark(white, black)) {
   :root {

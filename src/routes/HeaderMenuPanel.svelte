@@ -9,7 +9,10 @@
   import LogoutIcon from "$icons/LogoutIcon.svelte";
   import ReloadIcon from "$icons/ReloadIcon.svelte";
   import SwapIcon from "$icons/SwapIcon.svelte";
+  import SunIcon from "$icons/SunIcon.svelte";
+  import MoonIcon from "$icons/MoonIcon.svelte";
   import { isLoading, userEmail, isTeacher, isMenuOpen } from "$lib/stores.js";
+  import { theme, themePreference, toggleTheme, setTheme } from "$lib/theme.js";
   import { onDestroy } from "svelte";
 
   let closing = false;
@@ -210,6 +213,44 @@
 
         <div class="nav-section-label">Azioni</div>
         <ul class="nav-list">
+          <li>
+            <button
+              type="button"
+              class="nav-action-btn theme-toggle-btn"
+              role="switch"
+              aria-checked={$theme === 'dark'}
+              aria-label="Passa a tema {$theme === 'dark' ? 'chiaro' : 'scuro'}"
+              on:click={toggleTheme}
+            >
+              <span class="nav-icon">
+                {#if $theme === 'dark'}
+                  <MoonIcon />
+                {:else}
+                  <SunIcon />
+                {/if}
+              </span>
+              <span class="nav-text">
+                {$theme === 'dark' ? 'Tema scuro' : 'Tema chiaro'}
+                {#if $themePreference === 'system'}
+                  <span class="theme-system-tag">Sistema</span>
+                {/if}
+              </span>
+              <span class="theme-switch" aria-hidden="true" class:active={$theme === 'dark'}>
+                <span class="theme-switch-thumb"></span>
+              </span>
+            </button>
+            {#if $themePreference !== 'system'}
+              <div class="theme-reset-row">
+                <button
+                  type="button"
+                  class="theme-reset-btn"
+                  on:click={() => setTheme('system')}
+                >
+                  Ripristina tema di sistema
+                </button>
+              </div>
+            {/if}
+          </li>
           <li>
             <button type="button" class="nav-action-btn" on:click={reload}>
               <span class="nav-icon"><ReloadIcon /></span>
@@ -508,6 +549,77 @@
   .nav-action-btn.logout-btn:hover {
     background: rgba(239, 68, 68, 0.1);
     color: #dc2626;
+  }
+
+  /* Theme Switch in Drawer */
+  .theme-switch {
+    float: right;
+    width: 38px;
+    height: 20px;
+    background: var(--brand-border);
+    border-radius: 9999px;
+    padding: 2px;
+    transition: background-color 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    display: inline-flex;
+    align-items: center;
+    box-sizing: border-box;
+    margin-top: -1px;
+  }
+
+  .theme-switch.active {
+    background: var(--brand-primary);
+  }
+
+  .theme-switch-thumb {
+    width: 16px;
+    height: 16px;
+    background: #ffffff;
+    border-radius: 50%;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+    transition: transform 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translateX(0);
+    display: block;
+  }
+
+  .theme-switch.active .theme-switch-thumb {
+    transform: translateX(18px);
+  }
+
+  .theme-system-tag {
+    display: inline-block;
+    font-size: 0.625rem;
+    font-weight: 700;
+    color: var(--brand-text-muted);
+    background: var(--brand-surface-subtle);
+    border: 1px solid var(--brand-border);
+    padding: 0.05rem 0.3rem;
+    border-radius: 4px;
+    margin-left: 0.35rem;
+    vertical-align: middle;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    line-height: 1.2;
+  }
+
+  .theme-reset-row {
+    display: block;
+    padding: 0.15rem 0.75rem 0.25rem 2.25rem;
+  }
+
+  .theme-reset-btn {
+    background: transparent;
+    border: none;
+    padding: 0;
+    color: var(--brand-text-muted);
+    font-size: 0.7rem;
+    text-decoration: underline;
+    cursor: pointer;
+    line-height: 1.2;
+    transition: color 0.15s ease;
+  }
+
+  .theme-reset-btn:hover {
+    color: var(--brand-primary);
   }
 
   .drawer-footer {
