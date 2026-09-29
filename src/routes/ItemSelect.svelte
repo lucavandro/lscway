@@ -807,11 +807,11 @@
   .sheet-search-wrap .search-input-box {
     background: var(--brand-surface-card);
     border: 1.5px solid var(--brand-border);
-    border-radius: 8px;
-    height: 38px;
-    min-height: 38px;
-    max-height: 38px;
-    padding: 0 0.6rem;
+    border-radius: 10px;
+    height: 42px;
+    min-height: 42px;
+    max-height: 42px;
+    padding: 0 0.75rem;
     transition: border-color 0.15s ease;
   }
 
@@ -823,13 +823,14 @@
   .search-input.mobile-input {
     font-size: 16px !important;
     line-height: 1.25;
+    font-weight: 500;
   }
 
   .sheet-options-list {
     flex: 1;
     overflow-y: auto;
     overscroll-behavior: contain;
-    padding: 0.25rem 0.5rem;
+    padding: 0.5rem 0.75rem 1.25rem;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -838,30 +839,31 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    min-height: 38px;
-    height: 38px;
-    margin: 0 0 2px 0 !important;
-    padding: 0 0.75rem !important;
-    background: transparent;
-    border: none !important;
-    border-radius: 6px;
-    box-shadow: none !important;
-    font-size: 0.9rem;
-    font-weight: 500;
+    min-height: 48px;
+    margin: 0 0 6px 0 !important;
+    padding: 0.65rem 1rem !important;
+    background: var(--brand-surface-card);
+    border: 1px solid var(--brand-border) !important;
+    border-radius: 10px;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+    font-size: 1.05rem;
+    font-weight: 600;
     color: var(--brand-text);
     text-align: left;
     cursor: pointer;
-    transition: background-color 0.1s ease;
+    transition: background-color 0.12s ease, border-color 0.12s ease;
     box-sizing: border-box;
-    line-height: 1.2;
+    line-height: 1.3;
   }
 
   .sheet-option-item:active {
     background: var(--brand-surface-subtle);
+    border-color: var(--brand-primary) !important;
   }
 
   .sheet-option-item.is-selected {
     background: color-mix(in srgb, var(--brand-primary) 12%, transparent);
+    border-color: var(--brand-primary) !important;
     color: var(--brand-primary);
     font-weight: 700;
   }
@@ -872,6 +874,8 @@
     justify-content: center;
     color: var(--brand-primary);
     flex-shrink: 0;
+    width: 20px;
+    height: 20px;
   }
 
   @media (min-width: 640px) {
