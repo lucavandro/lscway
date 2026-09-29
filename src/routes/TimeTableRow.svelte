@@ -13,7 +13,6 @@
   $: hour = hours[hourIndex];
   $: rowData = data.filter((e) => e.ora == hour).sort(inclusioneInFondo);
   $: isActive = hourIndex === currentHour - 1;
-  $: isPotRow = rowData.some((e) => e.materia === "POT" || e.materia === "sub_potenziamento" || e.materia === "RIC");
 
   function getFieldEntries(field, rows) {
     if (!rows || rows.length <= 1) return rows;
@@ -42,7 +41,7 @@
   const queryValue = (value) => encodeURIComponent(value ?? "");
 </script>
 
-<tr class="timetable-row" class:is-active={isActive} class:is-pot-row={isPotRow}>
+<tr class="timetable-row" class:is-active={isActive}>
   <!-- Sticky Hour Header -->
   <th class="hour-cell" scope="row">
     <div class="hour-number-wrap">
@@ -88,8 +87,6 @@
                   <a href="{base}/?q={queryValue(rd['classe'])}" class="link-chip class-chip" title="Classe {rd['classe']}">
                     <span>{rd["classe"]}</span>
                   </a>
-                {:else if rd["materia"] === "POT" || rd["materia"] === "sub_potenziamento" || rd["materia"] === "RIC"}
-                  <span class="badge-chip badge-pot">Potenziamento</span>
                 {:else if rd["materia"] === "INC" || rd["materia"] === "MADISO"}
                   <span class="badge-chip badge-sostegno">Sostegno</span>
                 {:else}
@@ -145,15 +142,6 @@
 
   .timetable-row.is-active .hour-number {
     color: var(--brand-primary);
-  }
-
-  /* Potenziamento row highlight */
-  .timetable-row.is-pot-row {
-    background-color: color-mix(in srgb, #f59e0b 6%, var(--brand-surface-card));
-  }
-
-  .timetable-row.is-pot-row .hour-cell {
-    border-left: 3px solid #f59e0b;
   }
 
   .hour-cell {
@@ -340,19 +328,6 @@
     font-weight: 700;
     line-height: 1.25;
     white-space: nowrap;
-  }
-
-  .badge-chip.badge-pot {
-    background: rgba(245, 158, 11, 0.14);
-    color: #b45309;
-    border: 1px solid rgba(245, 158, 11, 0.35);
-  }
-
-  :global([data-theme="dark"]) .badge-chip.badge-pot,
-  :global(.dark) .badge-chip.badge-pot {
-    color: #fbbf24;
-    background: rgba(245, 158, 11, 0.2);
-    border-color: rgba(245, 158, 11, 0.45);
   }
 
   .badge-chip.badge-sostegno {

@@ -45,13 +45,11 @@
     {@const isToday = weekday === currentDay}
     {@const isActiveSlot = hourIndex === currentHour - 1 && isToday}
     {@const dayEntries = filteredRowData[weekday] || []}
-    {@const hasPot = dayEntries.some((e) => e.materia === "POT" || e.materia === "sub_potenziamento" || e.materia === "RIC")}
 
     <td
       class="day-slot"
       class:is-today={isToday}
       class:is-active-slot={isActiveSlot}
-      class:is-pot-slot={hasPot}
     >
       {#if dayEntries.length > 0}
         <div class="slot-stack">
@@ -62,7 +60,7 @@
             {@const hasPrimary = (fields.includes("classe") && entry["classe"] && !isSecondarySostegno) || (fields.includes("docente") && entry["docente"])}
             {@const showAula = fields.includes("aula") && entry["aula"] && entry["aula"] !== "-" && !isSecondarySostegno}
 
-            <div class="entry-micro" class:is-pot-entry={isPot}>
+            <div class="entry-micro">
               <!-- Line 1: Primary identifier (Docente in class view, Classe in teacher/room view) -->
               <div class="line-primary">
                 {#if fields.includes("classe") && entry["classe"] && !isSecondarySostegno}
@@ -75,19 +73,21 @@
                   </span>
                 {/if}
 
-                {#if !hasPrimary}
-                  {#if isPot}
-                    <span class="primary-label pot-hero">Potenziamento</span>
-                  {:else if entry["materia"]}
-                    <span class="primary-label fallback-label">{entry["materia"]}</span>
-                  {/if}
+                {#if !hasPrimary && entry["materia"]}
+                  <span
+                    class="subj-tag fallback-subj"
+                    class:is-pot={isPot}
+                    class:is-sostegno={isSostegno}
+                  >
+                    {entry["materia"]}
+                  </span>
                 {/if}
               </div>
 
               <!-- Line 2: Secondary info (Materia and Aula, stacked on mobile, side-by-side on tablet/desktop) -->
-              {#if entry["materia"] || showAula}
+              {#if (hasPrimary && entry["materia"]) || showAula}
                 <div class="line-secondary">
-                  {#if entry["materia"]}
+                  {#if hasPrimary && entry["materia"]}
                     <span
                       class="subj-tag"
                       class:is-pot={isPot}
@@ -97,7 +97,7 @@
                     </span>
                   {/if}
 
-                  {#if entry["materia"] && showAula}
+                  {#if hasPrimary && entry["materia"] && showAula}
                     <span class="sec-sep" aria-hidden="true">•</span>
                   {/if}
 
@@ -230,31 +230,9 @@
     max-width: 68px;
   }
 
-  .fallback-label {
+  .fallback-subj {
     font-size: 0.725rem;
     font-weight: 700;
-  }
-
-  .day-slot.is-pot-slot {
-    background: color-mix(in srgb, #f59e0b 9%, var(--brand-surface-card));
-    border-left: 2px solid #f59e0b;
-  }
-
-  .day-slot.is-pot-slot.is-today {
-    background: color-mix(in srgb, #f59e0b 16%, var(--brand-surface-card));
-  }
-
-  .primary-label.pot-hero {
-    color: #b45309;
-    font-size: 0.725rem;
-    font-weight: 800;
-    letter-spacing: 0.02em;
-    text-transform: uppercase;
-  }
-
-  :global([data-theme="dark"]) .primary-label.pot-hero,
-  :global(.dark) .primary-label.pot-hero {
-    color: #fbbf24;
   }
 
   /* Secondary line: Stacked vertically on mobile, row on tablet/desktop */
@@ -378,11 +356,8 @@
       font-weight: 700;
       max-width: 110px;
     }
-    .fallback-label {
-      font-size: 0.825rem;
-    }
-    .primary-label.pot-hero {
-      font-size: 0.825rem;
+    .fallback-subj {
+      font-size: 0.8rem;
     }
     .line-secondary {
       display: inline-flex;
@@ -437,11 +412,8 @@
       font-size: 0.875rem;
       max-width: none;
     }
-    .fallback-label {
-      font-size: 0.875rem;
-    }
-    .primary-label.pot-hero {
-      font-size: 0.875rem;
+    .fallback-subj {
+      font-size: 0.85rem;
     }
     .line-secondary {
       gap: 0.4rem;
