@@ -12,7 +12,7 @@
       aria-checked={!control}
       on:click={() => (control = false)}
     >
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
         <line x1="16" y1="2" x2="16" y2="6"></line>
         <line x1="8" y1="2" x2="8" y2="6"></line>
@@ -29,13 +29,13 @@
       aria-checked={control}
       on:click={() => (control = true)}
     >
-      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
         <rect x="3" y="3" width="7" height="7"></rect>
         <rect x="14" y="3" width="7" height="7"></rect>
         <rect x="14" y="14" width="7" height="7"></rect>
         <rect x="3" y="14" width="7" height="7"></rect>
       </svg>
-      <span>Settimana</span>
+      <span>Sett.</span>
     </button>
   </div>
 </div>
@@ -43,29 +43,31 @@
 <style>
   .view-switch-wrapper {
     display: flex;
-    justify-content: flex-end;
     align-items: center;
-    margin-bottom: 1rem;
+    justify-content: flex-end;
+    margin: 0;
   }
 
   .segmented-control {
     display: inline-flex;
     align-items: center;
     background: var(--brand-surface-subtle);
-    border: 1px solid var(--brand-border);
-    border-radius: 10px;
-    padding: 3px;
+    border: 1.5px solid var(--brand-border);
+    border-radius: 8px;
+    padding: 2px;
     gap: 2px;
+    box-sizing: border-box;
+    min-height: 38px;
   }
 
   .segment-btn {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.35rem 0.75rem;
-    border-radius: 8px;
-    font-size: 0.825rem;
-    font-weight: 500;
+    gap: 0.3rem;
+    padding: 0.3rem 0.6rem;
+    border-radius: 6px;
+    font-size: 0.775rem;
+    font-weight: 600;
     color: var(--brand-text-muted);
     background: transparent;
     border: none;
@@ -73,6 +75,7 @@
     transition: all 0.15s ease;
     margin: 0;
     line-height: 1.2;
+    white-space: nowrap;
   }
 
   .segment-btn:hover {
@@ -82,21 +85,19 @@
   .segment-btn.active {
     background: var(--brand-surface-card);
     color: var(--brand-primary);
-    font-weight: 600;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+    font-weight: 700;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
   }
 
-  @media (max-width: 480px) {
-    .view-switch-wrapper {
-      justify-content: stretch;
-    }
+  @media (min-width: 640px) {
     .segmented-control {
-      width: 100%;
+      min-height: 42px;
+      border-radius: 10px;
     }
     .segment-btn {
-      flex: 1;
-      justify-content: center;
-      padding: 0.45rem 0.5rem;
+      padding: 0.4rem 0.75rem;
+      font-size: 0.825rem;
+      border-radius: 8px;
     }
   }
 </style>
