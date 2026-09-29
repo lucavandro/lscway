@@ -624,7 +624,7 @@
     max-height: 260px;
     overflow-y: auto;
     overscroll-behavior: contain;
-    padding: 0.3rem 0;
+    padding: 0.2rem 0;
   }
 
   .option-item {
@@ -632,17 +632,22 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    padding: 0.45rem 0.75rem;
+    height: 32px;
+    min-height: 32px;
+    margin: 0 !important;
+    padding: 0 0.65rem !important;
     background: transparent;
-    border: none;
-    font-size: 0.875rem;
+    border: none !important;
+    border-radius: 4px;
+    box-shadow: none !important;
+    font-size: 0.85rem;
     font-weight: 500;
     color: var(--brand-text);
     cursor: pointer;
     text-align: left;
     transition: background-color 0.1s ease, color 0.1s ease;
     box-sizing: border-box;
-    line-height: 1.25;
+    line-height: 1.2;
   }
 
   .option-item:hover,
@@ -824,7 +829,7 @@
     flex: 1;
     overflow-y: auto;
     overscroll-behavior: contain;
-    padding: 0.35rem 0.5rem;
+    padding: 0.25rem 0.5rem;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -833,19 +838,22 @@
     align-items: center;
     justify-content: space-between;
     width: 100%;
-    min-height: 48px; /* Touch target minimum 48px */
-    padding: 0.65rem 0.85rem;
+    min-height: 38px;
+    height: 38px;
+    margin: 0 0 2px 0 !important;
+    padding: 0 0.75rem !important;
     background: transparent;
-    border: none;
-    border-radius: 8px;
-    font-size: 0.95rem;
+    border: none !important;
+    border-radius: 6px;
+    box-shadow: none !important;
+    font-size: 0.9rem;
     font-weight: 500;
     color: var(--brand-text);
     text-align: left;
     cursor: pointer;
-    transition: background-color 0.12s ease;
+    transition: background-color 0.1s ease;
     box-sizing: border-box;
-    margin-bottom: 0.15rem;
+    line-height: 1.2;
   }
 
   .sheet-option-item:active {
