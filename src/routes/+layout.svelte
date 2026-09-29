@@ -4,9 +4,22 @@
 	import { onDestroy, onMount } from "svelte";
 	import Footer from "./Footer.svelte";
 	import { base } from "$app/paths";
+	import { onNavigate } from "$app/navigation";
 
 	let day = getDay();
 	let intervalTimer;
+
+	// Modern View Transitions API for page navigation
+	onNavigate((navigation) => {
+		if (!document.startViewTransition) return;
+
+		return new Promise((resolve) => {
+			document.startViewTransition(async () => {
+				resolve();
+				await navigation.complete;
+			});
+		});
+	});
 
 	// Lifecycle events
 	onMount(() => {
@@ -20,9 +33,10 @@
 	});
 
 	onDestroy(() => {
-		clearInterval(intervalTimer);
+		if (intervalTimer) {
+			clearInterval(intervalTimer);
+		}
 	});
-	
 </script>
 
 <svelte:head>
@@ -41,7 +55,7 @@
 <div class="app">
 	<Header />
 
-	<main class="container-fluid">
+	<main class="container-fluid" id="main-content">
 		<slot />
 	</main>
 
@@ -52,18 +66,16 @@
 	.app {
 		display: flex;
 		flex-direction: column;
+		min-height: 100dvh;
 	}
 
 	main {
 		flex: 1;
 		display: flex;
 		flex-direction: column;
-		padding: 1rem;
 		width: 100%;
-		max-width: 64rem;
+		max-width: 68rem;
 		margin: 0 auto;
 		box-sizing: border-box;
 	}
-
-
 </style>

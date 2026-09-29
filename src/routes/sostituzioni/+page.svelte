@@ -5,18 +5,16 @@
   import { inviaConfermaSostituzione } from "$lib/data";
   import { requestNotificationPermission } from "$lib/notifications.js";
   import { getTodayDate, isDateBefore } from "$lib/utils.js";
+  import { base } from "$app/paths";
 
   let sostituzioni = [];
   let loading = false;
   let error = null;
   let interval;
-  let confirmingIds = new Set(); // Per tracciare quali sostituzioni sono in fase di conferma
-  let errorMessages = {}; // Per tracciare errori specifici per ogni sostituzione
+  let confirmingIds = new Set();
+  let errorMessages = {};
 
-  // Computed per filtrare le sostituzioni odierne
   $: sostituzioniOggi = sostituzioni.filter((s) => s.data >= getTodayDate());
-
-  // Computed per filtrare le sostituzioni passate
   $: sostituzioniPassate = sostituzioni.filter((s) =>
     isDateBefore(s.data, getTodayDate()),
   );
@@ -30,58 +28,20 @@
     if (!$userEmail) return;
 
     error = null;
-
     try {
       const response = await fetch(
         `${API_URL}/sostituzioni?email=${encodeURIComponent($userEmail)}`,
       );
       const data = await response.json();
 
-      if (data && data.substitutions != sostituzioni) {
+      if (data && data.substitutions) {
         sostituzioni = data.substitutions;
       } else {
         error = "Errore nel recupero dei dati";
-        console.log(data);
       }
     } catch (err) {
-      error = "Errore di connessione";
+      error = "Errore di connessione al server";
       console.error("Errore fetch sostituzioni:", err);
-    }
-  }
-
-  async function confermaSostituzione(id) {
-    confirmingIds.add(id);
-    confirmingIds = confirmingIds; // Trigger reactivity
-
-    // Rimuovi eventuali errori precedenti
-    delete errorMessages[id];
-    errorMessages = errorMessages;
-
-    try {
-      const response = await inviaConfermaSostituzione(id);
-
-      if (response.success) {
-        // Aggiorna lo stato della sostituzione localmente
-        sostituzioni = sostituzioni.map((s) =>
-          s.id === id ? { ...s, accettato: true } : s,
-        );
-      } else {
-        errorMessages[id] = "Errore nella conferma della sostituzione";
-        errorMessages = errorMessages;
-      }
-    } catch (err) {
-      console.error("Errore fetch conferma sostituzione:", err);
-      if (err.message) {
-        console.error("Error message:", err.message);
-      }
-      if (err.stack) {
-        console.error("Error stack:", err.stack);
-      }
-      errorMessages[id] = "Errore di connessione";
-      errorMessages = errorMessages;
-    } finally {
-      confirmingIds.delete(id);
-      confirmingIds = confirmingIds;
     }
   }
 
@@ -90,20 +50,16 @@
   }
 
   onMount(() => {
-    // Reindirizza alla home se l'utente non è loggato
     if (!$userEmail) {
-      goto("/");
+      goto(base || "/");
     } else {
       fetchSostituzioni();
-      // Aggiorna i dati ogni minuto (60000ms)
       interval = setInterval(fetchSostituzioni, 60000);
     }
   });
 
   onDestroy(() => {
-    if (interval) {
-      clearInterval(interval);
-    }
+    if (interval) clearInterval(interval);
   });
 </script>
 
@@ -111,360 +67,341 @@
   <title>Sostituzioni - WAY Cortese</title>
 </svelte:head>
 
-<main class="container">
+<div class="sostituzioni-page">
   {#if $userEmail}
-    <!-- Banner notifiche -->
+    <!-- Notification Banner if not enabled -->
     {#if !$notificationPermission}
-      <article class="notification-banner">
-        <header>
-          <strong>🔔 Abilita le notifiche</strong>
-        </header>
-        <p>
-          Le notifiche ti aiutano a rimanere aggiornato sulle sostituzioni che
-          richiedono conferma. Riceverai un avviso quando ci sono sostituzioni
-          non confermate per la giornata odierna.
-        </p>
-        <footer>
-          <button
-            on:click={enableNotifications}
-            class="enable-notifications-btn"
-          >
-            Abilita notifiche
+      <div class="banner-card notification-banner">
+        <div class="banner-icon-wrap" aria-hidden="true">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+          </svg>
+        </div>
+        <div class="banner-content">
+          <h3 class="banner-title">Abilita le notifiche push</h3>
+          <p class="banner-text">
+            Ricevi un avviso immediato non appena ti viene assegnata una nuova sostituzione da confermare.
+          </p>
+          <button type="button" on:click={enableNotifications} class="banner-action-btn">
+            Attiva notifiche
           </button>
-        </footer>
-      </article>
+        </div>
+      </div>
     {/if}
 
     {#if error}
-      <article class="error">
-        <p>{error}</p>
-        <button on:click={fetchSostituzioni}>Riprova</button>
-      </article>
-    {:else}
-      <!-- Sezione sostituzioni odierne -->
-      <section class="today-section">
-        <h2>Sostituzioni di oggi</h2>
-        {#if sostituzioniOggi.length > 0}
-          <div class="today-cards">
-            {#each sostituzioniOggi as sostituzione}
-              <article class="today-card">
-                <header>
-                  <strong
-                    >{sostituzione.ora} - {sostituzione.classe.nome}</strong
-                  >
-                  <div class="header-actions">
-                    {#if sostituzione.presaVisione.stato === "inviata"}
-                      <span class="badge sent">
-                        {sostituzione.presaVisione.stato}
-                      </span>
-                    {:else}
-                      <span class="badge sent">
-                        {sostituzione.presaVisione.stato}
-                      </span>
-                    {/if}
-                  </div>
-                </header>
-                <p>
-                  <strong>Classe:</strong>
-                  {sostituzione.classe.nome}
-                </p>
-                <p>
-                  <strong>Aula:</strong>
-                  {sostituzione.aula.nome}
-                </p>
-                <p>
-                  <strong>Docente da sostituire: </strong>
-                  {sostituzione.docenteAssente.nome}
-                </p>
-                {#if sostituzione.note}
-                  <p>
-                    <strong>Note:</strong>
-                    {sostituzione.note}
-                  </p>
-                {/if}
-                {#if sostituzione.presaVisione.stato === "inviata"}
-                  <ins
-                    >Controlla la tua casella di posta per la presa visione</ins
-                  >
-                {/if}
-              </article>
-            {/each}
-          </div>
-        {:else}
-          <p class="no-substitutions">
-            Non sono previste sostituzioni per te oggi. 🥳
-          </p>
-        {/if}
-      </section>
-
-      <!-- Sezione storico 
-      {#if sostituzioniPassate.length > 0}
-        <section class="history-section">
-          <h2>Storico sostituzioni</h2>
-          <p>Trovate {sostituzioniPassate.length} sostituzioni passate</p>
-
-          <div class="history-cards">
-            {#each sostituzioniPassate as sostituzione}
-              <article class="history-card">
-                <header>
-                  <div class="card-header-left">
-                    <strong>{sostituzione.data} - {sostituzione.giorno}</strong>
-                    <small>{sostituzione.ora}</small>
-                  </div>
-                  <span
-                    class="badge"
-                    class:accepted={sostituzione.accettato}
-                    class:rejected={!sostituzione.accettato}
-                  >
-                    {sostituzione.accettato ? "Accettato" : "Rifiutato"}
-                  </span>
-                </header>
-                <div class="card-content">
-                  <div class="card-row">
-                    <span class="label">Classe:</span>
-                    <span class="value">{sostituzione.classe}</span>
-                  </div>
-                  <div class="card-row">
-                    <span class="label">Aula:</span>
-                    <span class="value">{sostituzione.aula}</span>
-                  </div>
-                  <div class="card-row">
-                    <span class="label">Titolare:</span>
-                    <span class="value">{sostituzione.docSost}</span>
-                  </div>
-                  {#if sostituzione.note}
-                    <div class="card-row">
-                      <span class="label">Note:</span>
-                      <span class="value">{sostituzione.note}</span>
-                    </div>
-                  {/if}
-                </div>
-              </article>
-            {/each}
-          </div>
-        </section>
-      {:else if sostituzioni.length > 0}
-        <section class="history-section">
-          <h2>Storico sostituzioni</h2>
-          <p>Nessuna sostituzione passata trovata.</p>
-        </section>
-      {/if}
-      -->
+      <div class="status-banner error">
+        <span>{error}</span>
+        <button type="button" on:click={fetchSostituzioni} class="retry-btn">Riprova</button>
+      </div>
     {/if}
+
+    <section class="section-container">
+      <div class="section-header">
+        <h2 class="section-heading">Sostituzioni di oggi</h2>
+        <span class="count-pill">{sostituzioniOggi.length}</span>
+      </div>
+
+      {#if sostituzioniOggi.length > 0}
+        <div class="cards-grid">
+          {#each sostituzioniOggi as sostituzione}
+            <div class="sub-card">
+              <div class="sub-card-header">
+                <div class="slot-info">
+                  <span class="slot-hour">{sostituzione.ora}</span>
+                  <span class="slot-class">Classe {sostituzione.classe?.nome || sostituzione.classe}</span>
+                </div>
+                <div class="status-badge" class:badge-sent={sostituzione.presaVisione?.stato === "inviata"}>
+                  {sostituzione.presaVisione?.stato || "assegnata"}
+                </div>
+              </div>
+
+              <div class="sub-details">
+                <div class="detail-row">
+                  <span class="detail-label">Aula:</span>
+                  <span class="detail-value">{sostituzione.aula?.nome || sostituzione.aula || "-"}</span>
+                </div>
+                <div class="detail-row">
+                  <span class="detail-label">Docente assente:</span>
+                  <span class="detail-value teacher-absent">{sostituzione.docenteAssente?.nome || sostituzione.docenteAssente || "-"}</span>
+                </div>
+                {#if sostituzione.note}
+                  <div class="detail-row note-row">
+                    <span class="detail-label">Note:</span>
+                    <span class="detail-value">{sostituzione.note}</span>
+                  </div>
+                {/if}
+              </div>
+
+              {#if sostituzione.presaVisione?.stato === "inviata"}
+                <div class="sub-card-footer info-footer">
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                  </svg>
+                  <span>Controlla la casella di posta per la conferma</span>
+                </div>
+              {/if}
+            </div>
+          {/each}
+        </div>
+      {:else}
+        <div class="empty-state-card">
+          <div class="empty-icon" aria-hidden="true">🎉</div>
+          <h3>Nessuna sostituzione</h3>
+          <p>Oggi non hai ore di sostituzione assegnate.</p>
+        </div>
+      {/if}
+    </section>
   {:else}
-    <h1>Accesso negato</h1>
-    <p>Devi effettuare l'accesso per visualizzare questa pagina.</p>
+    <div class="empty-state-card">
+      <h3>Accesso riservato</h3>
+      <p>Effettua l'accesso come docente per consultare le sostituzioni.</p>
+      <a href="{base}/signin" class="login-link-btn">Vai al login</a>
+    </div>
   {/if}
-</main>
+</div>
 
 <style>
-  .error {
-    background-color: var(--pico-del-background-color);
-    border: 1px solid var(--pico-del-color);
-    border-radius: var(--pico-border-radius);
-    padding: 1rem;
-    margin: 1rem 0;
-  }
-
-  .history-section {
-    margin-top: 2rem;
-  }
-
-  .history-cards {
-    display: grid;
-    gap: 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
-    margin-top: 1rem;
-  }
-
-  .history-card {
-    background: var(--pico-background-color);
-    border: 1px solid var(--pico-muted-border-color);
-    border-radius: var(--pico-border-radius);
-    margin: 0;
-    transition: box-shadow 0.2s ease;
-  }
-
-  .history-card:hover {
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-
-  .history-card header {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    padding: 1rem 1rem 0.5rem 1rem;
-    margin: 0;
-    border-bottom: 1px solid var(--pico-muted-border-color);
-    gap: 1rem;
-  }
-
-  .card-header-left {
+  .sostituzioni-page {
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 1.5rem;
+    animation: fade-in 0.2s ease-out;
   }
 
-  .card-header-left strong {
-    font-size: 1rem;
-    margin: 0;
-  }
-
-  .card-header-left small {
-    color: var(--pico-muted-color);
-    font-size: 0.875rem;
-  }
-
-  .card-content {
-    padding: 1rem;
-  }
-
-  .card-row {
+  .banner-card {
     display: flex;
-    justify-content: space-between;
+    gap: 1rem;
     align-items: flex-start;
-    margin-bottom: 0.5rem;
-    gap: 1rem;
+    padding: 1.25rem;
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--brand-primary) 8%, var(--brand-surface-card));
+    border: 1px solid color-mix(in srgb, var(--brand-primary) 25%, transparent);
   }
 
-  .card-row:last-child {
-    margin-bottom: 0;
-  }
-
-  .card-row .label {
-    font-weight: 500;
-    color: var(--pico-muted-color);
+  .banner-icon-wrap {
+    color: var(--brand-primary);
+    padding: 0.5rem;
+    background: color-mix(in srgb, var(--brand-primary) 15%, transparent);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     flex-shrink: 0;
-    min-width: 120px;
   }
 
-  .card-row .value {
-    text-align: right;
-    word-break: break-word;
+  .banner-content {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
   }
 
-  @media (max-width: 768px) {
-    .history-cards {
-      grid-template-columns: 1fr;
-    }
-
-    .card-row {
-      align-items: flex-start;
-      gap: 0.25rem;
-    }
-
-    .card-row .value {
-      text-align: left;
-    }
-
-    .card-row .label {
-      min-width: auto;
-    }
+  .banner-title {
+    font-size: 1rem;
+    font-weight: 700;
+    margin: 0;
+    color: var(--brand-text);
   }
 
-  .badge {
-    padding: 0.25rem 0.5rem;
-    border-radius: var(--pico-border-radius);
-    font-size: 0.875rem;
-    font-weight: 500;
+  .banner-text {
+    font-size: 0.85rem;
+    color: var(--brand-text-muted);
+    margin: 0;
+    line-height: 1.4;
   }
 
-  .badge.accepted {
-    background-color: var(--pico-ins-background-color);
-    color: var(--pico-ins-color);
+  .banner-action-btn {
+    align-self: flex-start;
+    margin-top: 0.25rem;
+    padding: 0.45rem 0.95rem;
+    border-radius: 8px;
+    font-size: 0.85rem;
+    font-weight: 600;
+    background: var(--brand-primary);
+    color: white;
+    border: none;
+    cursor: pointer;
+    transition: background 0.15s ease;
   }
 
-  .badge.rejected {
-    background-color: var(--pico-del-background-color);
-    color: var(--pico-del-color);
+  .banner-action-btn:hover {
+    background: var(--brand-primary-hover);
   }
 
-  .badge.sent {
-    background-color: var(--pico-mark-background-color);
-    color: var(--pico-info-color);
-  }
-
-  .today-section {
-    margin-bottom: 2rem;
-    padding-bottom: 2rem;
-    border-bottom: 1px solid var(--pico-muted-border-color);
-  }
-
-  .today-cards {
-    display: grid;
+  .section-container {
+    display: flex;
+    flex-direction: column;
     gap: 1rem;
-    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-    margin-top: 1rem;
   }
 
-  .today-card {
-    background: var(--pico-background-color);
-    border: 1px solid var(--pico-muted-border-color);
-    border-radius: var(--pico-border-radius);
-    padding: 1rem;
+  .section-header {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .section-heading {
+    font-size: 1.2rem;
+    font-weight: 700;
     margin: 0;
   }
 
-  .today-card header {
+  .count-pill {
+    font-size: 0.75rem;
+    font-weight: 700;
+    padding: 0.15rem 0.55rem;
+    border-radius: 9999px;
+    background: var(--brand-surface-subtle);
+    border: 1px solid var(--brand-border);
+    color: var(--brand-text-muted);
+  }
+
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+  }
+
+  .sub-card {
+    background: var(--brand-surface-card);
+    border: 1px solid var(--brand-border);
+    border-radius: 12px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    transition: border-color 0.15s ease, transform 0.15s ease;
+  }
+
+  .sub-card:hover {
+    border-color: color-mix(in srgb, var(--brand-primary) 40%, var(--brand-border));
+    transform: translateY(-1px);
+  }
+
+  .sub-card-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.85rem 1rem;
+    background: var(--brand-surface-subtle);
+    border-bottom: 1px solid var(--brand-border);
+  }
+
+  .slot-info {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+  }
+
+  .slot-hour {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--brand-primary);
+  }
+
+  .slot-class {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--brand-text);
+  }
+
+  .status-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 0.2rem 0.55rem;
+    border-radius: 6px;
+    background: rgba(245, 158, 11, 0.12);
+    color: #f59e0b;
+    border: 1px solid rgba(245, 158, 11, 0.3);
+  }
+
+  .sub-details {
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    flex: 1;
+  }
+
+  .detail-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 0.5rem;
-    padding-bottom: 0.5rem;
-    border-bottom: 1px solid var(--pico-muted-border-color);
-    flex-wrap: wrap;
-    gap: 0.5rem;
+    font-size: 0.875rem;
   }
 
-  .header-actions {
+  .detail-label {
+    color: var(--brand-text-muted);
+    font-weight: 500;
+  }
+
+  .detail-value {
+    color: var(--brand-text);
+    font-weight: 600;
+    text-align: right;
+  }
+
+  .teacher-absent {
+    color: #ef4444;
+  }
+
+  .sub-card-footer {
     display: flex;
     align-items: center;
+    gap: 0.4rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.75rem;
+    background: var(--brand-surface-subtle);
+    border-top: 1px solid var(--brand-border);
+  }
+
+  .info-footer {
+    color: var(--brand-text-muted);
+  }
+
+  .empty-state-card {
+    text-align: center;
+    padding: 3rem 1.5rem;
+    background: var(--brand-surface-card);
+    border: 1px dashed var(--brand-border);
+    border-radius: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
     gap: 0.5rem;
-    flex-wrap: wrap;
   }
 
-  .confirm-btn {
-    background-color: var(--pico-primary);
-    color: var(--pico-primary-inverse);
-    border: none;
-    border-radius: var(--pico-border-radius);
-    padding: 0.25rem 0.75rem;
+  .empty-icon {
+    font-size: 2.5rem;
+    margin-bottom: 0.5rem;
+  }
+
+  .empty-state-card h3 {
+    margin: 0;
+    font-size: 1.15rem;
+  }
+
+  .empty-state-card p {
+    color: var(--brand-text-muted);
+    margin: 0;
+    font-size: 0.9rem;
+  }
+
+  .login-link-btn {
+    margin-top: 1rem;
+    display: inline-block;
+    padding: 0.5rem 1.25rem;
+    background: var(--brand-primary);
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
     font-size: 0.875rem;
-    cursor: pointer;
-    transition: background-color 0.2s;
-  }
-
-  .confirm-btn:hover:not(:disabled) {
-    background-color: var(--pico-primary-hover);
-  }
-
-  .confirm-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-  }
-
-  .error-message {
-    background-color: var(--pico-del-background-color);
-    color: var(--pico-del-color);
-    padding: 0.5rem;
-    border-radius: var(--pico-border-radius);
-    font-size: 0.875rem;
-    margin-top: 0.5rem;
-  }
-
-  .notification-banner {
-    color: var(--pico-primary-inverse);
-    border: none;
-    margin-bottom: 2rem;
-  }
-
-  .notification-banner header strong {
-    color: var(--pico-primary-inverse);
-    font-size: 1.1rem;
-  }
-
-  .notification-banner p {
-    margin: 1rem 0;
-    opacity: 0.9;
   }
 </style>

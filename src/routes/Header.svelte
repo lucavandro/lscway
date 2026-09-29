@@ -6,8 +6,7 @@
   import PwaButton from "./PWAButton.svelte";
   import Tabs from "./Tabs.svelte";
   import HeaderMenuPanel from "./HeaderMenuPanel.svelte";
-  import { userEmail, isTeacher } from "$lib/stores.js";
-  import ShareIcon from "$icons/ShareIcon.svelte";
+  import { userEmail, isTeacher, isLoading } from "$lib/stores.js";
 
   import {
     requestNotificationPermission,
@@ -19,7 +18,11 @@
     clearUserFromServiceWorker,
   } from "$lib/notifications.js";
 
-  let day, schoolHour, timeInterval, substitutionInterval;
+  let day = getDay();
+  let schoolHour = getSchoolHour();
+  let timeInterval;
+  let substitutionInterval;
+  let open = false;
 
   function updateTime() {
     schoolHour = getSchoolHour();
@@ -43,53 +46,41 @@
     }
   }
 
-  updateTime();
-
-  // Lifecycle's events
   onMount(async () => {
+    updateTime();
     timeInterval = setInterval(updateTime, 1000);
     isLoading.set(false);
-    // Controlla lo stato delle notifiche
-    checkNotificationPermission();
 
-    // Setup background sync
+    checkNotificationPermission();
     await setupBackgroundSync();
 
-    // Richiedi permesso per le notifiche se l'utente è loggato
     if ($userEmail) {
       await requestNotificationPermission();
       syncUserEmailWithServiceWorker();
       checkSubstitutions();
-      substitutionInterval = setInterval(checkSubstitutions, 5000);
+      substitutionInterval = setInterval(checkSubstitutions, 10000);
     }
   });
 
   onDestroy(() => {
-    clearInterval(timeInterval);
-    if (substitutionInterval) {
-      clearInterval(substitutionInterval);
-    }
+    if (timeInterval) clearInterval(timeInterval);
+    if (substitutionInterval) clearInterval(substitutionInterval);
   });
 
-  // Reagisci ai cambiamenti dello stato di login
   $: if ($userEmail) {
-    // Utente appena loggato
     requestNotificationPermission().then(() => {
       syncUserEmailWithServiceWorker();
       checkSubstitutions();
       if (!substitutionInterval) {
-        substitutionInterval = setInterval(checkSubstitutions, 5000);
+        substitutionInterval = setInterval(checkSubstitutions, 10000);
       }
     });
   } else if (substitutionInterval) {
-    // Utente appena sloggato
     clearInterval(substitutionInterval);
     substitutionInterval = null;
     clearNotifiedSubstitutions();
     clearUserFromServiceWorker();
   }
-
-  let open = false;
 
   function closeMenu() {
     open = false;
@@ -100,93 +91,214 @@
   }
 </script>
 
-<header>
-  <div class="container-fluid">
-    <nav>
-      <ul>
-        <li class="menu">
-          <button
-            type="button"
-            class="menu-toggle"
-            aria-expanded={open}
-            aria-label="Apri menu"
-            on:click={() => (open = !open)}
-          >
-            ☰
-          </button>
+<header class="app-header">
+  <div class="header-inner">
+    <div class="header-row">
+      <!-- Left side: Hamburger & Title -->
+      <div class="left-cluster">
+        <button
+          type="button"
+          class="hamburger-btn"
+          aria-expanded={open}
+          aria-label="Apri menu principale"
+          on:click={() => (open = !open)}
+        >
+          <span class="bar"></span>
+          <span class="bar"></span>
+          <span class="bar"></span>
+        </button>
 
-          <HeaderMenuPanel
-            {open}
-            isTeacher={$isTeacher}
-            currentPath={$page.url.pathname}
-            onClose={closeMenu}
-          />
-        </li>
-        <li><strong>WAY Cortese</strong></li>
-        <li><PwaButton /></li>
-      </ul>
-      <ul>
-        <li>{day}</li>
-        <li>{schoolHour}</li>
-      </ul>
-    </nav>
-    <Tabs></Tabs>
+        <a href={base || "/"} class="logo-link">
+          <div class="logo-icon">W</div>
+          <div class="logo-text">
+            <span class="brand-title">WAY Cortese</span>
+            <span class="brand-subtitle">Liceo N. Cortese</span>
+          </div>
+        </a>
+      </div>
+
+      <!-- Right side: Status indicator & PWA Button -->
+      <div class="right-cluster">
+        <div class="live-pill" title="Stato orario scolastico in tempo reale">
+          {#if schoolHour && schoolHour !== "Fuori orario"}
+            <span class="live-indicator"></span>
+          {:else}
+            <span class="offline-dot"></span>
+          {/if}
+          <span class="day-text">{day}</span>
+          <span class="sep">•</span>
+          <span class="hour-text">{schoolHour}</span>
+        </div>
+
+        <PwaButton />
+      </div>
+    </div>
+
+    <!-- Navigation Tabs -->
+    <Tabs />
   </div>
+
+  <HeaderMenuPanel
+    {open}
+    isTeacher={$isTeacher}
+    currentPath={$page.url.pathname}
+    onClose={closeMenu}
+  />
 </header>
 
 <style>
-  @media (prefers-color-scheme: dark) {
-    header {
-      background-color: #1d232f;
-    }
+  .app-header {
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: color-mix(in srgb, var(--brand-surface) 90%, transparent);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border-bottom: 1px solid var(--brand-border);
+    transition: background-color 0.2s ease, border-color 0.2s ease;
   }
 
-  header {
-    background-color: var(--pico-muted-border-color);
+  .header-inner {
+    max-width: 68rem;
+    margin: 0 auto;
+    padding: 0.65rem 1rem 0;
   }
 
-  .menu {
+  .header-row {
     display: flex;
     align-items: center;
-    flex-shrink: 0;
+    justify-content: space-between;
+    gap: 0.75rem;
+    padding-bottom: 0.5rem;
   }
 
-  .menu-toggle {
+  .left-cluster {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .hamburger-btn {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 4px;
+    width: 38px;
+    height: 38px;
+    padding: 8px;
+    background: transparent;
+    border: 1px solid transparent;
+    border-radius: 8px;
+    cursor: pointer;
+    color: var(--brand-text);
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .hamburger-btn:hover {
+    background: var(--brand-surface-subtle);
+    border-color: var(--brand-border);
+  }
+
+  .hamburger-btn .bar {
+    display: block;
+    width: 100%;
+    height: 2px;
+    background: currentColor;
+    border-radius: 2px;
+    transition: transform 0.2s ease;
+  }
+
+  .logo-link {
+    display: flex;
+    align-items: center;
+    gap: 0.55rem;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .logo-link:hover {
+    text-decoration: none;
+  }
+
+  .logo-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, var(--brand-primary), #1d4ed8);
+    color: #ffffff;
+    font-weight: 700;
+    font-size: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    text-decoration: none;
-    color: var(--pico-color);
-    background: none;
-    border: 0;
-    padding: 0;
-    cursor: pointer;
-    font-size: 1.2rem;
-    line-height: 1;
-    padding: 0.25rem 0.5rem;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+    flex-shrink: 0;
   }
 
-  #more-menu summary,
-  #more-menu summary:hover,
-  #more-menu summary:focus {
-    list-style: none;
-    cursor: pointer;
-    border: none;
-    background: none;
-    font-weight: bold;
-    color: var(--pico-color);
-    font-size: 1.2rem;
-    box-shadow: none;
+  .logo-text {
+    display: flex;
+    flex-direction: column;
   }
 
-  #more-menu summary::after {
-    display: none;
+  .brand-title {
+    font-weight: 700;
+    font-size: 0.95rem;
+    line-height: 1.15;
+    color: var(--brand-text);
+    letter-spacing: -0.01em;
   }
 
-  #more-menu .divider {
-    border-top: 1px solid var(--pico-muted-border-color);
-    padding: 0;
-    margin: 0;
-    font-size: 0;
+  .brand-subtitle {
+    font-size: 0.7rem;
+    color: var(--brand-text-muted);
+    font-weight: 500;
+  }
+
+  .right-cluster {
+    display: flex;
+    align-items: center;
+    gap: 0.65rem;
+  }
+
+  .live-pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    padding: 0.35rem 0.65rem;
+    border-radius: 9999px;
+    background: var(--brand-surface-subtle);
+    border: 1px solid var(--brand-border);
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: var(--brand-text);
+    white-space: nowrap;
+  }
+
+  .day-text {
+    font-weight: 700;
+    color: var(--brand-primary);
+  }
+
+  .sep {
+    color: var(--brand-text-muted);
+    opacity: 0.5;
+  }
+
+  .offline-dot {
+    display: inline-block;
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background-color: var(--brand-text-muted);
+  }
+
+  @media (max-width: 480px) {
+    .brand-subtitle {
+      display: none;
+    }
+    .live-pill {
+      font-size: 0.7rem;
+      padding: 0.25rem 0.5rem;
+    }
   }
 </style>
