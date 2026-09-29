@@ -550,9 +550,15 @@
     position: relative;
     display: flex;
     align-items: center;
-    padding: 0.4rem 0.5rem;
+    gap: 0.4rem;
+    height: 36px;
+    min-height: 36px;
+    max-height: 36px;
+    padding: 0 0.55rem;
     border-bottom: 1px solid var(--brand-border);
     background: var(--brand-surface-subtle);
+    box-sizing: border-box;
+    margin: 0;
   }
 
   .search-icon {
@@ -560,26 +566,34 @@
     align-items: center;
     justify-content: center;
     color: var(--brand-text-muted);
-    margin-right: 0.4rem;
-    margin-left: 0.2rem;
+    width: 16px;
+    height: 16px;
     flex-shrink: 0;
+    margin: 0;
   }
 
   .search-input {
     flex: 1;
-    border: none;
-    background: transparent;
-    padding: 0.35rem 0.25rem;
-    font-size: 0.875rem;
-    color: var(--brand-text);
-    outline: none;
-    box-sizing: border-box;
     width: 100%;
+    height: 100% !important;
+    min-height: unset !important;
+    max-height: unset !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: none !important;
+    background: transparent !important;
+    box-shadow: none !important;
+    outline: none !important;
+    color: var(--brand-text);
+    font-size: 0.875rem;
+    line-height: 1.25;
+    box-sizing: border-box;
   }
 
   .search-input:focus {
-    outline: none;
-    box-shadow: none;
+    outline: none !important;
+    box-shadow: none !important;
+    border: none !important;
   }
 
   .clear-btn {
@@ -588,12 +602,17 @@
     color: var(--brand-text-muted);
     font-size: 0.75rem;
     cursor: pointer;
-    padding: 0.25rem 0.4rem;
-    border-radius: 4px;
+    width: 22px;
+    height: 22px;
+    padding: 0;
+    border-radius: 50%;
     display: flex;
     align-items: center;
     justify-content: center;
     line-height: 1;
+    margin: 0;
+    flex-shrink: 0;
+    transition: background-color 0.15s ease, color 0.15s ease;
   }
 
   .clear-btn:hover {
@@ -775,7 +794,7 @@
   }
 
   .sheet-search-wrap {
-    padding: 0.6rem 0.85rem;
+    padding: 0.4rem 0.75rem;
     border-bottom: 1px solid var(--brand-border);
     background: var(--brand-surface-subtle);
   }
@@ -783,8 +802,11 @@
   .sheet-search-wrap .search-input-box {
     background: var(--brand-surface-card);
     border: 1.5px solid var(--brand-border);
-    border-radius: 10px;
-    padding: 0.35rem 0.65rem;
+    border-radius: 8px;
+    height: 38px;
+    min-height: 38px;
+    max-height: 38px;
+    padding: 0 0.6rem;
     transition: border-color 0.15s ease;
   }
 
@@ -794,9 +816,8 @@
 
   /* Font size 16px is MANDATORY to prevent iOS Safari auto-zoom */
   .search-input.mobile-input {
-    font-size: 16px;
-    min-height: 28px;
-    line-height: 1.3;
+    font-size: 16px !important;
+    line-height: 1.25;
   }
 
   .sheet-options-list {
