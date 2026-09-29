@@ -124,7 +124,7 @@
           aria-label="Chiudi menu"
           on:click={closeMenu}
         >
-          <svg viewBox="0 0 24 24" width="22" height="22" stroke="currentColor" stroke-width="2.2" fill="none">
+          <svg viewBox="0 0 24 24" width="20" height="20" stroke="currentColor" stroke-width="2.2" fill="none">
             <line x1="18" y1="6" x2="6" y2="18"></line>
             <line x1="6" y1="6" x2="18" y2="18"></line>
           </svg>
@@ -271,13 +271,13 @@
     height: 100dvh;
     min-height: 100dvh;
     max-height: 100dvh;
-    width: min(85vw, 320px);
+    width: min(82vw, 290px);
     background: var(--brand-surface-card);
     border-right: 1px solid var(--brand-border);
     box-shadow: 6px 0 32px rgba(0, 0, 0, 0.25);
     display: flex;
     flex-direction: column;
-    padding: calc(1.25rem + env(safe-area-inset-top, 0px)) 1.15rem calc(1.25rem + env(safe-area-inset-bottom, 0px));
+    padding: calc(0.85rem + env(safe-area-inset-top, 0px)) 0.85rem calc(0.85rem + env(safe-area-inset-bottom, 0px));
     z-index: 99999;
     overflow-y: auto;
     overscroll-behavior: contain;
@@ -293,30 +293,30 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding-bottom: 1rem;
+    padding-bottom: 0.65rem;
     border-bottom: 1px solid var(--brand-border);
-    margin-bottom: 1rem;
+    margin-bottom: 0.65rem;
     flex-shrink: 0;
   }
 
   .brand-group {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.6rem;
   }
 
   .brand-badge {
-    width: 38px;
-    height: 38px;
-    border-radius: 10px;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
     background: linear-gradient(135deg, var(--brand-primary), #1d4ed8);
     color: #ffffff;
     font-weight: 700;
-    font-size: 1.15rem;
+    font-size: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
-    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
   }
 
   .brand-meta {
@@ -325,22 +325,22 @@
   }
 
   .brand-name {
-    font-size: 1.05rem;
+    font-size: 0.95rem;
     font-weight: 700;
     color: var(--brand-text);
     line-height: 1.2;
   }
 
   .brand-sub {
-    font-size: 0.75rem;
+    font-size: 0.675rem;
     color: var(--brand-text-muted);
   }
 
   .close-btn {
     background: transparent;
     border: none;
-    padding: 0.45rem;
-    border-radius: 8px;
+    padding: 0.35rem;
+    border-radius: 6px;
     color: var(--brand-text-muted);
     cursor: pointer;
     display: flex;
@@ -357,23 +357,23 @@
   .user-card {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
+    gap: 0.6rem;
+    padding: 0.45rem 0.6rem;
     background: var(--brand-surface-subtle);
     border: 1px solid var(--brand-border);
-    border-radius: 10px;
-    margin-bottom: 1.25rem;
+    border-radius: 8px;
+    margin-bottom: 0.65rem;
     flex-shrink: 0;
   }
 
   .user-avatar {
-    width: 34px;
-    height: 34px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
     background: var(--brand-primary);
     color: white;
     font-weight: 700;
-    font-size: 0.9rem;
+    font-size: 0.8rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -387,7 +387,7 @@
   }
 
   .user-tag {
-    font-size: 0.7rem;
+    font-size: 0.65rem;
     font-weight: 600;
     text-transform: uppercase;
     color: var(--brand-primary);
@@ -395,7 +395,7 @@
   }
 
   .user-email {
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     color: var(--brand-text);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -406,16 +406,16 @@
     flex: 1;
     display: flex;
     flex-direction: column;
-    gap: 0.5rem;
+    gap: 0.35rem;
   }
 
   .nav-section-label {
-    font-size: 0.7rem;
-    font-weight: 600;
+    font-size: 0.65rem;
+    font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
     color: var(--brand-text-muted);
-    padding: 0.5rem 0.5rem 0.25rem;
+    padding: 0.2rem 0.4rem 0.1rem;
   }
 
   .nav-list {
@@ -424,19 +424,19 @@
     margin: 0;
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 2px;
   }
 
   .nav-link,
   .nav-action-btn {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.7rem 0.8rem;
-    border-radius: 8px;
+    gap: 0.55rem;
+    padding: 0.45rem 0.55rem;
+    border-radius: 6px;
     color: var(--brand-text);
     text-decoration: none;
-    font-size: 0.925rem;
+    font-size: 0.85rem;
     font-weight: 500;
     background: transparent;
     border: none;
@@ -445,6 +445,7 @@
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease;
     box-sizing: border-box;
+    line-height: 1.2;
   }
 
   .nav-link:hover,
@@ -465,6 +466,14 @@
     align-items: center;
     justify-content: center;
     color: var(--brand-text-muted);
+    width: 18px;
+    height: 18px;
+    flex-shrink: 0;
+  }
+
+  .nav-icon :global(.icon) {
+    width: 16px;
+    height: 16px;
   }
 
   .nav-link.active .nav-icon {
@@ -485,13 +494,13 @@
   }
 
   .drawer-footer {
-    padding-top: 1rem;
+    padding-top: 0.65rem;
     border-top: 1px solid var(--brand-border);
     display: flex;
     flex-direction: column;
-    gap: 0.25rem;
+    gap: 0.15rem;
     color: var(--brand-text-muted);
-    font-size: 0.75rem;
+    font-size: 0.7rem;
     flex-shrink: 0;
   }
 

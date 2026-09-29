@@ -84,7 +84,7 @@
 <header class="app-header">
   <div class="header-inner">
     <div class="header-row">
-      <!-- Left side: Hamburger & Title -->
+      <!-- Left side: Hamburger & Logo/Title aligned -->
       <div class="left-cluster">
         <button
           type="button"
@@ -93,9 +93,11 @@
           aria-label="Apri menu principale"
           on:click={() => ($isMenuOpen = !$isMenuOpen)}
         >
-          <span class="bar"></span>
-          <span class="bar"></span>
-          <span class="bar"></span>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true">
+            <line x1="3" y1="6" x2="21" y2="6"></line>
+            <line x1="3" y1="12" x2="21" y2="12"></line>
+            <line x1="3" y1="18" x2="21" y2="18"></line>
+          </svg>
         </button>
 
         <a href={base || "/"} class="logo-link">
@@ -134,7 +136,7 @@
     position: sticky;
     top: 0;
     z-index: 100;
-    background: color-mix(in srgb, var(--brand-surface) 90%, transparent);
+    background: color-mix(in srgb, var(--brand-surface) 92%, transparent);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border-bottom: 1px solid var(--brand-border);
@@ -144,7 +146,7 @@
   .header-inner {
     max-width: 68rem;
     margin: 0 auto;
-    padding: 0.65rem 1rem 0;
+    padding: 0.55rem 1rem 0;
   }
 
   .header-row {
@@ -152,29 +154,35 @@
     align-items: center;
     justify-content: space-between;
     gap: 0.75rem;
-    padding-bottom: 0.5rem;
+    padding-bottom: 0.45rem;
   }
 
+  /* Left cluster: perfect vertical alignment between button, logo icon, and title */
   .left-cluster {
-    display: flex;
+    display: inline-flex;
     align-items: center;
-    gap: 0.65rem;
+    gap: 0.55rem;
+    margin: 0;
+    padding: 0;
   }
 
   .hamburger-btn {
-    display: flex;
-    flex-direction: column;
+    display: inline-flex;
+    align-items: center;
     justify-content: center;
-    gap: 4px;
-    width: 38px;
-    height: 38px;
-    padding: 8px;
+    width: 36px;
+    height: 36px;
+    padding: 0;
+    margin: 0;
     background: transparent;
     border: 1px solid transparent;
     border-radius: 8px;
     cursor: pointer;
     color: var(--brand-text);
     transition: background 0.15s ease, border-color 0.15s ease;
+    flex-shrink: 0;
+    box-sizing: border-box;
+    line-height: 1;
   }
 
   .hamburger-btn:hover {
@@ -182,21 +190,15 @@
     border-color: var(--brand-border);
   }
 
-  .hamburger-btn .bar {
-    display: block;
-    width: 100%;
-    height: 2px;
-    background: currentColor;
-    border-radius: 2px;
-    transition: transform 0.2s ease;
-  }
-
   .logo-link {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.55rem;
     text-decoration: none;
     color: inherit;
+    margin: 0;
+    padding: 0;
+    line-height: 1;
   }
 
   .logo-link:hover {
@@ -204,84 +206,127 @@
   }
 
   .logo-icon {
-    width: 32px;
-    height: 32px;
-    border-radius: 8px;
+    width: 34px;
+    height: 34px;
+    border-radius: 9px;
     background: linear-gradient(135deg, var(--brand-primary), #1d4ed8);
     color: #ffffff;
     font-weight: 700;
-    font-size: 1rem;
-    display: flex;
+    font-size: 1.05rem;
+    display: inline-flex;
     align-items: center;
     justify-content: center;
     box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
     flex-shrink: 0;
+    margin: 0;
+    line-height: 1;
   }
 
   .logo-text {
-    display: flex;
+    display: inline-flex;
     flex-direction: column;
+    justify-content: center;
+    margin: 0;
+    padding: 0;
   }
 
   .brand-title {
     font-weight: 700;
-    font-size: 0.95rem;
-    line-height: 1.15;
+    font-size: 1rem;
+    line-height: 1.2;
     color: var(--brand-text);
     letter-spacing: -0.01em;
+    margin: 0;
   }
 
   .brand-subtitle {
     font-size: 0.7rem;
     color: var(--brand-text-muted);
     font-weight: 500;
+    line-height: 1.1;
+    margin: 0;
   }
 
   .right-cluster {
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 0.65rem;
+    margin: 0;
   }
 
+  /* Live pill: large, legible, high-contrast */
   .live-pill {
     display: inline-flex;
     align-items: center;
-    gap: 0.4rem;
-    padding: 0.35rem 0.65rem;
+    gap: 0.45rem;
+    padding: 0.35rem 0.75rem;
     border-radius: 9999px;
-    background: var(--brand-surface-subtle);
-    border: 1px solid var(--brand-border);
-    font-size: 0.75rem;
+    background: var(--brand-surface-card);
+    border: 1.5px solid var(--brand-border);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    font-size: 0.85rem;
     font-weight: 600;
     color: var(--brand-text);
     white-space: nowrap;
+    margin: 0;
+    line-height: 1.2;
   }
 
   .day-text {
-    font-weight: 700;
+    font-weight: 800;
+    font-size: 0.875rem;
     color: var(--brand-primary);
+    letter-spacing: 0.02em;
+  }
+
+  .hour-text {
+    font-weight: 700;
+    font-size: 0.875rem;
+    color: var(--brand-text);
   }
 
   .sep {
     color: var(--brand-text-muted);
     opacity: 0.5;
+    font-size: 0.85rem;
+  }
+
+  .live-indicator {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background-color: #10b981;
+    animation: pulse-dot 2s infinite ease-in-out;
+    flex-shrink: 0;
   }
 
   .offline-dot {
     display: inline-block;
-    width: 6px;
-    height: 6px;
+    width: 7px;
+    height: 7px;
     border-radius: 50%;
     background-color: var(--brand-text-muted);
+    flex-shrink: 0;
   }
 
   @media (max-width: 480px) {
     .brand-subtitle {
       display: none;
     }
+    .brand-title {
+      font-size: 0.95rem;
+    }
     .live-pill {
-      font-size: 0.7rem;
-      padding: 0.25rem 0.5rem;
+      font-size: 0.825rem;
+      padding: 0.3rem 0.6rem;
+      gap: 0.35rem;
+    }
+    .day-text {
+      font-size: 0.825rem;
+    }
+    .hour-text {
+      font-size: 0.825rem;
     }
   }
 </style>
