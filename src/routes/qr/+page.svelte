@@ -87,7 +87,7 @@
           <polyline points="7 10 12 15 17 10"></polyline>
           <line x1="12" y1="15" x2="12" y2="3"></line>
         </svg>
-        <span>Scarica Immagine</span>
+        <span>Scarica</span>
       </a>
     </div>
 
@@ -193,20 +193,25 @@
 
   .actions-group {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 0.65rem;
     width: 100%;
+  }
+
+  .actions-group .btn {
+    flex: 1;
+    min-width: 0;
   }
 
   .btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
+    gap: 0.45rem;
     width: 100%;
-    padding: 0.75rem 1rem;
+    padding: 0.75rem 0.75rem;
     border-radius: 10px;
-    font-size: 0.95rem;
+    font-size: 0.925rem;
     font-weight: 600;
     text-decoration: none;
     cursor: pointer;
@@ -214,6 +219,7 @@
     box-sizing: border-box;
     border: none;
     margin: 0;
+    white-space: nowrap;
   }
 
   .btn-primary {

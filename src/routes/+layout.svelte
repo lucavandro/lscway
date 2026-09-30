@@ -30,6 +30,29 @@
 			navigator.serviceWorker.register(`${base}/service-worker.js`, { scope: `${base}/` });
 		}
 
+		// Precarica l'immagine 500 (Panda) nel browser e nel Cache Storage per la fruizione offline
+		if (typeof window !== 'undefined') {
+			const pandaUrls = [
+				`${base}/eastereggs/500.gif`,
+				`${base}/easterggs/500.gif`
+			];
+
+			// 1. Precaricamento in memoria/HTTP cache
+			pandaUrls.forEach((url) => {
+				const img = new Image();
+				img.src = url;
+			});
+
+			// 2. Precaricamento esplicito nel Cache Storage utilizzato dal Service Worker
+			if ('caches' in window) {
+				caches.open('lscway-cache').then((cache) => {
+					pandaUrls.forEach((url) => {
+						cache.add(url).catch(() => {});
+					});
+				}).catch(() => {});
+			}
+		}
+
 		intervalTimer = setInterval(() => {
 			day = getDay();
 		}, 60 * 1000);
@@ -43,6 +66,7 @@
 </script>
 
 <svelte:head>
+	<link rel="prefetch" href="{base}/eastereggs/500.gif" as="image" />
 	<link
 		rel="stylesheet"
 		href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"

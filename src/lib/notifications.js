@@ -1,10 +1,8 @@
-import { userEmail, notificationPermission } from './stores.js';
+import { userEmail, notificationPermission, notificationsEnabled } from './stores.js';
 import { get } from 'svelte/store';
 import { validateEmail } from './utils.js';
 
 let notifiedSubstitutions = new Set();
-
-
 
 // Funzione per ottenere l'email validata
 function getValidatedUserEmail() {
@@ -26,6 +24,7 @@ export async function requestNotificationPermission() {
 
 	if (Notification.permission === 'granted') {
 		notificationPermission.set(true);
+		notificationsEnabled.set(true);
 		return true;
 	}
 
@@ -33,20 +32,77 @@ export async function requestNotificationPermission() {
 		const permission = await Notification.requestPermission();
 		const granted = permission === 'granted';
 		notificationPermission.set(granted);
+		notificationsEnabled.set(granted);
 		return granted;
 	}
 
 	return false;
 }
 
+export async function enableNotifications() {
+	if (typeof window === 'undefined' || !('Notification' in window)) {
+		if (typeof window !== 'undefined') {
+			alert('Le notifiche non sono supportate da questo browser.');
+		}
+		notificationsEnabled.set(false);
+		notificationPermission.set(false);
+		return false;
+	}
+
+	if (Notification.permission === 'denied') {
+		alert('Le notifiche risultano bloccate nel browser. Per attivarle, modifica i permessi nelle impostazioni del sito o del browser.');
+		notificationsEnabled.set(false);
+		notificationPermission.set(false);
+		return false;
+	}
+
+	if (Notification.permission === 'default') {
+		const permission = await Notification.requestPermission();
+		const granted = permission === 'granted';
+		notificationPermission.set(granted);
+		notificationsEnabled.set(granted);
+		if (granted) {
+			syncNotificationsWithServiceWorker(true);
+		}
+		return granted;
+	}
+
+	if (Notification.permission === 'granted') {
+		notificationPermission.set(true);
+		notificationsEnabled.set(true);
+		syncNotificationsWithServiceWorker(true);
+		return true;
+	}
+
+	return false;
+}
+
+export function disableNotifications() {
+	notificationsEnabled.set(false);
+	syncNotificationsWithServiceWorker(false);
+}
+
+export async function toggleNotifications() {
+	const current = get(notificationsEnabled);
+	if (current) {
+		disableNotifications();
+		return false;
+	} else {
+		return await enableNotifications();
+	}
+}
+
 export function checkNotificationPermission() {
-	const hasPermission = 'Notification' in window && Notification.permission === 'granted';
+	const hasPermission = typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'granted';
 	notificationPermission.set(hasPermission);
+	if (!hasPermission && typeof window !== 'undefined' && 'Notification' in window && Notification.permission === 'denied') {
+		notificationsEnabled.set(false);
+	}
 	return hasPermission;
 }
 
 export function showSubstitutionNotification(substitution) {
-	if (Notification.permission !== 'granted' || notifiedSubstitutions.has(substitution.id)) {
+	if (!get(notificationsEnabled) || typeof window === 'undefined' || !('Notification' in window) || Notification.permission !== 'granted' || notifiedSubstitutions.has(substitution.id)) {
 		return;
 	}
 
@@ -73,7 +129,7 @@ export function showSubstitutionNotification(substitution) {
 }
 
 export function checkSubstitutionsForNotifications(substitutions) {
-	if (Notification.permission !== 'granted') return;
+	if (!get(notificationsEnabled) || typeof window === 'undefined' || !('Notification' in window) || Notification.permission !== 'granted') return;
 
 	const today = new Date().toISOString().split('T')[0];
 	const todaySubstitutions = substitutions.filter(s => 
@@ -96,6 +152,7 @@ export async function setupBackgroundSync() {
 		
 		// Sincronizza sempre l'email dell'utente con il service worker
 		syncUserEmailWithServiceWorker();
+		syncNotificationsWithServiceWorker(get(notificationsEnabled));
 		
 		// Setup del controllo periodico
 		if ('sync' in window.ServiceWorkerRegistration.prototype) {
@@ -110,7 +167,18 @@ export function syncUserEmailWithServiceWorker() {
 		const currentEmail = getValidatedUserEmail();
 		navigator.serviceWorker.controller.postMessage({
 			type: 'SET_USER_EMAIL',
-			email: currentEmail
+			email: currentEmail,
+			notificationsEnabled: get(notificationsEnabled)
+		});
+	}
+}
+
+// Funzione per sincronizzare l'abilitazione delle notifiche con il service worker
+export function syncNotificationsWithServiceWorker(enabled) {
+	if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+		navigator.serviceWorker.controller.postMessage({
+			type: 'SET_NOTIFICATIONS_ENABLED',
+			enabled: !!enabled
 		});
 	}
 }

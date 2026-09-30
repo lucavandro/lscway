@@ -5,15 +5,15 @@
   import { onDestroy, onMount } from "svelte";
   import PwaButton from "./PWAButton.svelte";
   import Tabs from "./Tabs.svelte";
-  import { userEmail, isTeacher, isLoading, isMenuOpen } from "$lib/stores.js";
+  import { userEmail, isTeacher, isLoading, isMenuOpen, notificationsEnabled } from "$lib/stores.js";
 
   import {
-    requestNotificationPermission,
     checkSubstitutionsForNotifications,
     clearNotifiedSubstitutions,
     setupBackgroundSync,
     checkNotificationPermission,
     syncUserEmailWithServiceWorker,
+    syncNotificationsWithServiceWorker,
     clearUserFromServiceWorker,
   } from "$lib/notifications.js";
 
@@ -28,7 +28,7 @@
   }
 
   async function checkSubstitutions() {
-    if (!$userEmail) return;
+    if (!$userEmail || !$notificationsEnabled) return;
 
     try {
       const response = await fetch(
@@ -36,7 +36,7 @@
       );
       const data = await response.json();
 
-      if (data.success) {
+      if (data.success && $notificationsEnabled) {
         checkSubstitutionsForNotifications(data.data);
       }
     } catch (err) {
@@ -52,11 +52,13 @@
     checkNotificationPermission();
     await setupBackgroundSync();
 
-    if ($userEmail) {
-      await requestNotificationPermission();
+    if ($userEmail && $notificationsEnabled) {
       syncUserEmailWithServiceWorker();
+      syncNotificationsWithServiceWorker(true);
       checkSubstitutions();
-      substitutionInterval = setInterval(checkSubstitutions, 10000);
+      if (!substitutionInterval) {
+        substitutionInterval = setInterval(checkSubstitutions, 10000);
+      }
     }
   });
 
@@ -65,19 +67,24 @@
     if (substitutionInterval) clearInterval(substitutionInterval);
   });
 
-  $: if ($userEmail) {
-    requestNotificationPermission().then(() => {
-      syncUserEmailWithServiceWorker();
-      checkSubstitutions();
-      if (!substitutionInterval) {
-        substitutionInterval = setInterval(checkSubstitutions, 10000);
-      }
-    });
-  } else if (substitutionInterval) {
-    clearInterval(substitutionInterval);
-    substitutionInterval = null;
-    clearNotifiedSubstitutions();
-    clearUserFromServiceWorker();
+  $: if ($userEmail && $notificationsEnabled) {
+    syncUserEmailWithServiceWorker();
+    syncNotificationsWithServiceWorker(true);
+    checkSubstitutions();
+    if (!substitutionInterval) {
+      substitutionInterval = setInterval(checkSubstitutions, 10000);
+    }
+  } else {
+    if (substitutionInterval) {
+      clearInterval(substitutionInterval);
+      substitutionInterval = null;
+    }
+    if (!$userEmail) {
+      clearNotifiedSubstitutions();
+      clearUserFromServiceWorker();
+    } else if (!$notificationsEnabled) {
+      syncNotificationsWithServiceWorker(false);
+    }
   }
 </script>
 

@@ -25,6 +25,31 @@ userEmail.subscribe((value) => {
 })
 export const notificationPermission = writable(false);
 
+const getInitialNotificationsEnabled = () => {
+    if (typeof window === 'undefined') {
+        return false;
+    }
+    const saved = window.localStorage.getItem('notifications_enabled');
+    if (saved !== null) {
+        if (saved === 'true') {
+            if ('Notification' in window && Notification.permission === 'denied') {
+                return false;
+            }
+            return true;
+        }
+        return false;
+    }
+    return 'Notification' in window && Notification.permission === 'granted';
+};
+
+export const notificationsEnabled = writable(getInitialNotificationsEnabled());
+
+if (typeof window !== 'undefined') {
+    notificationsEnabled.subscribe((value) => {
+        window.localStorage.setItem('notifications_enabled', value ? 'true' : 'false');
+    });
+}
+
 if (typeof window !== 'undefined') {
     userEmail.subscribe((value) => {
         if (value) {

@@ -1,9 +1,9 @@
 <script>
-  import { userEmail, notificationPermission } from "$lib/stores.js";
+  import { userEmail, notificationPermission, notificationsEnabled } from "$lib/stores.js";
   import { goto } from "$app/navigation";
   import { onMount, onDestroy } from "svelte";
   import { inviaConfermaSostituzione } from "$lib/data";
-  import { requestNotificationPermission } from "$lib/notifications.js";
+  import { enableNotifications } from "$lib/notifications.js";
   import { getTodayDate, isDateBefore } from "$lib/utils.js";
   import { base } from "$app/paths";
 
@@ -45,8 +45,8 @@
     }
   }
 
-  async function enableNotifications() {
-    await requestNotificationPermission();
+  async function handleEnableNotifications() {
+    await enableNotifications();
   }
 
   onMount(() => {
@@ -70,7 +70,7 @@
 <div class="sostituzioni-page">
   {#if $userEmail}
     <!-- Notification Banner if not enabled -->
-    {#if !$notificationPermission}
+    {#if !$notificationPermission || !$notificationsEnabled}
       <div class="banner-card notification-banner">
         <div class="banner-icon-wrap" aria-hidden="true">
           <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -83,7 +83,7 @@
           <p class="banner-text">
             Ricevi un avviso immediato non appena ti viene assegnata una nuova sostituzione da confermare.
           </p>
-          <button type="button" on:click={enableNotifications} class="banner-action-btn">
+          <button type="button" on:click={handleEnableNotifications} class="banner-action-btn">
             Attiva notifiche
           </button>
         </div>

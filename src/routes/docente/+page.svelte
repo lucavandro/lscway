@@ -48,7 +48,7 @@
 </script>
 
 <svelte:head>
-  <title>Orario Prof. {selectedTeacher} - WAY Cortese</title>
+  <title>Orario {selectedTeacher} - WAY Cortese</title>
 </svelte:head>
 
 <div class="page-container">
@@ -69,7 +69,7 @@
   <div class="table-section">
     <div class="section-meta">
       <h2 class="section-title">
-        <span>Prof. {selectedTeacher}</span>
+        <span>{selectedTeacher}</span>
         <span class="view-tag">{showFullTimeTable ? "Settimanale" : `Oggi (${currenDay})`}</span>
       </h2>
     </div>

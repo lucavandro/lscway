@@ -11,12 +11,19 @@
   import SwapIcon from "$icons/SwapIcon.svelte";
   import SunIcon from "$icons/SunIcon.svelte";
   import MoonIcon from "$icons/MoonIcon.svelte";
-  import { isLoading, userEmail, isTeacher, isMenuOpen } from "$lib/stores.js";
+  import BellIcon from "$icons/BellIcon.svelte";
+  import BellOffIcon from "$icons/BellOffIcon.svelte";
+  import { isLoading, userEmail, isTeacher, isMenuOpen, notificationsEnabled } from "$lib/stores.js";
   import { theme, toggleTheme } from "$lib/theme.js";
+  import { toggleNotifications } from "$lib/notifications.js";
   import { onDestroy } from "svelte";
 
   let closing = false;
   let previouslyFocusedEl = null;
+
+  async function handleToggleNotifications() {
+    await toggleNotifications();
+  }
 
   function reload() {
     isLoading.set(true);
@@ -115,7 +122,7 @@
     >
       <div class="drawer-header">
         <div class="brand-group">
-          <div class="brand-badge">W</div>
+          <img src="{base}/logo-blue.png" alt="Logo WAY Cortese" class="brand-logo" />
           <div class="brand-meta">
             <span class="brand-name">WAY Cortese</span>
             <span class="brand-sub">Orario & Sostituzioni</span>
@@ -143,6 +150,22 @@
             <span class="user-tag">Docente</span>
             <span class="user-email" title={$userEmail}>{$userEmail}</span>
           </div>
+          <button
+            type="button"
+            class="user-card-notif-btn"
+            class:active={$notificationsEnabled}
+            role="switch"
+            aria-checked={$notificationsEnabled}
+            aria-label={$notificationsEnabled ? 'Disattiva notifiche' : 'Attiva notifiche'}
+            title={$notificationsEnabled ? 'Notifiche attive (clicca per disattivare)' : 'Notifiche disattivate (clicca per attivare)'}
+            on:click={handleToggleNotifications}
+          >
+            {#if $notificationsEnabled}
+              <BellIcon />
+            {:else}
+              <BellOffIcon />
+            {/if}
+          </button>
         </div>
       {/if}
 
@@ -213,6 +236,33 @@
 
         <div class="nav-section-label">Azioni</div>
         <ul class="nav-list">
+          {#if $isTeacher}
+            <li>
+              <button
+                type="button"
+                class="nav-action-btn notif-toggle-btn"
+                role="switch"
+                aria-checked={$notificationsEnabled}
+                aria-label={$notificationsEnabled ? 'Disattiva notifiche' : 'Attiva notifiche'}
+                title={$notificationsEnabled ? 'Disattiva notifiche' : 'Attiva notifiche'}
+                on:click={handleToggleNotifications}
+              >
+                <span class="nav-icon" class:active-bell={$notificationsEnabled}>
+                  {#if $notificationsEnabled}
+                    <BellIcon />
+                  {:else}
+                    <BellOffIcon />
+                  {/if}
+                </span>
+                <span class="nav-text">
+                  {$notificationsEnabled ? 'Notifiche attive' : 'Notifiche disattivate'}
+                </span>
+                <span class="theme-switch" aria-hidden="true" class:active={$notificationsEnabled}>
+                  <span class="theme-switch-thumb"></span>
+                </span>
+              </button>
+            </li>
+          {/if}
           <li>
             <button
               type="button"
@@ -328,21 +378,16 @@
   .brand-group {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
+    gap: 0.65rem;
   }
 
-  .brand-badge {
+  .brand-logo {
     width: 32px;
     height: 32px;
     border-radius: 8px;
-    background: linear-gradient(135deg, var(--brand-primary), #1d4ed8);
-    color: #ffffff;
-    font-weight: 700;
-    font-size: 1rem;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.3);
+    object-fit: cover;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
   }
 
   .brand-meta {
@@ -426,6 +471,37 @@
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
+  }
+
+  .user-card-notif-btn {
+    margin-left: auto;
+    background: transparent;
+    border: 1px solid var(--brand-border);
+    border-radius: 6px;
+    padding: 0.3rem;
+    color: var(--brand-text-muted);
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s ease;
+    flex-shrink: 0;
+  }
+
+  .user-card-notif-btn:hover {
+    background: var(--brand-surface-card);
+    color: var(--brand-text);
+  }
+
+  .user-card-notif-btn.active {
+    background: color-mix(in srgb, var(--brand-primary) 15%, transparent);
+    color: var(--brand-primary);
+    border-color: color-mix(in srgb, var(--brand-primary) 30%, transparent);
+  }
+
+  .user-card-notif-btn :global(.icon) {
+    width: 14px;
+    height: 14px;
   }
 
   .drawer-nav {
@@ -521,6 +597,10 @@
   }
 
   .nav-link.active .nav-icon {
+    color: var(--brand-primary);
+  }
+
+  .nav-icon.active-bell {
     color: var(--brand-primary);
   }
 

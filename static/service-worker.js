@@ -2,6 +2,7 @@
 
 const CACHE = "lscway-cache";
 let userEmail = null;
+let notificationsEnabled = true;
 let notifiedSubstitutions = new Set();
 let checkInterval = null;
 
@@ -22,9 +23,19 @@ self.addEventListener("message", (event) => {
     }
     
     userEmail = newEmail;
+    if (typeof event.data.notificationsEnabled === "boolean") {
+      notificationsEnabled = event.data.notificationsEnabled;
+    }
     
     // Gestisci l'intervallo di controllo
-    if (userEmail) {
+    if (userEmail && notificationsEnabled) {
+      startPeriodicCheck();
+    } else {
+      stopPeriodicCheck();
+    }
+  } else if (event.data && event.data.type === "SET_NOTIFICATIONS_ENABLED") {
+    notificationsEnabled = !!event.data.enabled;
+    if (userEmail && notificationsEnabled) {
       startPeriodicCheck();
     } else {
       stopPeriodicCheck();
@@ -36,7 +47,7 @@ function startPeriodicCheck() {
   if (checkInterval) return; // Evita intervalli multipli
   
   checkInterval = setInterval(() => {
-    if (userEmail) {
+    if (userEmail && notificationsEnabled) {
       checkSubstitutionsInBackground();
     }
   }, 5000); // Ogni 60 secondi
@@ -49,22 +60,49 @@ function stopPeriodicCheck() {
   }
 }
 
-self.addEventListener('install', async (event) => {
+const PRECACHE_ASSETS = [
+  offlineFallbackPage,
+  "eastereggs/500.gif",
+  "easterggs/500.gif",
+  "500",
+  "500.html"
+];
+
+self.addEventListener('install', (event) => {
+  self.skipWaiting();
   event.waitUntil(
-    caches.open(CACHE)
-      .then((cache) => {
-        try {
-          cache.add(offlineFallbackPage)
-        } catch (error) {
-          console.log("⛔ Failed to add offline fallback page to cache")
-        }
-      })
+    caches.open(CACHE).then(async (cache) => {
+      await Promise.allSettled(
+        PRECACHE_ASSETS.map(async (asset) => {
+          try {
+            await cache.add(asset);
+          } catch (err) {
+            console.warn(`[Service Worker] Failed to precache asset ${asset}:`, err);
+          }
+        })
+      );
+    })
   );
+});
+
+self.addEventListener('activate', (event) => {
+  event.waitUntil(self.clients.claim());
 });
 
 if (workbox.navigationPreload.isSupported()) {
   workbox.navigationPreload.enable();
 }
+
+// Strategia StaleWhileRevalidate per immagini (inclusi 500.gif e easter eggs)
+workbox.routing.registerRoute(
+  ({ request, url }) =>
+    request.destination === 'image' ||
+    url.pathname.includes('/eastereggs/') ||
+    url.pathname.includes('/easterggs/'),
+  new workbox.strategies.StaleWhileRevalidate({
+    cacheName: CACHE
+  })
+);
 
 workbox.routing.registerRoute(
   new RegExp('/*'),
@@ -99,14 +137,16 @@ self.addEventListener('fetch', (event) => {
 // Gestione del background sync
 self.addEventListener('sync', function(event) {
   if (event.tag === 'check-substitutions') {
-    event.waitUntil(checkSubstitutionsInBackground());
+    if (notificationsEnabled) {
+      event.waitUntil(checkSubstitutionsInBackground());
+    }
   }
 });
 
 async function checkSubstitutionsInBackground() {
-  // Verifica che l'utente sia loggato
-  if (!userEmail) {
-    console.log('Service Worker: Nessun utente loggato, skip controllo sostituzioni');
+  // Verifica che l'utente sia loggato e le notifiche siano abilitate
+  if (!userEmail || !notificationsEnabled) {
+    console.log('Service Worker: Skip controllo sostituzioni (utente non loggato o notifiche disabilitate)');
     return;
   }
 

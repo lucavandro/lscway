@@ -4,4 +4,5 @@ RewriteCond %{HTTPS} off
 RewriteRule ^(.*)$ https://%{HTTP_HOST}%{REQUEST_URI} [L,R=301]
 Redirect 301 /app/way/tmp/docente /app/way/tmp/
 Redirect 301 /app/way/tmp/aula /app/way/tmp/
+ErrorDocument 500 /app/way/tmp/500.html
 </IfModule>
