@@ -80,7 +80,11 @@
         fields={["classe", "aula", "materia"]}
       />
     {:else}
-      <TimeTable bind:data={teacherData} fields={["classe", "aula", "materia"]} />
+      <TimeTable
+        bind:data={teacherData}
+        fields={["classe", "aula", "materia"]}
+        day={currenDay}
+      />
     {/if}
   </div>
 </div>

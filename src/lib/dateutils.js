@@ -33,13 +33,25 @@ export function getHour(){
         return getHourNum() > 0 ? hours[getHourNum()-1] : hours[0]
 }
 
-export function getDay(){
-    return weekdays[ new Date().getDay() - 1 ] || "DOM"
+export function getDay() {
+    const day = new Date().getDay();
+    if (day === 6) return "SAB";
+    if (day === 0) return "DOM";
+    return weekdays[day - 1];
+}
+
+export function isChristmasPeriod(date = new Date()) {
+    const month = date.getMonth();
+    const day = date.getDate();
+    return (month === 11 && day >= 23) || (month === 0 && day <= 6);
 }
 
 export function getSchoolHour() {
-    const hourNum = getHourNum()
-    const lessonHourList = ["Fuori orario", "I ora", "II ora", "III ora", "IV ora", "V ora", "VI ora", "VII ora"]
+    const now = new Date();
+    const day = now.getDay();
+    if (day === 0 || day === 6 || isChristmasPeriod(now)) return "Fuori orario";
+    const hourNum = getHourNum();
+    const lessonHourList = ["Fuori orario", "I ora", "II ora", "III ora", "IV ora", "V ora", "VI ora", "VII ora"];
     return lessonHourList[hourNum];
 }
 

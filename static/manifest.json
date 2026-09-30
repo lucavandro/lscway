@@ -50,38 +50,6 @@
             "description": "Schermata aula"
         }
     ],
-    "shortcuts": [
-        {
-            "name": "Classe",
-            "url": "/app/way/tmp/",
-            "icons": [
-                {
-                    "src": "classe.png",
-                    "sizes": "96x96"
-                }
-            ]
-        },
-        {
-            "name": "Docente",
-            "url": "/app/way/tmp/docente",
-            "icons": [
-                {
-                    "src": "docente.png",
-                    "sizes": "96x96"
-                }
-            ]
-        },
-        {
-            "name": "Aula",
-            "url": "/app/way/tmp/aula",
-            "icons": [
-                {
-                    "src": "aula.png",
-                    "sizes": "96x96"
-                }
-            ]
-        }
-    ],
     "related_applications": [],
     "prefer_related_applications": false,
     "categories": [

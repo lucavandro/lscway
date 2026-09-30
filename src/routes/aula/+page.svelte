@@ -83,6 +83,7 @@
       <TimeTable
         bind:data={classroomData}
         fields={["classe", "docente", "materia"]}
+        day={currenDay}
       />
     {/if}
   </div>

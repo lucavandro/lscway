@@ -1,26 +1,83 @@
 <script>
   import TimeTableRow from "./TimeTableRow.svelte";
+  import { base } from "$app/paths";
+  import { getDay, isChristmasPeriod } from "$lib/dateutils.js";
+  import { onMount, onDestroy } from "svelte";
+
   export let data = [];
   export let fields = [];
+  export let day = undefined;
+  export let isChristmas = undefined;
+
+  const xmasGifs = ["xmas1.gif", "xmas2.gif", "xmas3.gif"];
+  let randomXmasGif = xmasGifs[Math.floor(Math.random() * xmasGifs.length)];
+
+  let currentDay = getDay();
+  let currentIsChristmas = isChristmasPeriod();
+  let interval;
+
+  onMount(() => {
+    currentDay = getDay();
+    currentIsChristmas = isChristmasPeriod();
+    interval = setInterval(() => {
+      currentDay = getDay();
+      currentIsChristmas = isChristmasPeriod();
+    }, 1000);
+  });
+
+  onDestroy(() => {
+    if (interval) clearInterval(interval);
+  });
+
+  $: activeDay = day !== undefined ? day : currentDay;
+  $: activeIsChristmas = isChristmas !== undefined ? isChristmas : currentIsChristmas;
+  $: isSaturday = activeDay === "SAB" || activeDay === 6;
+  $: isSunday = activeDay === "DOM" || activeDay === 0;
 </script>
 
-<div class="daily-table-container">
-  <table class="daily-timetable">
-    <thead>
-      <tr>
-        <th class="col-hour" scope="col">Ora</th>
-        {#each fields as field}
-          <th scope="col" class="col-{field}">{field}</th>
+{#if activeIsChristmas}
+  <div class="easteregg-container">
+    <img
+      src="{base}/eastereggs/{randomXmasGif}"
+      alt="Buone Feste!"
+      class="easteregg-gif"
+    />
+  </div>
+{:else if isSaturday}
+  <div class="easteregg-container">
+    <img
+      src="{base}/eastereggs/saturday.gif"
+      alt="Sabato"
+      class="easteregg-gif"
+    />
+  </div>
+{:else if isSunday}
+  <div class="easteregg-container">
+    <img
+      src="{base}/eastereggs/sunday.gif"
+      alt="Domenica"
+      class="easteregg-gif"
+    />
+  </div>
+{:else}
+  <div class="daily-table-container">
+    <table class="daily-timetable">
+      <thead>
+        <tr>
+          <th class="col-hour" scope="col">Ora</th>
+          {#each fields as field}
+            <th scope="col" class="col-{field}">{field}</th>
+          {/each}
+        </tr>
+      </thead>
+      <tbody>
+        {#each { length: 7 } as _, i}
+          <TimeTableRow hourIndex={i} bind:data {fields} />
         {/each}
-      </tr>
-    </thead>
-    <tbody>
-      {#each { length: 7 } as _, i}
-        <TimeTableRow hourIndex={i} bind:data {fields} />
-      {/each}
-    </tbody>
-  </table>
-</div>
+      </tbody>
+    </table>
+  </div>
+{/if}
 
 <style>
   .daily-table-container {
@@ -83,6 +140,29 @@
     width: auto; /* Takes all remaining width */
   }
 
+  .easteregg-container,
+  .weekend-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1rem;
+    border-radius: 12px;
+    border: 1px solid var(--brand-border);
+    background: var(--brand-surface-card);
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+  }
+
+  .easteregg-gif,
+  .weekend-gif {
+    width: 280px;
+    max-width: 100%;
+    height: auto;
+    object-fit: contain;
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
   @media (max-width: 400px) {
     thead th {
       padding: 0.45rem 0.2rem;
@@ -91,6 +171,14 @@
     .col-hour {
       width: 40px;
       min-width: 40px;
+    }
+    .easteregg-container,
+    .weekend-container {
+      padding: 1.5rem 0.75rem;
+    }
+    .easteregg-gif,
+    .weekend-gif {
+      width: 220px;
     }
   }
 </style>
