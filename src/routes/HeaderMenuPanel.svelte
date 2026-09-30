@@ -150,22 +150,6 @@
             <span class="user-tag">Docente</span>
             <span class="user-email" title={$userEmail}>{$userEmail}</span>
           </div>
-          <button
-            type="button"
-            class="user-card-notif-btn"
-            class:active={$notificationsEnabled}
-            role="switch"
-            aria-checked={$notificationsEnabled}
-            aria-label={$notificationsEnabled ? 'Disattiva notifiche' : 'Attiva notifiche'}
-            title={$notificationsEnabled ? 'Notifiche attive (clicca per disattivare)' : 'Notifiche disattivate (clicca per attivare)'}
-            on:click={handleToggleNotifications}
-          >
-            {#if $notificationsEnabled}
-              <BellIcon />
-            {:else}
-              <BellOffIcon />
-            {/if}
-          </button>
         </div>
       {/if}
 
@@ -473,36 +457,6 @@
     white-space: nowrap;
   }
 
-  .user-card-notif-btn {
-    margin-left: auto;
-    background: transparent;
-    border: 1px solid var(--brand-border);
-    border-radius: 6px;
-    padding: 0.3rem;
-    color: var(--brand-text-muted);
-    cursor: pointer;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s ease;
-    flex-shrink: 0;
-  }
-
-  .user-card-notif-btn:hover {
-    background: var(--brand-surface-card);
-    color: var(--brand-text);
-  }
-
-  .user-card-notif-btn.active {
-    background: color-mix(in srgb, var(--brand-primary) 15%, transparent);
-    color: var(--brand-primary);
-    border-color: color-mix(in srgb, var(--brand-primary) 30%, transparent);
-  }
-
-  .user-card-notif-btn :global(.icon) {
-    width: 14px;
-    height: 14px;
-  }
 
   .drawer-nav {
     display: block;
