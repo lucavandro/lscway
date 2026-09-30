@@ -34,7 +34,7 @@
 		if (typeof window !== 'undefined') {
 			const pandaUrls = [
 				`${base}/eastereggs/500.gif`,
-				`${base}/easterggs/500.gif`
+				`${base}/eastereggs/500.gif`
 			];
 
 			// 1. Precaricamento in memoria/HTTP cache

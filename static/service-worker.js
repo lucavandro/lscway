@@ -63,7 +63,7 @@ function stopPeriodicCheck() {
 const PRECACHE_ASSETS = [
   offlineFallbackPage,
   "eastereggs/500.gif",
-  "easterggs/500.gif",
+  "eastereggs/500.gif",
   "500",
   "500.html"
 ];
@@ -98,7 +98,7 @@ workbox.routing.registerRoute(
   ({ request, url }) =>
     request.destination === 'image' ||
     url.pathname.includes('/eastereggs/') ||
-    url.pathname.includes('/easterggs/'),
+    url.pathname.includes('/eastereggs/'),
   new workbox.strategies.StaleWhileRevalidate({
     cacheName: CACHE
   })

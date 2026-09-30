@@ -20,9 +20,9 @@
       const cache = await caches.open("lscway-cache");
       const match =
         (await cache.match(`${base}/eastereggs/500.gif`)) ||
-        (await cache.match(`${base}/easterggs/500.gif`)) ||
+        (await cache.match(`${base}/eastereggs/500.gif`)) ||
         (await cache.match("eastereggs/500.gif")) ||
-        (await cache.match("easterggs/500.gif"));
+        (await cache.match("eastereggs/500.gif"));
       if (match) {
         const blob = await match.blob();
         imageSrc = URL.createObjectURL(blob);
@@ -53,8 +53,8 @@
 
     // Tentativo 2: fallback sul path alternativo
     if (!imgEl.dataset.fallback) {
-      imgEl.dataset.fallback = "easterggs";
-      imageSrc = `${base}/easterggs/500.gif`;
+      imgEl.dataset.fallback = "eastereggs";
+      imageSrc = `${base}/eastereggs/500.gif`;
     }
   }
 </script>
