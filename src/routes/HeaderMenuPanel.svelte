@@ -13,6 +13,7 @@
   import MoonIcon from "$icons/MoonIcon.svelte";
   import BellIcon from "$icons/BellIcon.svelte";
   import BellOffIcon from "$icons/BellOffIcon.svelte";
+  import SocialIcon from "$icons/SocialIcon.svelte";
   import { isLoading, userEmail, isTeacher, isMenuOpen, notificationsEnabled } from "$lib/stores.js";
   import { theme, toggleTheme } from "$lib/theme.js";
   import { toggleNotifications } from "$lib/notifications.js";
@@ -204,6 +205,18 @@
               </a>
             </li>
           {/if}
+
+          <li>
+            <a
+              href="{base}/social"
+              class="nav-link"
+              class:active={$page.url.pathname === base + "/social"}
+              on:click={closeMenu}
+            >
+              <span class="nav-icon"><SocialIcon /></span>
+              <span class="nav-text">Canali Social</span>
+            </a>
+          </li>
 
           <li>
             <a
