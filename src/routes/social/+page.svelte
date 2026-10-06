@@ -102,9 +102,8 @@
   <!-- Header Intro Card -->
   <header class="social-intro-card">
     <div class="intro-badge-icon" aria-hidden="true">
-      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <circle cx="12" cy="12" r="4" />
-        <path d="M16 8v5a3 3 0 0 0 6 0v-1a10 10 0 1 0-3.92 7.94" />
+      <svg width="26" height="26" viewBox="0 -960 960 960" fill="currentColor">
+        <path d="M80-80v-720q0-33 23.5-56.5T160-880h640q33 0 56.5 23.5T880-800v480q0 33-23.5 56.5T800-240H240L80-80Zm126-240h594v-480H160v525l46-45Zm274-56-23-21q-40-36-67-63t-42-47.5q-15-21-22-38.5t-6-36q0-38 25-63t63-25q21 0 39.5 9t32.5 25q14-16 32.5-25t39.5-9q38 0 63 25t25 63q0 18.5-6 36t-22 38.5q-15 21-42 47.5t-67 63l-23 21ZM160-320v-480 480Z" />
       </svg>
     </div>
     <h1 class="page-title">Canali Social Ufficiali</h1>

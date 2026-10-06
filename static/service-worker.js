@@ -1,6 +1,6 @@
 // This is the service worker with the combined offline experience (Offline page + Offline copy of pages)
 
-const CACHE_VERSION = "v2026-10-06-4";
+const CACHE_VERSION = "v2026-10-06-16";
 const CACHE = `lscway-cache-${CACHE_VERSION}`;
 let userEmail = null;
 let notificationsEnabled = true;
@@ -13,7 +13,7 @@ if (typeof workbox !== 'undefined') {
   workbox.setConfig({ debug: false });
 }
 
-const offlineFallbackPage = "offline";
+const offlineFallbackPage = "./";
 
 self.addEventListener("message", (event) => {
   if (event.data && event.data.type === "SKIP_WAITING") {
@@ -66,9 +66,7 @@ function stopPeriodicCheck() {
 
 const PRECACHE_ASSETS = [
   offlineFallbackPage,
-  "eastereggs/500.gif",
-  "500",
-  "500.html"
+  "eastereggs/500.gif"
 ];
 
 self.addEventListener('install', (event) => {
@@ -91,21 +89,34 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
+      // Disabilita navigationPreload (che persiste dalla vecchia registrazione SW e pesca dalla cache HTTP del browser)
+      if (self.registration && self.registration.navigationPreload) {
+        try {
+          await self.registration.navigationPreload.disable();
+        } catch (e) {}
+      }
+
       // Elimina tutte le cache delle versioni precedenti (es. "lscway-cache" non versionata)
       const cacheNames = await caches.keys();
-      await Promise.all(
-        cacheNames
-          .filter((name) => name !== CACHE)
-          .map((name) => caches.delete(name))
-      );
+      const oldCaches = cacheNames.filter((name) => name !== CACHE);
+      await Promise.all(oldCaches.map((name) => caches.delete(name)));
+
       await self.clients.claim();
+
+      // Se c'erano vecchie cache, forza il reload immediato delle finestre aperte con il vecchio HTML
+      if (oldCaches.length > 0) {
+        const windowClients = await self.clients.matchAll({ type: 'window' });
+        await Promise.allSettled(
+          windowClients.map((client) => {
+            if ('navigate' in client && client.url) {
+              return client.navigate(client.url);
+            }
+          })
+        );
+      }
     })()
   );
 });
-
-if (workbox.navigationPreload.isSupported()) {
-  workbox.navigationPreload.enable();
-}
 
 const isDevModuleRequest = (url) =>
   url.pathname.includes('/@vite/') ||
@@ -114,27 +125,40 @@ const isDevModuleRequest = (url) =>
   url.pathname.includes('/src/') ||
   url.pathname.includes('/.svelte-kit/');
 
-// NetworkFirst con cache: 'no-cache' per garantire che online vengano sempre
-// scaricate le versioni aggiornate di HTML, CSS, JS e icone senza pescare dalla cache HTTP stantia
+// NetworkFirst con cache: 'no-store' per ignorare completamente la cache HTTP su disco del browser
 const networkFirstStrategy = new workbox.strategies.NetworkFirst({
   cacheName: CACHE,
   fetchOptions: {
-    cache: 'no-cache'
+    cache: 'no-store'
   }
 });
 
-// Gestione navigazione pagina con fallback su offlineFallbackPage
+// Gestione navigazione pagina (SPA): tutte le rotte client (/aula, /docente, /social, ecc.)
+// usano l'unico index.html della SPA (scopeRootUrl) sia online che offline
 workbox.routing.registerRoute(
   ({ request, url }) => request.mode === 'navigate' && !isDevModuleRequest(url),
-  async (params) => {
-    try {
-      const response = await networkFirstStrategy.handle(params);
-      if (response) return response;
-    } catch (error) {
-      // Ignora e passa al fallback offline
-    }
+  async ({ request }) => {
     const cache = await caches.open(CACHE);
-    return (await cache.match(offlineFallbackPage)) || Response.error();
+    const scopeRootUrl = self.registration ? new URL('./', self.registration.scope).href : offlineFallbackPage;
+    try {
+      const freshResponse = await fetch(scopeRootUrl, {
+        cache: 'no-store',
+        credentials: 'same-origin',
+        redirect: 'follow'
+      });
+      if (freshResponse && freshResponse.ok) {
+        cache.put(scopeRootUrl, freshResponse.clone()).catch(() => {});
+        return freshResponse;
+      }
+    } catch (error) {
+      // Offline o server locale spento: usa l'index.html della SPA salvato in cache
+    }
+    return (
+      (await cache.match(scopeRootUrl, { ignoreSearch: true })) ||
+      (await cache.match(request, { ignoreSearch: true })) ||
+      (await cache.match(offlineFallbackPage, { ignoreSearch: true })) ||
+      Response.error()
+    );
   }
 );
 

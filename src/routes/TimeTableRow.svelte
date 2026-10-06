@@ -67,7 +67,7 @@
           {#each entries as rd, index}
             <div class="entry-item">
               {#if field === "aula"}
-                {#if rd[field] && rd[field] !== "-"}
+                {#if rd[field] && rd[field] !== "-" && rd["materia"] !== "POT" && rd["materia"] !== "sub_potenziamento" && rd["materia"] !== "RIC" && rd["materia"] !== "sub_ricevimento"}
                   <a href="{base}/aula?q={queryValue(rd[field])}" class="link-chip room-chip" title="Aula {rd[field]}">
                     <span>{rd[field]}</span>
                   </a>
@@ -83,14 +83,12 @@
                   <span class="dash">—</span>
                 {/if}
               {:else if field === "classe"}
-                {#if rd["classe"]}
+                {#if rd["classe"] && rd["materia"] !== "POT" && rd["materia"] !== "sub_potenziamento"}
                   <a href="{base}/?q={queryValue(rd['classe'])}" class="link-chip class-chip" title="Classe {rd['classe']}">
                     <span>{rd["classe"]}</span>
                   </a>
                 {:else if rd["materia"] === "RIC" || rd["materia"] === "sub_ricevimento"}
-                  <span class="badge-chip badge-pot">Ricevimento</span>
-                {:else if rd["materia"] === "POT" || rd["materia"] === "sub_potenziamento"}
-                  <span class="badge-chip badge-pot">Potenziamento</span>
+                  <span class="badge-chip badge-ric">Ricevimento</span>
                 {:else if rd["materia"] === "INC" || rd["materia"] === "MADISO"}
                   <span class="badge-chip badge-sostegno">Sostegno</span>
                 {:else}
@@ -99,7 +97,8 @@
               {:else if field === "materia"}
                 <span
                   class="subject-tag"
-                  class:is-pot={rd[field] === "POT" || rd[field] === "sub_potenziamento" || rd[field] === "RIC" || rd[field] === "sub_ricevimento"}
+                  class:is-pot={rd[field] === "POT" || rd[field] === "sub_potenziamento"}
+                  class:is-ric={rd[field] === "RIC" || rd[field] === "sub_ricevimento"}
                   class:is-sostegno={rd[field] === "MADISO" || rd[field] === "INC"}
                   title={rd[field]}
                 >
@@ -310,6 +309,20 @@
     border-color: rgba(245, 158, 11, 0.5);
   }
 
+  .subject-tag.is-ric {
+    background: rgba(236, 72, 153, 0.15);
+    color: #be185d;
+    border: 1px solid rgba(236, 72, 153, 0.4);
+    font-weight: 800;
+  }
+
+  :global([data-theme="dark"]) .subject-tag.is-ric,
+  :global(.dark) .subject-tag.is-ric {
+    color: #f472b6;
+    background: rgba(236, 72, 153, 0.22);
+    border-color: rgba(236, 72, 153, 0.5);
+  }
+
   .subject-tag.is-sostegno {
     background: rgba(99, 102, 241, 0.12);
     color: #4f46e5;
@@ -334,17 +347,17 @@
     white-space: nowrap;
   }
 
-  .badge-chip.badge-pot {
-    background: rgba(245, 158, 11, 0.14);
-    color: #b45309;
-    border: 1px solid rgba(245, 158, 11, 0.35);
+  .badge-chip.badge-ric {
+    background: rgba(236, 72, 153, 0.14);
+    color: #be185d;
+    border: 1px solid rgba(236, 72, 153, 0.35);
   }
 
-  :global([data-theme="dark"]) .badge-chip.badge-pot,
-  :global(.dark) .badge-chip.badge-pot {
-    color: #fbbf24;
-    background: rgba(245, 158, 11, 0.2);
-    border-color: rgba(245, 158, 11, 0.45);
+  :global([data-theme="dark"]) .badge-chip.badge-ric,
+  :global(.dark) .badge-chip.badge-ric {
+    color: #f472b6;
+    background: rgba(236, 72, 153, 0.2);
+    border-color: rgba(236, 72, 153, 0.45);
   }
 
   .badge-chip.badge-sostegno {

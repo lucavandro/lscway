@@ -55,14 +55,15 @@
         <div class="slot-stack">
           {#each dayEntries as entry, idx}
             {@const isSostegno = entry["materia"] === "MADISO" || entry["materia"] === "INC"}
-            {@const isPot = entry["materia"] === "POT" || entry["materia"] === "sub_potenziamento" || entry["materia"] === "RIC" || entry["materia"] === "sub_ricevimento"}
+            {@const isPot = entry["materia"] === "POT" || entry["materia"] === "sub_potenziamento"}
+            {@const isRic = entry["materia"] === "RIC" || entry["materia"] === "sub_ricevimento"}
             {@const isSecondarySostegno = idx > 0 && isSostegno}
             {@const isRoomView = fields.includes("classe") && fields.includes("docente")}
-            {@const showPrimaryClass = fields.includes("classe") && !isRoomView && entry["classe"] && !isSecondarySostegno}
+            {@const showPrimaryClass = fields.includes("classe") && !isRoomView && entry["classe"] && !isSecondarySostegno && !isPot}
             {@const showPrimaryTeacher = fields.includes("docente") && entry["docente"]}
             {@const hasPrimary = Boolean(showPrimaryClass || showPrimaryTeacher)}
-            {@const showClassTag = isRoomView && entry["classe"] && !isSecondarySostegno}
-            {@const showAula = fields.includes("aula") && entry["aula"] && entry["aula"] !== "-" && !isSecondarySostegno}
+            {@const showClassTag = isRoomView && entry["classe"] && !isSecondarySostegno && !isPot}
+            {@const showAula = fields.includes("aula") && entry["aula"] && entry["aula"] !== "-" && !isSecondarySostegno && !isPot && !isRic}
 
             <div class="entry-micro">
               <!-- Line 1: Primary identifier (Docente in class/room view, Classe in teacher view) -->
@@ -81,6 +82,7 @@
                   <span
                     class="subj-tag fallback-subj"
                     class:is-pot={isPot}
+                    class:is-ric={isRic}
                     class:is-sostegno={isSostegno}
                   >
                     {entry["materia"]}
@@ -103,6 +105,7 @@
                     <span
                       class="subj-tag"
                       class:is-pot={isPot}
+                      class:is-ric={isRic}
                       class:is-sostegno={isSostegno}
                     >
                       {entry["materia"]}
@@ -300,6 +303,20 @@
     color: #fbbf24;
     background: rgba(245, 158, 11, 0.22);
     border-color: rgba(245, 158, 11, 0.5);
+  }
+
+  .subj-tag.is-ric {
+    background: rgba(236, 72, 153, 0.16);
+    color: #be185d;
+    border-color: rgba(236, 72, 153, 0.45);
+    font-weight: 700;
+  }
+
+  :global([data-theme="dark"]) .subj-tag.is-ric,
+  :global(.dark) .subj-tag.is-ric {
+    color: #f472b6;
+    background: rgba(236, 72, 153, 0.22);
+    border-color: rgba(236, 72, 153, 0.5);
   }
 
   .subj-tag.is-sostegno {

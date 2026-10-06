@@ -197,13 +197,6 @@
 <svelte:window on:click={handleClickOutside} on:keydown={handleKeydown} />
 
 <div class="select-wrapper">
-  {#if label}
-    <label for="select-trigger-{label}" class="select-label">
-      <span class="label-text">{label}</span>
-      <span class="item-count">({list.length})</span>
-    </label>
-  {/if}
-
   <div class="select-container" bind:this={containerEl}>
     <!-- Hidden native select for 100% mobile widget and automated form compatibility -->
     <select
@@ -226,6 +219,7 @@
       id="select-trigger-{label}"
       bind:this={triggerEl}
       class="custom-select-trigger"
+      aria-label={label}
       aria-haspopup="listbox"
       aria-expanded={isOpen}
       on:click={() => (isOpen ? closeSelect() : openSelect())}
@@ -458,29 +452,9 @@
   .select-wrapper {
     display: flex;
     flex-direction: column;
-    gap: 0.2rem;
     width: 100%;
     margin: 0;
     position: relative;
-  }
-
-  .select-label {
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-    font-size: 0.825rem;
-    font-weight: 700;
-    color: var(--brand-text-muted);
-    text-transform: uppercase;
-    letter-spacing: 0.04em;
-    margin: 0;
-    line-height: 1;
-  }
-
-  .item-count {
-    font-weight: 400;
-    opacity: 0.65;
-    font-size: 0.775rem;
   }
 
   .select-container {

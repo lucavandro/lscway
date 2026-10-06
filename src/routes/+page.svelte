@@ -76,13 +76,6 @@
   </div>
 
   <div class="table-section">
-    <div class="section-meta">
-      <h2 class="section-title">
-        <span>Classe {selectedClass}</span>
-        <span class="view-tag">{showFullTimeTable ? "Settimanale" : `Oggi (${currenDay})`}</span>
-      </h2>
-    </div>
-
     {#if showFullTimeTable}
       <FullTimeTable
         bind:tableData={classWeekData}
@@ -154,31 +147,5 @@
     display: flex;
     flex-direction: column;
     gap: 0.45rem;
-  }
-
-  .section-meta {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 0 0.15rem;
-  }
-
-  .section-title {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-size: 1.15rem;
-    font-weight: 700;
-    margin: 0;
-    color: var(--brand-text);
-  }
-
-  .view-tag {
-    font-size: 0.85rem;
-    font-weight: 600;
-    padding: 0.15rem 0.55rem;
-    border-radius: 9999px;
-    background: color-mix(in srgb, var(--brand-primary) 12%, transparent);
-    color: var(--brand-primary);
   }
 </style>

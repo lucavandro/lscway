@@ -50,6 +50,67 @@
     closeMenu();
   }
 
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchCurrentX = 0;
+  let touchCurrentY = 0;
+  let isTrackingTouch = false;
+  let suppressNextClick = false;
+
+  function handleTouchStart(e) {
+    if (!e.touches || e.touches.length !== 1 || closing) return;
+    touchStartX = e.touches[0].clientX;
+    touchStartY = e.touches[0].clientY;
+    touchCurrentX = touchStartX;
+    touchCurrentY = touchStartY;
+    isTrackingTouch = true;
+    suppressNextClick = false;
+  }
+
+  function handleTouchMove(e) {
+    if (!isTrackingTouch || !e.touches || e.touches.length !== 1 || closing) return;
+    touchCurrentX = e.touches[0].clientX;
+    touchCurrentY = e.touches[0].clientY;
+  }
+
+  function handleTouchEnd(e) {
+    if (!isTrackingTouch || closing) return;
+    isTrackingTouch = false;
+
+    const endX =
+      e.changedTouches && e.changedTouches.length > 0
+        ? e.changedTouches[0].clientX
+        : touchCurrentX;
+    const endY =
+      e.changedTouches && e.changedTouches.length > 0
+        ? e.changedTouches[0].clientY
+        : touchCurrentY;
+
+    const deltaX = endX - touchStartX;
+    const deltaY = endY - touchStartY;
+
+    // Close drawer on horizontal swipe (swipe right or swipe left)
+    if (Math.abs(deltaX) >= 40 && Math.abs(deltaX) > Math.abs(deltaY) * 1.25) {
+      suppressNextClick = true;
+      setTimeout(() => {
+        suppressNextClick = false;
+      }, 350);
+      closeMenu();
+    }
+  }
+
+  function handleTouchCancel() {
+    isTrackingTouch = false;
+  }
+
+  function handleCaptureClick(e) {
+    if (suppressNextClick) {
+      e.preventDefault();
+      e.stopPropagation();
+      suppressNextClick = false;
+    }
+  }
+
   function closeMenu() {
     if (!$isMenuOpen || closing) return;
     closing = true;
@@ -116,7 +177,17 @@
 <svelte:window on:keydown={handleKeydown} />
 
 {#if $isMenuOpen || closing}
-  <div use:portal class="drawer-portal-wrapper">
+  <!-- svelte-ignore a11y-click-events-have-key-events -->
+  <!-- svelte-ignore a11y-no-static-element-interactions -->
+  <div
+    use:portal
+    class="drawer-portal-wrapper"
+    on:touchstart|passive={handleTouchStart}
+    on:touchmove|passive={handleTouchMove}
+    on:touchend={handleTouchEnd}
+    on:touchcancel={handleTouchCancel}
+    on:click|capture={handleCaptureClick}
+  >
     <!-- Backdrop covering the entire viewport -->
     <button
       class="drawer-backdrop"
@@ -139,7 +210,7 @@
           <img src="{base}/logo-blue.png?v=20261006-2" alt="Logo WAY Cortese" class="brand-logo" />
           <div class="brand-meta">
             <span class="brand-name">WAY Cortese</span>
-            <span class="brand-sub">Orario & Sostituzioni</span>
+            <span class="brand-sub">Liceo N. Cortese</span>
           </div>
         </div>
         <button
@@ -358,7 +429,7 @@
     height: 100dvh;
     min-height: 100dvh;
     max-height: 100dvh;
-    width: min(82vw, 290px);
+    width: min(85vw, 310px);
     background: var(--brand-surface-card);
     border-right: 1px solid var(--brand-border);
     box-shadow: 6px 0 32px rgba(0, 0, 0, 0.25);
@@ -367,6 +438,7 @@
     z-index: 99999;
     overflow-y: auto;
     overscroll-behavior: contain;
+    touch-action: pan-y;
     box-sizing: border-box;
     animation: slide-drawer 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards;
   }
@@ -392,8 +464,8 @@
   }
 
   .brand-logo {
-    width: 32px;
-    height: 32px;
+    width: 36px;
+    height: 36px;
     border-radius: 8px;
     object-fit: cover;
     flex-shrink: 0;
@@ -406,14 +478,14 @@
   }
 
   .brand-name {
-    font-size: 1.025rem;
+    font-size: 1.125rem;
     font-weight: 700;
     color: var(--brand-text);
     line-height: 1.2;
   }
 
   .brand-sub {
-    font-size: 0.75rem;
+    font-size: 0.85rem;
     color: var(--brand-text-muted);
   }
 
@@ -438,8 +510,8 @@
   .user-card {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.45rem 0.6rem;
+    gap: 0.65rem;
+    padding: 0.5rem 0.65rem;
     background: var(--brand-surface-subtle);
     border: 1px solid var(--brand-border);
     border-radius: 8px;
@@ -448,13 +520,13 @@
   }
 
   .user-avatar {
-    width: 28px;
-    height: 28px;
+    width: 32px;
+    height: 32px;
     border-radius: 50%;
     background: var(--brand-primary);
     color: white;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -468,7 +540,7 @@
   }
 
   .user-tag {
-    font-size: 0.7rem;
+    font-size: 0.78rem;
     font-weight: 600;
     text-transform: uppercase;
     color: var(--brand-primary);
@@ -476,7 +548,7 @@
   }
 
   .user-email {
-    font-size: 0.825rem;
+    font-size: 0.9rem;
     color: var(--brand-text);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -490,7 +562,7 @@
 
   .nav-section-label {
     display: block;
-    font-size: 0.725rem;
+    font-size: 0.8rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -525,11 +597,11 @@
   .nav-link,
   .nav-action-btn {
     display: block;
-    padding: 0.65rem 0.75rem;
+    padding: 0.72rem 0.8rem;
     border-radius: 8px;
     color: var(--brand-text);
     text-decoration: none;
-    font-size: 0.95rem;
+    font-size: 1.05rem;
     font-weight: 500;
     background: transparent;
     border: none;
@@ -560,15 +632,15 @@
     justify-content: center;
     vertical-align: middle;
     color: var(--brand-text-muted);
-    width: 18px;
-    height: 18px;
+    width: 20px;
+    height: 20px;
     margin-right: 0.65rem;
     flex-shrink: 0;
   }
 
   .nav-icon :global(.icon) {
-    width: 16px;
-    height: 16px;
+    width: 18px;
+    height: 18px;
   }
 
   .nav-text {
@@ -637,7 +709,7 @@
     border-top: 1px solid var(--brand-border);
     display: block;
     color: var(--brand-text-muted);
-    font-size: 0.7rem;
+    font-size: 0.8rem;
   }
 
   .drawer-footer small {

@@ -80,12 +80,13 @@ export async function getData(fetch){
             if(!e.aula)
                 e.aula = "-"
         }
-        if(e.materia == "sub_potenziamento"){
+        if(e.materia == "sub_potenziamento" || e.materia == "POT"){
             e.materia = "POT";
-            e.aula = ""
-        } else if(e.materia == "sub_ricevimento"){
+            e.aula = "";
+            e.classe = "";
+        } else if(e.materia == "sub_ricevimento" || e.materia == "RIC"){
             e.materia = "RIC";
-            e.aula = ""
+            e.aula = "";
         }
             
         return e
