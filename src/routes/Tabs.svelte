@@ -86,9 +86,9 @@
     align-items: center;
     justify-content: center;
     text-align: center;
-    padding: 0.45rem 0.65rem;
+    padding: 0.5rem 0.7rem;
     border-radius: 9999px;
-    font-size: 0.85rem;
+    font-size: 0.975rem;
     font-weight: 500;
     color: var(--brand-text-muted);
     text-decoration: none;
@@ -112,8 +112,8 @@
 
   @media (max-width: 400px) {
     .tab-pill {
-      font-size: 0.8rem;
-      padding: 0.35rem 0.45rem;
+      font-size: 0.925rem;
+      padding: 0.42rem 0.5rem;
     }
   }
 </style>

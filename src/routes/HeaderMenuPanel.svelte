@@ -26,10 +26,23 @@
     await toggleNotifications();
   }
 
-  function reload() {
+  async function reload() {
     isLoading.set(true);
     closeMenu();
-    setTimeout(() => location.reload(), 500);
+    try {
+      if (typeof localStorage !== "undefined") {
+        localStorage.removeItem("lscway_orario_cache_v1");
+      }
+      if (typeof window !== "undefined" && "caches" in window) {
+        const keys = await caches.keys();
+        await Promise.all(keys.map((k) => caches.delete(k)));
+      }
+      if (typeof navigator !== "undefined" && "serviceWorker" in navigator) {
+        const regs = await navigator.serviceWorker.getRegistrations();
+        await Promise.all(regs.map((r) => r.update().catch(() => {})));
+      }
+    } catch (e) {}
+    setTimeout(() => location.reload(), 300);
   }
 
   function logout() {
@@ -123,7 +136,7 @@
     >
       <div class="drawer-header">
         <div class="brand-group">
-          <img src="{base}/logo-blue.png" alt="Logo WAY Cortese" class="brand-logo" />
+          <img src="{base}/logo-blue.png?v=20261006-2" alt="Logo WAY Cortese" class="brand-logo" />
           <div class="brand-meta">
             <span class="brand-name">WAY Cortese</span>
             <span class="brand-sub">Orario & Sostituzioni</span>
@@ -393,14 +406,14 @@
   }
 
   .brand-name {
-    font-size: 0.95rem;
+    font-size: 1.025rem;
     font-weight: 700;
     color: var(--brand-text);
     line-height: 1.2;
   }
 
   .brand-sub {
-    font-size: 0.675rem;
+    font-size: 0.75rem;
     color: var(--brand-text-muted);
   }
 
@@ -441,7 +454,7 @@
     background: var(--brand-primary);
     color: white;
     font-weight: 700;
-    font-size: 0.8rem;
+    font-size: 0.85rem;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -455,7 +468,7 @@
   }
 
   .user-tag {
-    font-size: 0.65rem;
+    font-size: 0.7rem;
     font-weight: 600;
     text-transform: uppercase;
     color: var(--brand-primary);
@@ -463,7 +476,7 @@
   }
 
   .user-email {
-    font-size: 0.75rem;
+    font-size: 0.825rem;
     color: var(--brand-text);
     overflow: hidden;
     text-overflow: ellipsis;
@@ -477,7 +490,7 @@
 
   .nav-section-label {
     display: block;
-    font-size: 0.675rem;
+    font-size: 0.725rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.05em;
@@ -516,7 +529,7 @@
     border-radius: 8px;
     color: var(--brand-text);
     text-decoration: none;
-    font-size: 0.875rem;
+    font-size: 0.95rem;
     font-weight: 500;
     background: transparent;
     border: none;
@@ -525,7 +538,7 @@
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease;
     box-sizing: border-box;
-    line-height: 1.2;
+    line-height: 1.25;
   }
 
   .nav-link:hover,

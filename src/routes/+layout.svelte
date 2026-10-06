@@ -5,8 +5,13 @@
 	import { onDestroy, onMount } from "svelte";
 	import Footer from "./Footer.svelte";
 	import { base } from "$app/paths";
+	import { dev } from "$app/environment";
 	import { onNavigate } from "$app/navigation";
 	import { initTheme } from "$lib/theme.js";
+	import { isLoading } from "$lib/stores.js";
+
+	export let data = undefined;
+	export let params = undefined;
 
 	let day = getDay();
 	let intervalTimer;
@@ -26,30 +31,70 @@
 	// Lifecycle events
 	onMount(() => {
 		initTheme();
-		if ('serviceWorker' in navigator) {
-			navigator.serviceWorker.register(`${base}/service-worker.js`, { scope: `${base}/` });
+
+		const splash = document.getElementById("app-splash");
+		if (splash) {
+			splash.classList.add("is-hidden");
+			setTimeout(() => {
+				splash.remove();
+			}, 320);
 		}
 
-		// Precarica l'immagine 500 (Panda) nel browser e nel Cache Storage per la fruizione offline
+		if ('serviceWorker' in navigator) {
+			if (dev) {
+				navigator.serviceWorker.getRegistrations().then((registrations) => {
+					for (const registration of registrations) {
+						registration.unregister();
+					}
+				});
+			} else {
+				const hadController = Boolean(navigator.serviceWorker.controller);
+				let refreshing = false;
+
+				navigator.serviceWorker.addEventListener('controllerchange', () => {
+					if (hadController && !refreshing) {
+						refreshing = true;
+						window.location.reload();
+					}
+				});
+
+				navigator.serviceWorker
+					.register(`${base}/service-worker.js`, {
+						scope: `${base}/`,
+						updateViaCache: 'none'
+					})
+					.then((registration) => {
+						registration.update().catch(() => {});
+					})
+					.catch(() => {});
+			}
+		}
+
+		// Precarica l'immagine 500 (Panda) quando il browser è inattivo per non rallentare l'avvio
 		if (typeof window !== 'undefined') {
-			const pandaUrls = [
-				`${base}/eastereggs/500.gif`,
-				`${base}/eastereggs/500.gif`
-			];
+			const preloadEasterEggs = () => {
+				const pandaUrls = [
+					`${base}/eastereggs/500.gif`
+				];
 
-			// 1. Precaricamento in memoria/HTTP cache
-			pandaUrls.forEach((url) => {
-				const img = new Image();
-				img.src = url;
-			});
+				pandaUrls.forEach((url) => {
+					const img = new Image();
+					img.src = url;
+				});
 
-			// 2. Precaricamento esplicito nel Cache Storage utilizzato dal Service Worker
-			if ('caches' in window) {
-				caches.open('lscway-cache').then((cache) => {
-					pandaUrls.forEach((url) => {
-						cache.add(url).catch(() => {});
-					});
-				}).catch(() => {});
+				if ('caches' in window && !dev) {
+					caches.open('lscway-cache-v2026-10-06-2').then((cache) => {
+						pandaUrls.forEach((url) => {
+							cache.add(url).catch(() => {});
+						});
+					}).catch(() => {});
+				}
+			};
+
+			if ('requestIdleCallback' in window) {
+				window.requestIdleCallback(preloadEasterEggs, { timeout: 4000 });
+			} else {
+				setTimeout(preloadEasterEggs, 2500);
 			}
 		}
 
@@ -66,11 +111,6 @@
 </script>
 
 <svelte:head>
-	<link rel="prefetch" href="{base}/eastereggs/500.gif" as="image" />
-	<link
-		rel="stylesheet"
-		href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css"
-	/>
 	<script>
 		window.addEventListener("beforeinstallprompt", (event) => {
 			event.preventDefault();
@@ -78,6 +118,20 @@
 		});
 	</script>
 </svelte:head>
+
+{#if $isLoading}
+	<div id="app-splash" role="status" aria-live="polite" aria-label="Aggiornamento dati in corso">
+		<div class="app-splash__card">
+			<div class="app-splash__logo-wrap">
+				<img src="{base}/logo-blue.png?v=20261006-2" alt="Logo WAY Cortese" class="app-splash__logo" width="76" height="76" />
+			</div>
+			<p class="app-splash__title">WAY Cortese</p>
+			<p class="app-splash__subtitle">Liceo Scientifico N. Cortese</p>
+			<div class="app-splash__spinner" aria-hidden="true"></div>
+			<p class="app-splash__status">Aggiornamento orario in corso...</p>
+		</div>
+	</div>
+{/if}
 
 <div class="app">
 	<Header />

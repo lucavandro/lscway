@@ -95,7 +95,7 @@
     border-collapse: separate;
     border-spacing: 0;
     margin: 0;
-    font-size: 0.85rem;
+    font-size: 1rem;
   }
 
   thead {
@@ -106,8 +106,8 @@
   }
 
   thead th {
-    padding: 0.55rem 0.35rem;
-    font-size: 0.725rem;
+    padding: 0.65rem 0.35rem;
+    font-size: 0.875rem;
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -120,9 +120,9 @@
   }
 
   .col-hour {
-    width: 44px;
-    min-width: 44px;
-    max-width: 48px;
+    width: 52px;
+    min-width: 52px;
+    max-width: 56px;
     text-align: center;
     border-right: 1px solid var(--brand-border);
   }
@@ -165,12 +165,12 @@
 
   @media (max-width: 400px) {
     thead th {
-      padding: 0.45rem 0.2rem;
-      font-size: 0.675rem;
+      padding: 0.55rem 0.25rem;
+      font-size: 0.825rem;
     }
     .col-hour {
-      width: 40px;
-      min-width: 40px;
+      width: 48px;
+      min-width: 48px;
     }
     .easteregg-container,
     .weekend-container {

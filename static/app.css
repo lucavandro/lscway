@@ -261,24 +261,18 @@ main.container-fluid {
   animation: pulse-dot 2s infinite ease-in-out;
 }
 
-/* Responsive Table & Soft Edge Fade Guidance */
+/* Responsive Table Horizontal Scroll */
 .table-scroll-container {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
   overflow-x: auto;
   overflow-y: hidden;
-  max-width: 100%;
   border-radius: 12px;
   border: 1px solid var(--brand-border);
   background: var(--brand-surface-card);
-  container-type: inline-size;
   -webkit-overflow-scrolling: touch;
-  /* Soft Edge Fade on right edge to indicate scrollability */
-  -webkit-mask-image: linear-gradient(to right, black calc(100% - 28px), transparent 100%);
-  mask-image: linear-gradient(to right, black calc(100% - 28px), transparent 100%);
-}
-
-.table-scroll-container.scrolled-right {
-  -webkit-mask-image: none;
-  mask-image: none;
+  overscroll-behavior-x: contain;
 }
 
 /* Modern View Transitions */

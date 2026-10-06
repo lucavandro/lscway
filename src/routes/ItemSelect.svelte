@@ -468,7 +468,7 @@
     display: flex;
     align-items: center;
     gap: 0.3rem;
-    font-size: 0.675rem;
+    font-size: 0.825rem;
     font-weight: 700;
     color: var(--brand-text-muted);
     text-transform: uppercase;
@@ -480,7 +480,7 @@
   .item-count {
     font-weight: 400;
     opacity: 0.65;
-    font-size: 0.65rem;
+    font-size: 0.775rem;
   }
 
   .select-container {
@@ -506,19 +506,19 @@
   /* Custom Trigger Button */
   .custom-select-trigger {
     width: 100%;
-    min-height: 38px;
-    padding: 0.35rem 2rem 0.35rem 0.65rem;
-    font-size: 0.9rem;
+    min-height: 44px;
+    padding: 0.45rem 2.2rem 0.45rem 0.8rem;
+    font-size: 1.05rem;
     font-weight: 600;
     color: var(--brand-text);
     background: var(--brand-surface-card);
     border: 1.5px solid var(--brand-border);
-    border-radius: 8px;
+    border-radius: 9px;
     cursor: pointer;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
     transition: border-color 0.15s ease, box-shadow 0.15s ease;
     margin: 0;
-    line-height: 1.2;
+    line-height: 1.25;
     display: flex;
     align-items: center;
     justify-content: space-between;

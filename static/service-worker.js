@@ -1,6 +1,7 @@
 // This is the service worker with the combined offline experience (Offline page + Offline copy of pages)
 
-const CACHE = "lscway-cache";
+const CACHE_VERSION = "v2026-10-06-4";
+const CACHE = `lscway-cache-${CACHE_VERSION}`;
 let userEmail = null;
 let notificationsEnabled = true;
 let notifiedSubstitutions = new Set();
@@ -8,7 +9,10 @@ let checkInterval = null;
 
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
 
-// TODO: replace the following with the correct offline fallback page i.e.: const offlineFallbackPage = "offline.html";
+if (typeof workbox !== 'undefined') {
+  workbox.setConfig({ debug: false });
+}
+
 const offlineFallbackPage = "offline";
 
 self.addEventListener("message", (event) => {
@@ -50,7 +54,7 @@ function startPeriodicCheck() {
     if (userEmail && notificationsEnabled) {
       checkSubstitutionsInBackground();
     }
-  }, 5000); // Ogni 60 secondi
+  }, 5000);
 }
 
 function stopPeriodicCheck() {
@@ -63,7 +67,6 @@ function stopPeriodicCheck() {
 const PRECACHE_ASSETS = [
   offlineFallbackPage,
   "eastereggs/500.gif",
-  "eastereggs/500.gif",
   "500",
   "500.html"
 ];
@@ -75,7 +78,7 @@ self.addEventListener('install', (event) => {
       await Promise.allSettled(
         PRECACHE_ASSETS.map(async (asset) => {
           try {
-            await cache.add(asset);
+            await cache.add(new Request(asset, { cache: 'reload' }));
           } catch (err) {
             console.warn(`[Service Worker] Failed to precache asset ${asset}:`, err);
           }
@@ -86,53 +89,63 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', (event) => {
-  event.waitUntil(self.clients.claim());
+  event.waitUntil(
+    (async () => {
+      // Elimina tutte le cache delle versioni precedenti (es. "lscway-cache" non versionata)
+      const cacheNames = await caches.keys();
+      await Promise.all(
+        cacheNames
+          .filter((name) => name !== CACHE)
+          .map((name) => caches.delete(name))
+      );
+      await self.clients.claim();
+    })()
+  );
 });
 
 if (workbox.navigationPreload.isSupported()) {
   workbox.navigationPreload.enable();
 }
 
-// Strategia StaleWhileRevalidate per immagini (inclusi 500.gif e easter eggs)
-workbox.routing.registerRoute(
-  ({ request, url }) =>
-    request.destination === 'image' ||
-    url.pathname.includes('/eastereggs/') ||
-    url.pathname.includes('/eastereggs/'),
-  new workbox.strategies.StaleWhileRevalidate({
-    cacheName: CACHE
-  })
-);
+const isDevModuleRequest = (url) =>
+  url.pathname.includes('/@vite/') ||
+  url.pathname.includes('/@fs/') ||
+  url.pathname.includes('/node_modules/') ||
+  url.pathname.includes('/src/') ||
+  url.pathname.includes('/.svelte-kit/');
 
-workbox.routing.registerRoute(
-  new RegExp('/*'),
-  new workbox.strategies.NetworkFirst({
-    cacheName: CACHE
-  })
-);
-
-self.addEventListener('fetch', (event) => {
-  console.log(event)
-  if (event.request.mode === 'navigate') {
-    event.respondWith((async () => {
-      try {
-        const preloadResp = await event.preloadResponse;
-
-        if (preloadResp) {
-          return preloadResp;
-        }
-
-        const networkResp = await fetch(event.request);
-        return networkResp;
-      } catch (error) {
-
-        const cache = await caches.open(CACHE);
-        const cachedResp = await cache.match(offlineFallbackPage);
-        return cachedResp;
-      }
-    })());
+// NetworkFirst con cache: 'no-cache' per garantire che online vengano sempre
+// scaricate le versioni aggiornate di HTML, CSS, JS e icone senza pescare dalla cache HTTP stantia
+const networkFirstStrategy = new workbox.strategies.NetworkFirst({
+  cacheName: CACHE,
+  fetchOptions: {
+    cache: 'no-cache'
   }
 });
+
+// Gestione navigazione pagina con fallback su offlineFallbackPage
+workbox.routing.registerRoute(
+  ({ request, url }) => request.mode === 'navigate' && !isDevModuleRequest(url),
+  async (params) => {
+    try {
+      const response = await networkFirstStrategy.handle(params);
+      if (response) return response;
+    } catch (error) {
+      // Ignora e passa al fallback offline
+    }
+    const cache = await caches.open(CACHE);
+    return (await cache.match(offlineFallbackPage)) || Response.error();
+  }
+);
+
+// Tutte le altre risorse statiche, CSS, icone e API (esclusi moduli dev di Vite)
+workbox.routing.registerRoute(
+  ({ request, url }) =>
+    request.method === 'GET' &&
+    request.mode !== 'navigate' &&
+    !isDevModuleRequest(url),
+  networkFirstStrategy
+);
 
 // Gestione del background sync
 self.addEventListener('sync', function(event) {

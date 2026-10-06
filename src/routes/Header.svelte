@@ -311,18 +311,18 @@
       display: none;
     }
     .brand-title {
-      font-size: 0.95rem;
+      font-size: 1.075rem;
     }
     .live-pill {
-      font-size: 0.825rem;
-      padding: 0.3rem 0.6rem;
+      font-size: 0.925rem;
+      padding: 0.35rem 0.7rem;
       gap: 0.35rem;
     }
     .day-text {
-      font-size: 0.825rem;
+      font-size: 0.925rem;
     }
     .hour-text {
-      font-size: 0.825rem;
+      font-size: 0.925rem;
     }
   }
 </style>

@@ -72,23 +72,25 @@
 
   .compact-timetable {
     width: 100%;
+    min-width: 640px;
     table-layout: fixed;
     border-collapse: separate;
     border-spacing: 0;
     margin: 0;
-    font-size: 0.75rem;
+    font-size: 0.9rem;
   }
 
   thead {
     position: sticky;
+    top: 0;
     inset-block-start: 0;
     z-index: 3;
     background: var(--brand-surface-subtle);
   }
 
   th {
-    padding: 0.45rem 0.2rem;
-    font-size: 0.75rem;
+    padding: 0.55rem 0.3rem;
+    font-size: 0.875rem;
     font-weight: 700;
     letter-spacing: 0.02em;
     color: var(--brand-text-muted);
@@ -99,18 +101,20 @@
 
   .col-hour.fixed-col {
     position: sticky;
-    inset-inline-start: 0;
+    left: -1px;
+    inset-inline-start: -1px;
     z-index: 4;
     background: var(--brand-surface-subtle);
     border-right: 1px solid var(--brand-border);
-    width: 36px;
-    min-width: 36px;
-    max-width: 36px;
-    font-size: 0.75rem;
+    box-shadow: -2px 0 0 0 var(--brand-surface-subtle), 2px 0 6px -2px rgba(0, 0, 0, 0.08);
+    width: 52px;
+    min-width: 52px;
+    max-width: 52px;
+    font-size: 0.875rem;
   }
 
   .weekday-header {
-    min-width: 76px;
+    min-width: 116px;
     border-right: 1px solid var(--brand-border);
     transition: background-color 0.15s ease;
   }

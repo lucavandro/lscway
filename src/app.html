@@ -3,9 +3,12 @@
 
 <head>
 	<meta charset="utf-8" />
-	<link rel="icon" href="%sveltekit.assets%/favicon.png" />
-	<link rel="manifest" href="%sveltekit.assets%/manifest.json" />
-	<link rel="stylesheet" href="%sveltekit.assets%/app.css">
+	<link rel="preconnect" href="https://www.liceoscientificocortese.edu.it" crossorigin />
+	<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+	<link rel="icon" href="%sveltekit.assets%/favicon.png?v=20261006-4" />
+	<link rel="manifest" href="%sveltekit.assets%/manifest.json?v=20261006-4" />
+	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+	<link rel="stylesheet" href="%sveltekit.assets%/app.css?v=20261006-4" />
 	<meta name="color-scheme" content="light dark" />
 	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,interactive-widget=resizes-content">
 	<meta name="mobile-web-app-capable" content="yes">
@@ -18,6 +21,7 @@
 	<meta name="theme-color" media="(prefers-color-scheme: dark)" content="#202632" />
 	<script>
 		(function() {
+			var APP_VERSION = '2026-10-06-4';
 			try {
 				var saved = localStorage.getItem('theme');
 				var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -25,22 +29,166 @@
 				document.documentElement.setAttribute('data-theme', theme);
 				document.documentElement.style.colorScheme = theme;
 			} catch (e) {}
+
+			try {
+				var prevVersion = localStorage.getItem('lscway_app_version');
+				if (prevVersion !== APP_VERSION) {
+					localStorage.setItem('lscway_app_version', APP_VERSION);
+					localStorage.removeItem('lscway_orario_cache_v1');
+					var cleanupPromises = [];
+					if ('caches' in window) {
+						cleanupPromises.push(
+							caches.keys().then(function(names) {
+								return Promise.all(names.map(function(n) { return caches.delete(n); }));
+							})
+						);
+					}
+					if ('serviceWorker' in navigator) {
+						cleanupPromises.push(
+							navigator.serviceWorker.getRegistrations().then(function(regs) {
+								return Promise.all(regs.map(function(r) { return r.update().catch(function() {}); }));
+							})
+						);
+					}
+					if (prevVersion && cleanupPromises.length > 0) {
+						Promise.all(cleanupPromises).then(function() {
+							window.location.reload();
+						});
+					}
+				}
+			} catch (e) {}
+
+			try {
+				window.__lscwayInitialDataPromise = fetch(
+					'https://www.liceoscientificocortese.edu.it/app/orario/api/v0',
+					{ mode: 'cors', cache: 'no-cache' }
+				).then(function(res) {
+					if (!res.ok) throw new Error('HTTP ' + res.status);
+					return res.json();
+				});
+				window.__lscwayInitialDataPromise.catch(function() {});
+			} catch (e) {}
+
+			try {
+				if (window.location.search.indexOf('debug=1') !== -1) {
+					var s = document.createElement('script');
+					s.src = 'https://cdn.jsdelivr.net/npm/eruda';
+					s.onload = function() { window.eruda.init(); };
+					document.head.appendChild(s);
+				}
+			} catch (e) {}
 		})();
 	</script>
+	<style>
+		#app-splash {
+			position: fixed;
+			inset: 0;
+			z-index: 999999;
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			justify-content: center;
+			padding: 1.5rem;
+			background: #f8fafc;
+			color: #0f172a;
+			font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+			text-align: center;
+			transition: opacity 0.28s ease, visibility 0.28s ease;
+		}
+		html[data-theme="dark"] #app-splash {
+			background: #0f172a;
+			color: #f8fafc;
+		}
+		#app-splash.is-hidden {
+			opacity: 0;
+			visibility: hidden;
+			pointer-events: none;
+		}
+		.app-splash__card {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			max-width: 20rem;
+			width: 100%;
+		}
+		.app-splash__logo-wrap {
+			position: relative;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin-bottom: 1.25rem;
+		}
+		.app-splash__logo {
+			width: 76px;
+			height: 76px;
+			border-radius: 18px;
+			object-fit: cover;
+			box-shadow: 0 10px 25px -5px rgba(37, 99, 235, 0.4);
+			animation: splash-pulse 2s infinite ease-in-out;
+		}
+		.app-splash__title {
+			font-size: 1.35rem;
+			font-weight: 800;
+			letter-spacing: -0.02em;
+			margin: 0 0 0.2rem 0;
+			line-height: 1.2;
+		}
+		.app-splash__subtitle {
+			font-size: 0.85rem;
+			font-weight: 500;
+			color: #64748b;
+			margin: 0 0 1.75rem 0;
+		}
+		html[data-theme="dark"] .app-splash__subtitle {
+			color: #94a3b8;
+		}
+		.app-splash__spinner {
+			width: 34px;
+			height: 34px;
+			border-radius: 50%;
+			border: 3.5px solid rgba(37, 99, 235, 0.18);
+			border-top-color: #2563eb;
+			animation: splash-spin 0.8s linear infinite;
+			margin-bottom: 0.9rem;
+		}
+		html[data-theme="dark"] .app-splash__spinner {
+			border-color: rgba(59, 130, 246, 0.22);
+			border-top-color: #3b82f6;
+		}
+		.app-splash__status {
+			font-size: 0.9rem;
+			font-weight: 600;
+			margin: 0;
+			color: #334155;
+		}
+		html[data-theme="dark"] .app-splash__status {
+			color: #cbd5e1;
+		}
+		@keyframes splash-spin {
+			to { transform: rotate(360deg); }
+		}
+		@keyframes splash-pulse {
+			0%, 100% { transform: scale(1); }
+			50% { transform: scale(1.04); }
+		}
+	</style>
 
 	%sveltekit.head%
 </head>
 
 <body data-sveltekit-preload-data="hover">
+	<div id="app-splash" role="status" aria-live="polite" aria-label="Caricamento applicazione">
+		<div class="app-splash__card">
+			<div class="app-splash__logo-wrap">
+				<img src="%sveltekit.assets%/logo-blue.png?v=20261006-2" alt="Logo WAY Cortese" class="app-splash__logo" width="76" height="76" />
+			</div>
+			<p class="app-splash__title">WAY Cortese</p>
+			<p class="app-splash__subtitle">Liceo Scientifico N. Cortese</p>
+			<div class="app-splash__spinner" aria-hidden="true"></div>
+			<p class="app-splash__status">Caricamento orario in corso...</p>
+		</div>
+	</div>
 	<div style="display: contents">%sveltekit.body%</div>
 </body>
-<!--
-<script>
-	if (typeof navigator.serviceWorker !== 'undefined') {
-		navigator.serviceWorker.register('service-worker.js')
-	}
-</script>
--->
-
 </html>
 

@@ -87,6 +87,10 @@
                   <a href="{base}/?q={queryValue(rd['classe'])}" class="link-chip class-chip" title="Classe {rd['classe']}">
                     <span>{rd["classe"]}</span>
                   </a>
+                {:else if rd["materia"] === "RIC" || rd["materia"] === "sub_ricevimento"}
+                  <span class="badge-chip badge-pot">Ricevimento</span>
+                {:else if rd["materia"] === "POT" || rd["materia"] === "sub_potenziamento"}
+                  <span class="badge-chip badge-pot">Potenziamento</span>
                 {:else if rd["materia"] === "INC" || rd["materia"] === "MADISO"}
                   <span class="badge-chip badge-sostegno">Sostegno</span>
                 {:else}
@@ -95,7 +99,7 @@
               {:else if field === "materia"}
                 <span
                   class="subject-tag"
-                  class:is-pot={rd[field] === "POT" || rd[field] === "sub_potenziamento" || rd[field] === "RIC"}
+                  class:is-pot={rd[field] === "POT" || rd[field] === "sub_potenziamento" || rd[field] === "RIC" || rd[field] === "sub_ricevimento"}
                   class:is-sostegno={rd[field] === "MADISO" || rd[field] === "INC"}
                   title={rd[field]}
                 >
@@ -149,13 +153,13 @@
     inset-inline-start: 0;
     z-index: 2;
     background: var(--brand-surface-card);
-    padding: 0.4rem 0.2rem;
+    padding: 0.5rem 0.2rem;
     text-align: center;
     border-right: 1px solid var(--brand-border);
     transition: background-color 0.15s ease;
-    width: 44px;
-    min-width: 44px;
-    max-width: 48px;
+    width: 52px;
+    min-width: 52px;
+    max-width: 56px;
     vertical-align: middle;
   }
 
@@ -169,38 +173,38 @@
   }
 
   .hour-number {
-    font-size: 0.95rem;
+    font-size: 1.075rem;
     font-weight: 700;
     color: var(--brand-text);
   }
 
   .hour-time {
-    font-size: 0.65rem;
+    font-size: 0.775rem;
     font-weight: 500;
     color: var(--brand-text-muted);
   }
 
   .now-badge {
-    font-size: 0.575rem;
+    font-size: 0.675rem;
     font-weight: 700;
     text-transform: uppercase;
     background: var(--brand-primary);
     color: #ffffff;
-    padding: 0.05rem 0.25rem;
+    padding: 0.06rem 0.3rem;
     border-radius: 3px;
     margin-top: 0.1rem;
     line-height: 1.1;
   }
 
   .data-cell {
-    padding: 0.35rem 0.25rem;
+    padding: 0.45rem 0.25rem;
     text-align: center;
     vertical-align: middle;
     overflow: hidden;
   }
 
   .empty-cell {
-    padding: 0.35rem 0.25rem;
+    padding: 0.45rem 0.25rem;
     text-align: center;
     color: var(--brand-text-muted);
   }
@@ -208,7 +212,7 @@
   .dash {
     color: var(--brand-text-muted);
     opacity: 0.35;
-    font-size: 0.85rem;
+    font-size: 0.95rem;
   }
 
   .cell-entries {
@@ -216,7 +220,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.2rem;
+    gap: 0.22rem;
     width: 100%;
   }
 
@@ -239,9 +243,9 @@
   .link-chip {
     display: inline-block;
     max-width: 100%;
-    padding: 0.2rem 0.4rem;
+    padding: 0.25rem 0.5rem;
     border-radius: 6px;
-    font-size: 0.775rem;
+    font-size: 0.925rem;
     font-weight: 600;
     text-decoration: none;
     transition: transform 0.12s ease, background 0.12s ease;
@@ -278,9 +282,9 @@
   .subject-tag {
     display: inline-block;
     max-width: 100%;
-    padding: 0.15rem 0.35rem;
-    border-radius: 4px;
-    font-size: 0.725rem;
+    padding: 0.2rem 0.45rem;
+    border-radius: 5px;
+    font-size: 0.875rem;
     font-weight: 700;
     letter-spacing: 0.02em;
     background: var(--brand-surface-subtle);
@@ -322,12 +326,25 @@
 
   .badge-chip {
     display: inline-block;
-    padding: 0.18rem 0.45rem;
+    padding: 0.22rem 0.5rem;
     border-radius: 6px;
-    font-size: 0.75rem;
+    font-size: 0.875rem;
     font-weight: 700;
     line-height: 1.25;
     white-space: nowrap;
+  }
+
+  .badge-chip.badge-pot {
+    background: rgba(245, 158, 11, 0.14);
+    color: #b45309;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+  }
+
+  :global([data-theme="dark"]) .badge-chip.badge-pot,
+  :global(.dark) .badge-chip.badge-pot {
+    color: #fbbf24;
+    background: rgba(245, 158, 11, 0.2);
+    border-color: rgba(245, 158, 11, 0.45);
   }
 
   .badge-chip.badge-sostegno {
@@ -344,7 +361,7 @@
   }
 
   .cell-text {
-    font-size: 0.775rem;
+    font-size: 0.925rem;
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -352,26 +369,26 @@
 
   @media (max-width: 400px) {
     .hour-cell {
-      width: 40px;
-      min-width: 40px;
-      padding: 0.35rem 0.15rem;
+      width: 48px;
+      min-width: 48px;
+      padding: 0.4rem 0.15rem;
     }
     .hour-number {
-      font-size: 0.85rem;
+      font-size: 1rem;
     }
     .hour-time {
-      font-size: 0.6rem;
-    }
-    .data-cell {
-      padding: 0.3rem 0.15rem;
-    }
-    .link-chip {
-      padding: 0.18rem 0.3rem;
       font-size: 0.725rem;
     }
+    .data-cell {
+      padding: 0.38rem 0.15rem;
+    }
+    .link-chip {
+      padding: 0.22rem 0.38rem;
+      font-size: 0.875rem;
+    }
     .subject-tag {
-      padding: 0.12rem 0.25rem;
-      font-size: 0.675rem;
+      padding: 0.18rem 0.35rem;
+      font-size: 0.825rem;
     }
   }
 </style>

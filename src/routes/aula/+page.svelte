@@ -9,6 +9,7 @@
   import FullTimeTableSwitch from "./../FullTimeTableSwitch.svelte";
 
   export let data;
+  export let params = undefined;
   let selectedClassroom = "";
   let showFullTimeTable = false;
   let currenDay = getDay();
@@ -99,24 +100,24 @@
 
   .toolbar-card {
     display: flex;
-    flex-direction: row;
-    align-items: flex-end;
-    justify-content: space-between;
-    gap: 0.65rem;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+    gap: 0.6rem;
     background: var(--brand-surface-card);
     border: 1px solid var(--brand-border);
     border-radius: 12px;
-    padding: 0.55rem 0.75rem;
+    padding: 0.7rem 0.8rem;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
   }
 
   .toolbar-select {
-    flex: 1;
+    width: 100%;
     min-width: 0;
   }
 
   .toolbar-switch {
-    flex-shrink: 0;
+    width: 100%;
   }
 
   @media (min-width: 640px) {
@@ -124,12 +125,20 @@
       gap: 1.25rem;
     }
     .toolbar-card {
+      flex-direction: row;
+      align-items: flex-end;
+      justify-content: space-between;
       padding: 0.85rem 1.15rem;
       border-radius: 14px;
       gap: 1.5rem;
     }
     .toolbar-select {
+      flex: 1;
       max-width: 320px;
+    }
+    .toolbar-switch {
+      width: auto;
+      flex-shrink: 0;
     }
   }
 
@@ -150,16 +159,16 @@
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    font-size: 0.975rem;
+    font-size: 1.15rem;
     font-weight: 700;
     margin: 0;
     color: var(--brand-text);
   }
 
   .view-tag {
-    font-size: 0.725rem;
+    font-size: 0.85rem;
     font-weight: 600;
-    padding: 0.1rem 0.45rem;
+    padding: 0.15rem 0.55rem;
     border-radius: 9999px;
     background: color-mix(in srgb, var(--brand-primary) 12%, transparent);
     color: var(--brand-primary);

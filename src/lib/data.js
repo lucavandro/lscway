@@ -19,21 +19,55 @@ function decodeGoogleJwt(token) {
     return JSON.parse(normalized);
 }
 
+const DEFAULT_API_URL = "https://www.liceoscientificocortese.edu.it/app/orario/api/v0";
 const API_URL =
     import.meta.env.VITE_API_URL ||
     import.meta.env.VITE_ORARIO_API_URL ||
-    "https://www.liceoscientificocortese.edu.it/app/orario/api/v0";
+    DEFAULT_API_URL;
+const CACHE_KEY = "lscway_orario_cache_v1";
 
 export async function getData(fetch){
-    const res = await fetch(
-        API_URL,
-        {
-            mode: "cors",
-            cache: 'no-cache',
-        },
-    );
-    const data = await res.json();
-    console.log("User data:", data.user);
+    let data = null;
+
+    if (typeof window !== "undefined" && window.__lscwayInitialDataPromise && API_URL === DEFAULT_API_URL) {
+        const preloadPromise = window.__lscwayInitialDataPromise;
+        delete window.__lscwayInitialDataPromise;
+        try {
+            data = await preloadPromise;
+        } catch (e) {
+            data = null;
+        }
+    }
+
+    if (!data) {
+        try {
+            const res = await fetch(
+                API_URL,
+                {
+                    mode: "cors",
+                    cache: "no-cache",
+                },
+            );
+            data = await res.json();
+        } catch (err) {
+            if (typeof localStorage !== "undefined") {
+                try {
+                    const cached = localStorage.getItem(CACHE_KEY);
+                    if (cached) {
+                        data = JSON.parse(cached);
+                    }
+                } catch (e) {}
+            }
+            if (!data) throw err;
+        }
+    }
+
+    if (typeof localStorage !== "undefined" && data) {
+        try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify(data));
+        } catch (e) {}
+    }
+
     if(data.user){
         userEmail.set(data.user);
     }
@@ -48,6 +82,9 @@ export async function getData(fetch){
         }
         if(e.materia == "sub_potenziamento"){
             e.materia = "POT";
+            e.aula = ""
+        } else if(e.materia == "sub_ricevimento"){
+            e.materia = "RIC";
             e.aula = ""
         }
             
