@@ -10,7 +10,14 @@
   let error = null;
   let interval;
 
-  $: sostituzioniOggi = sostituzioni.filter((s) => s.data >= getTodayDate());
+  $: sostituzioniOggi = sostituzioni.filter(
+    (s) =>
+      s.data >= getTodayDate() &&
+      s.stato === "pubblicata" &&
+      s.presaVisione?.stato &&
+      s.presaVisione.stato !== "non_inviata" &&
+      s.presaVisione.stato !== "fallita",
+  );
 
   const API_URL = (
     import.meta.env.VITE_API_URL ||
