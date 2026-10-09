@@ -21,6 +21,7 @@
   let schoolHour = getSchoolHour();
   let timeInterval;
   let substitutionInterval;
+  let mounted = false;
 
   function updateTime() {
     schoolHour = getSchoolHour();
@@ -33,6 +34,7 @@
     try {
       const response = await fetch(
         `https://www.liceoscientificocortese.edu.it/app/way/docenti_sostituzioni_api.php?email=${encodeURIComponent($userEmail)}`,
+        { priority: "low" },
       );
       const data = await response.json();
 
@@ -44,22 +46,14 @@
     }
   }
 
-  onMount(async () => {
+  onMount(() => {
+    mounted = true;
     updateTime();
     timeInterval = setInterval(updateTime, 1000);
     isLoading.set(false);
 
     checkNotificationPermission();
-    await setupBackgroundSync();
-
-    if ($userEmail && $notificationsEnabled) {
-      syncUserEmailWithServiceWorker();
-      syncNotificationsWithServiceWorker(true);
-      checkSubstitutions();
-      if (!substitutionInterval) {
-        substitutionInterval = setInterval(checkSubstitutions, 10000);
-      }
-    }
+    setupBackgroundSync().catch(() => {});
   });
 
   onDestroy(() => {
@@ -67,23 +61,25 @@
     if (substitutionInterval) clearInterval(substitutionInterval);
   });
 
-  $: if ($userEmail && $notificationsEnabled) {
-    syncUserEmailWithServiceWorker();
-    syncNotificationsWithServiceWorker(true);
-    checkSubstitutions();
-    if (!substitutionInterval) {
-      substitutionInterval = setInterval(checkSubstitutions, 10000);
-    }
-  } else {
-    if (substitutionInterval) {
-      clearInterval(substitutionInterval);
-      substitutionInterval = null;
-    }
-    if (!$userEmail) {
-      clearNotifiedSubstitutions();
-      clearUserFromServiceWorker();
-    } else if (!$notificationsEnabled) {
-      syncNotificationsWithServiceWorker(false);
+  $: if (mounted) {
+    if ($userEmail && $notificationsEnabled) {
+      syncUserEmailWithServiceWorker();
+      syncNotificationsWithServiceWorker(true);
+      checkSubstitutions();
+      if (!substitutionInterval) {
+        substitutionInterval = setInterval(checkSubstitutions, 10000);
+      }
+    } else {
+      if (substitutionInterval) {
+        clearInterval(substitutionInterval);
+        substitutionInterval = null;
+      }
+      if (!$userEmail) {
+        clearNotifiedSubstitutions();
+        clearUserFromServiceWorker();
+      } else if (!$notificationsEnabled) {
+        syncNotificationsWithServiceWorker(false);
+      }
     }
   }
 </script>

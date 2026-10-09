@@ -4,6 +4,7 @@
   import ItemSelect from "./ItemSelect.svelte";
   import { getPrefClass, setPrefClass } from "$lib/utils.js";
   import { page } from "$app/stores";
+  import { timetableData } from "$lib/stores.js";
   import TimeTable from "./TimeTable.svelte";
   import FullTimeTable from "./FullTimeTable.svelte";
   import FullTimeTableSwitch from "./FullTimeTableSwitch.svelte";
@@ -16,8 +17,9 @@
   let showFullTimeTable = false;
   let interval;
 
-  $: classes = data?.classi ? data.classi.filter((e) => e != "") : [];
-  $: classWeekData = data?.data?.filter((e) => e.classe === selectedClass && e.materia != "INCL") || [];
+  $: activeData = $timetableData || data;
+  $: classes = activeData?.classi ? activeData.classi.filter((e) => e != "") : [];
+  $: classWeekData = activeData?.data?.filter((e) => e.classe === selectedClass && e.materia != "INCL") || [];
   $: classData = classWeekData.filter((e) => e.day === currenDay);
 
   function onSelectedItemChange() {
@@ -29,7 +31,7 @@
 
   onMount(() => {
     let queryClass = $page.url.searchParams.get("q");
-    if (queryClass && data?.classi?.includes(queryClass)) {
+    if (queryClass && activeData?.classi?.includes(queryClass)) {
       selectedClass = queryClass;
     } else {
       selectedClass = getPrefClass() || classes[0] || "";

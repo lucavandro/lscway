@@ -3,6 +3,7 @@
   import { page } from "$app/stores";
   import { getDay } from "$lib/dateutils.js";
   import { getPrefClassroom, setPrefClassroom } from "$lib/utils.js";
+  import { timetableData } from "$lib/stores.js";
   import ItemSelect from "./../ItemSelect.svelte";
   import TimeTable from "./../TimeTable.svelte";
   import FullTimeTable from "./../FullTimeTable.svelte";
@@ -14,8 +15,9 @@
   let showFullTimeTable = false;
   let currenDay = getDay();
 
-  $: classrooms = data?.aule ? data.aule.filter((e) => e != "") : [];
-  $: classroomWeekData = data?.data?.filter((e) => e.aula === selectedClassroom) || [];
+  $: activeData = $timetableData || data;
+  $: classrooms = activeData?.aule ? activeData.aule.filter((e) => e != "") : [];
+  $: classroomWeekData = activeData?.data?.filter((e) => e.aula === selectedClassroom) || [];
   $: classroomData = classroomWeekData.filter((e) => e.day === currenDay);
 
   function onSelectedItemChange() {

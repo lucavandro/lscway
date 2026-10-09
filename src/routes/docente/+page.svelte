@@ -3,6 +3,7 @@
   import { getDay } from "$lib/dateutils.js";
   import { getPrefTeacher, setPrefTeacher } from "$lib/utils.js";
   import { page } from "$app/stores";
+  import { timetableData } from "$lib/stores.js";
   import TimeTable from "./../TimeTable.svelte";
   import ItemSelect from "./../ItemSelect.svelte";
   import FullTimeTable from "./../FullTimeTable.svelte";
@@ -14,8 +15,9 @@
   let showFullTimeTable = false;
   let currenDay = getDay();
 
-  $: teachers = data?.docenti || [];
-  $: teacherWeekData = data?.data?.filter((e) => e.docente === selectedTeacher) || [];
+  $: activeData = $timetableData || data;
+  $: teachers = activeData?.docenti || [];
+  $: teacherWeekData = activeData?.data?.filter((e) => e.docente === selectedTeacher) || [];
   $: teacherData = teacherWeekData.filter((e) => e.day === currenDay);
 
   onMount(() => {

@@ -1,6 +1,6 @@
 // This is the service worker with the combined offline experience (Offline page + Offline copy of pages)
 
-const CACHE_VERSION = "v2026-10-06-16";
+const CACHE_VERSION = "v2026-10-09-1";
 const CACHE = `lscway-cache-${CACHE_VERSION}`;
 let userEmail = null;
 let notificationsEnabled = true;
@@ -65,8 +65,7 @@ function stopPeriodicCheck() {
 }
 
 const PRECACHE_ASSETS = [
-  offlineFallbackPage,
-  "eastereggs/500.gif"
+  offlineFallbackPage
 ];
 
 self.addEventListener('install', (event) => {
@@ -76,7 +75,7 @@ self.addEventListener('install', (event) => {
       await Promise.allSettled(
         PRECACHE_ASSETS.map(async (asset) => {
           try {
-            await cache.add(new Request(asset, { cache: 'reload' }));
+            await cache.add(new Request(asset, { cache: 'no-cache' }));
           } catch (err) {
             console.warn(`[Service Worker] Failed to precache asset ${asset}:`, err);
           }
@@ -89,31 +88,18 @@ self.addEventListener('install', (event) => {
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     (async () => {
-      // Disabilita navigationPreload (che persiste dalla vecchia registrazione SW e pesca dalla cache HTTP del browser)
       if (self.registration && self.registration.navigationPreload) {
         try {
           await self.registration.navigationPreload.disable();
         } catch (e) {}
       }
 
-      // Elimina tutte le cache delle versioni precedenti (es. "lscway-cache" non versionata)
+      // Elimina tutte le cache delle versioni precedenti
       const cacheNames = await caches.keys();
       const oldCaches = cacheNames.filter((name) => name !== CACHE);
       await Promise.all(oldCaches.map((name) => caches.delete(name)));
 
       await self.clients.claim();
-
-      // Se c'erano vecchie cache, forza il reload immediato delle finestre aperte con il vecchio HTML
-      if (oldCaches.length > 0) {
-        const windowClients = await self.clients.matchAll({ type: 'window' });
-        await Promise.allSettled(
-          windowClients.map((client) => {
-            if ('navigate' in client && client.url) {
-              return client.navigate(client.url);
-            }
-          })
-        );
-      }
     })()
   );
 });
@@ -125,50 +111,79 @@ const isDevModuleRequest = (url) =>
   url.pathname.includes('/src/') ||
   url.pathname.includes('/.svelte-kit/');
 
-// NetworkFirst con cache: 'no-store' per ignorare completamente la cache HTTP su disco del browser
-const networkFirstStrategy = new workbox.strategies.NetworkFirst({
-  cacheName: CACHE,
-  fetchOptions: {
-    cache: 'no-store'
-  }
+const isApiRequest = (url) =>
+  url.pathname.includes('/api/') ||
+  url.pathname.endsWith('.php');
+
+// CacheFirst per i bundle immutabili di SvelteKit (hanno già hash nel nome file)
+const immutableCacheFirstStrategy = new workbox.strategies.CacheFirst({
+  cacheName: CACHE
 });
 
-// Gestione navigazione pagina (SPA): tutte le rotte client (/aula, /docente, /social, ecc.)
-// usano l'unico index.html della SPA (scopeRootUrl) sia online che offline
+// StaleWhileRevalidate per asset statici (CSS, icone, immagini, CDN PicoCSS)
+const staticStaleWhileRevalidateStrategy = new workbox.strategies.StaleWhileRevalidate({
+  cacheName: CACHE
+});
+
+// Gestione navigazione pagina (SPA): Stale-While-Revalidate sull'index.html della SPA
+// per avvio istantaneo con aggiornamento in background
 workbox.routing.registerRoute(
   ({ request, url }) => request.mode === 'navigate' && !isDevModuleRequest(url),
   async ({ request }) => {
     const cache = await caches.open(CACHE);
     const scopeRootUrl = self.registration ? new URL('./', self.registration.scope).href : offlineFallbackPage;
-    try {
-      const freshResponse = await fetch(scopeRootUrl, {
-        cache: 'no-store',
-        credentials: 'same-origin',
-        redirect: 'follow'
-      });
-      if (freshResponse && freshResponse.ok) {
-        cache.put(scopeRootUrl, freshResponse.clone()).catch(() => {});
-        return freshResponse;
-      }
-    } catch (error) {
-      // Offline o server locale spento: usa l'index.html della SPA salvato in cache
-    }
-    return (
+
+    const cachedShell =
       (await cache.match(scopeRootUrl, { ignoreSearch: true })) ||
+      (await cache.match(offlineFallbackPage, { ignoreSearch: true }));
+
+    const networkFetch = fetch(scopeRootUrl, {
+      cache: 'no-cache',
+      credentials: 'same-origin',
+      redirect: 'follow'
+    })
+      .then((freshResponse) => {
+        if (freshResponse && freshResponse.ok) {
+          cache.put(scopeRootUrl, freshResponse.clone()).catch(() => {});
+        }
+        return freshResponse;
+      })
+      .catch(() => null);
+
+    if (cachedShell) {
+      return cachedShell;
+    }
+
+    const freshResponse = await networkFetch;
+    if (freshResponse) {
+      return freshResponse;
+    }
+
+    return (
       (await cache.match(request, { ignoreSearch: true })) ||
-      (await cache.match(offlineFallbackPage, { ignoreSearch: true })) ||
       Response.error()
     );
   }
 );
 
-// Tutte le altre risorse statiche, CSS, icone e API (esclusi moduli dev di Vite)
+// 1. Risorse immutabili di SvelteKit (/_app/immutable/) -> CacheFirst (0ms network)
+workbox.routing.registerRoute(
+  ({ request, url }) =>
+    request.method === 'GET' &&
+    url.pathname.includes('/_app/immutable/') &&
+    !isDevModuleRequest(url),
+  immutableCacheFirstStrategy
+);
+
+// 2. Risorse statiche (CSS, JS, immagini, icone, font) -> StaleWhileRevalidate
 workbox.routing.registerRoute(
   ({ request, url }) =>
     request.method === 'GET' &&
     request.mode !== 'navigate' &&
+    !url.pathname.includes('/_app/immutable/') &&
+    !isApiRequest(url) &&
     !isDevModuleRequest(url),
-  networkFirstStrategy
+  staticStaleWhileRevalidateStrategy
 );
 
 // Gestione del background sync

@@ -40,7 +40,9 @@
 			}, 320);
 		}
 
-		if ('serviceWorker' in navigator) {
+		const registerServiceWorker = () => {
+			if (!('serviceWorker' in navigator)) return;
+
 			if (dev) {
 				navigator.serviceWorker.getRegistrations().then((registrations) => {
 					for (const registration of registrations) {
@@ -48,16 +50,6 @@
 					}
 				});
 			} else {
-				const hadController = Boolean(navigator.serviceWorker.controller);
-				let refreshing = false;
-
-				navigator.serviceWorker.addEventListener('controllerchange', () => {
-					if (hadController && !refreshing) {
-						refreshing = true;
-						window.location.reload();
-					}
-				});
-
 				navigator.serviceWorker
 					.register(`${base}/service-worker.js`, {
 						scope: `${base}/`,
@@ -68,34 +60,27 @@
 					})
 					.catch(() => {});
 			}
-		}
+		};
 
-		// Precarica l'immagine 500 (Panda) quando il browser è inattivo per non rallentare l'avvio
 		if (typeof window !== 'undefined') {
+			if ('requestIdleCallback' in window) {
+				window.requestIdleCallback(registerServiceWorker, { timeout: 2000 });
+			} else {
+				setTimeout(registerServiceWorker, 1000);
+			}
+
+			// Precarica l'immagine 500 (Panda) con bassa priorità quando il browser è completamente inattivo
 			const preloadEasterEggs = () => {
-				const pandaUrls = [
-					`${base}/eastereggs/500.gif`
-				];
-
-				pandaUrls.forEach((url) => {
-					const img = new Image();
-					img.src = url;
-				});
-
-				if ('caches' in window && !dev) {
-					caches.open('lscway-cache-v2026-10-06-2').then((cache) => {
-						pandaUrls.forEach((url) => {
-							cache.add(url).catch(() => {});
-						});
-					}).catch(() => {});
-				}
+				fetch(`${base}/eastereggs/500.gif`, { priority: 'low' }).catch(() => {});
 			};
 
-			if ('requestIdleCallback' in window) {
-				window.requestIdleCallback(preloadEasterEggs, { timeout: 4000 });
-			} else {
-				setTimeout(preloadEasterEggs, 2500);
-			}
+			setTimeout(() => {
+				if ('requestIdleCallback' in window) {
+					window.requestIdleCallback(preloadEasterEggs, { timeout: 5000 });
+				} else {
+					preloadEasterEggs();
+				}
+			}, 4000);
 		}
 
 		intervalTimer = setInterval(() => {

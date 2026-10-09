@@ -1,4 +1,4 @@
-import { userEmail } from "./stores";
+import { userEmail, timetableData } from "./stores";
 
 
 function decodeGoogleJwt(token) {
@@ -26,74 +26,147 @@ const API_URL =
     DEFAULT_API_URL;
 const CACHE_KEY = "lscway_orario_cache_v1";
 
-export async function getData(fetch){
-    let data = null;
+let memoryCache = null;
+let inflightRevalidation = null;
+
+function normalizeTimetableData(raw) {
+    if (!raw || typeof raw !== "object") return null;
+
+    if (raw.user) {
+        userEmail.set(raw.user);
+    }
+
+    if (raw.__normalized) {
+        return raw;
+    }
+
+    const classi = Array.isArray(raw.classi)
+        ? raw.classi.filter((e) => !e.includes(".") && !e.includes("*"))
+        : [];
+
+    const rows = Array.isArray(raw.data)
+        ? raw.data.map((e) => {
+            if (e.classe && e.classe.includes(".")) {
+                e.classe = e.classe.replace(".", "");
+            } else if (e.classe && e.classe.includes("*")) {
+                e.classe = e.classe.replace("*", "");
+                if (!e.aula) e.aula = "-";
+            }
+            if (e.materia == "sub_potenziamento" || e.materia == "POT") {
+                e.materia = "POT";
+                e.aula = "";
+                e.classe = "";
+            } else if (e.materia == "sub_ricevimento" || e.materia == "RIC") {
+                e.materia = "RIC";
+                e.aula = "";
+            }
+            return e;
+        })
+        : [];
+
+    const normalized = {
+        ...raw,
+        classi,
+        data: rows,
+        __normalized: true
+    };
+
+    return normalized;
+}
+
+function readCachedData() {
+    if (memoryCache) return memoryCache;
+    if (typeof localStorage === "undefined") return null;
+
+    try {
+        const cachedStr = localStorage.getItem(CACHE_KEY);
+        if (!cachedStr) return null;
+        const parsed = JSON.parse(cachedStr);
+        if (!parsed || !Array.isArray(parsed.data)) return null;
+        memoryCache = normalizeTimetableData(parsed);
+        return memoryCache;
+    } catch (e) {
+        return null;
+    }
+}
+
+function persistCachedDataAsync(dataObj) {
+    if (typeof window === "undefined" || typeof localStorage === "undefined" || !dataObj) return;
+
+    const save = () => {
+        try {
+            localStorage.setItem(CACHE_KEY, JSON.stringify(dataObj));
+        } catch (e) {}
+    };
+
+    if ("requestIdleCallback" in window) {
+        window.requestIdleCallback(save, { timeout: 2000 });
+    } else {
+        setTimeout(save, 50);
+    }
+}
+
+async function fetchNetworkData(fetchFn, isBackground = false) {
+    let rawData = null;
 
     if (typeof window !== "undefined" && window.__lscwayInitialDataPromise && API_URL === DEFAULT_API_URL) {
         const preloadPromise = window.__lscwayInitialDataPromise;
         delete window.__lscwayInitialDataPromise;
         try {
-            data = await preloadPromise;
+            rawData = await preloadPromise;
         } catch (e) {
-            data = null;
+            rawData = null;
         }
     }
 
-    if (!data) {
-        try {
-            const res = await fetch(
-                API_URL,
-                {
-                    mode: "cors",
-                    cache: "no-cache",
-                },
-            );
-            data = await res.json();
-        } catch (err) {
-            if (typeof localStorage !== "undefined") {
-                try {
-                    const cached = localStorage.getItem(CACHE_KEY);
-                    if (cached) {
-                        data = JSON.parse(cached);
-                    }
-                } catch (e) {}
-            }
-            if (!data) throw err;
+    if (!rawData) {
+        const res = await fetchFn(API_URL, {
+            mode: "cors",
+            cache: "no-cache",
+            priority: isBackground ? "low" : "high"
+        });
+        if (!res.ok) {
+            throw new Error(`HTTP ${res.status}`);
         }
+        rawData = await res.json();
     }
 
-    if (typeof localStorage !== "undefined" && data) {
-        try {
-            localStorage.setItem(CACHE_KEY, JSON.stringify(data));
-        } catch (e) {}
+    const normalized = normalizeTimetableData(rawData);
+    if (normalized) {
+        memoryCache = normalized;
+        timetableData.set(normalized);
+        persistCachedDataAsync(normalized);
+    }
+    return normalized;
+}
+
+export async function getData(fetch) {
+    const cached = readCachedData();
+
+    if (cached) {
+        timetableData.set(cached);
+
+        if (!inflightRevalidation && typeof window !== "undefined") {
+            inflightRevalidation = fetchNetworkData(fetch, true)
+                .catch(() => {})
+                .finally(() => {
+                    inflightRevalidation = null;
+                });
+        }
+
+        return cached;
     }
 
-    if(data.user){
-        userEmail.set(data.user);
+    try {
+        return await fetchNetworkData(fetch, false);
+    } catch (err) {
+        const fallback = readCachedData();
+        if (fallback) {
+            timetableData.set(fallback);
+            return fallback;
+        }
+        throw err;
     }
-    data.classi = data.classi.filter(e=> !e.includes(".") && !e.includes("*"))
-    data.data = data.data.map(e=>{
-        if(e.classe.includes(".")){
-            e.classe = e.classe.replace(".", "")
-        } else if(e.classe.includes("*")){
-            e.classe = e.classe.replace("*", "")
-            if(!e.aula)
-                e.aula = "-"
-        }
-        if(e.materia == "sub_potenziamento" || e.materia == "POT"){
-            e.materia = "POT";
-            e.aula = "";
-            e.classe = "";
-        } else if(e.materia == "sub_ricevimento" || e.materia == "RIC"){
-            e.materia = "RIC";
-            e.aula = "";
-        }
-            
-        return e
-    })
-    
-
-    return data
 }
 
 export async function googleAuth(credential) {

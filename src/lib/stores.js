@@ -13,6 +13,7 @@ export const userEmail = writable(getInitialUserEmail());
 export const isTeacher = writable(false);
 export const isLoading = writable(false);
 export const isMenuOpen = writable(false);
+export const timetableData = writable(null);
 
 
 userEmail.subscribe((value) => {
