@@ -72,12 +72,12 @@
 
   .compact-timetable {
     width: 100%;
-    min-width: 640px;
+    min-width: calc(640px * var(--table-font-scale, 1));
     table-layout: fixed;
     border-collapse: separate;
     border-spacing: 0;
     margin: 0;
-    font-size: 0.9rem;
+    font-size: calc(0.9rem * var(--table-font-scale, 1));
   }
 
   thead {
@@ -90,7 +90,7 @@
 
   th {
     padding: 0.55rem 0.3rem;
-    font-size: 0.875rem;
+    font-size: calc(0.875rem * var(--table-font-scale, 1));
     font-weight: 700;
     letter-spacing: 0.02em;
     color: var(--brand-text-muted);
@@ -107,14 +107,14 @@
     background: var(--brand-surface-subtle);
     border-right: 1px solid var(--brand-border);
     box-shadow: -2px 0 0 0 var(--brand-surface-subtle), 2px 0 6px -2px rgba(0, 0, 0, 0.08);
-    width: 52px;
-    min-width: 52px;
-    max-width: 52px;
-    font-size: 0.875rem;
+    width: calc(52px * var(--table-font-scale, 1));
+    min-width: calc(52px * var(--table-font-scale, 1));
+    max-width: calc(52px * var(--table-font-scale, 1));
+    font-size: calc(0.875rem * var(--table-font-scale, 1));
   }
 
   .weekday-header {
-    min-width: 116px;
+    min-width: calc(116px * var(--table-font-scale, 1));
     border-right: 1px solid var(--brand-border);
     transition: background-color 0.15s ease;
   }
@@ -151,20 +151,20 @@
 
   @media (min-width: 640px) {
     .compact-timetable {
-      font-size: 0.85rem;
+      font-size: calc(0.85rem * var(--table-font-scale, 1));
     }
     th {
       padding: 0.65rem 0.4rem;
-      font-size: 0.875rem;
+      font-size: calc(0.875rem * var(--table-font-scale, 1));
     }
     .col-hour.fixed-col {
-      width: 58px;
-      min-width: 58px;
-      max-width: 58px;
-      font-size: 0.825rem;
+      width: calc(58px * var(--table-font-scale, 1));
+      min-width: calc(58px * var(--table-font-scale, 1));
+      max-width: calc(58px * var(--table-font-scale, 1));
+      font-size: calc(0.825rem * var(--table-font-scale, 1));
     }
     .weekday-header {
-      min-width: 100px;
+      min-width: calc(100px * var(--table-font-scale, 1));
     }
     .weekday-short {
       display: none;
@@ -176,20 +176,20 @@
 
   @media (min-width: 1024px) {
     .compact-timetable {
-      font-size: 0.9rem;
+      font-size: calc(0.9rem * var(--table-font-scale, 1));
     }
     th {
       padding: 0.8rem 0.5rem;
-      font-size: 0.925rem;
+      font-size: calc(0.925rem * var(--table-font-scale, 1));
     }
     .col-hour.fixed-col {
-      width: 72px;
-      min-width: 72px;
-      max-width: 72px;
-      font-size: 0.875rem;
+      width: calc(72px * var(--table-font-scale, 1));
+      min-width: calc(72px * var(--table-font-scale, 1));
+      max-width: calc(72px * var(--table-font-scale, 1));
+      font-size: calc(0.875rem * var(--table-font-scale, 1));
     }
     .weekday-header {
-      min-width: 120px;
+      min-width: calc(120px * var(--table-font-scale, 1));
     }
     .today-dot {
       width: 7px;

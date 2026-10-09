@@ -1,36 +1,18 @@
 <script>
   import TimeTableRow from "./TimeTableRow.svelte";
   import { base } from "$app/paths";
-  import { getDay, isChristmasPeriod } from "$lib/dateutils.js";
-  import { onMount, onDestroy } from "svelte";
+  import { clockStore } from "$lib/dateutils.js";
 
   export let data = [];
   export let fields = [];
   export let day = undefined;
   export let isChristmas = undefined;
 
-  const xmasGifs = ["xmas1.gif", "xmas2.gif", "xmas3.gif"];
-  let randomXmasGif = xmasGifs[Math.floor(Math.random() * xmasGifs.length)];
+  const xmasWebps = ["xmas1.webp", "xmas2.webp", "xmas3.webp"];
+  let randomXmasGif = xmasWebps[Math.floor(Math.random() * xmasWebps.length)];
 
-  let currentDay = getDay();
-  let currentIsChristmas = isChristmasPeriod();
-  let interval;
-
-  onMount(() => {
-    currentDay = getDay();
-    currentIsChristmas = isChristmasPeriod();
-    interval = setInterval(() => {
-      currentDay = getDay();
-      currentIsChristmas = isChristmasPeriod();
-    }, 1000);
-  });
-
-  onDestroy(() => {
-    if (interval) clearInterval(interval);
-  });
-
-  $: activeDay = day !== undefined ? day : currentDay;
-  $: activeIsChristmas = isChristmas !== undefined ? isChristmas : currentIsChristmas;
+  $: activeDay = day !== undefined ? day : $clockStore.day;
+  $: activeIsChristmas = isChristmas !== undefined ? isChristmas : $clockStore.isChristmas;
   $: isSaturday = activeDay === "SAB" || activeDay === 6;
   $: isSunday = activeDay === "DOM" || activeDay === 0;
 </script>
@@ -46,7 +28,7 @@
 {:else if isSaturday}
   <div class="easteregg-container">
     <img
-      src="{base}/eastereggs/saturday.gif"
+      src="{base}/eastereggs/saturday.webp"
       alt="Sabato"
       class="easteregg-gif"
     />
@@ -54,7 +36,7 @@
 {:else if isSunday}
   <div class="easteregg-container">
     <img
-      src="{base}/eastereggs/sunday.gif"
+      src="{base}/eastereggs/sunday.webp"
       alt="Domenica"
       class="easteregg-gif"
     />
@@ -95,7 +77,7 @@
     border-collapse: separate;
     border-spacing: 0;
     margin: 0;
-    font-size: 1rem;
+    font-size: calc(1rem * var(--table-font-scale, 1));
   }
 
   thead {
@@ -107,7 +89,7 @@
 
   thead th {
     padding: 0.65rem 0.35rem;
-    font-size: 0.875rem;
+    font-size: calc(0.875rem * var(--table-font-scale, 1));
     font-weight: 700;
     text-transform: uppercase;
     letter-spacing: 0.04em;
@@ -120,9 +102,9 @@
   }
 
   .col-hour {
-    width: 52px;
-    min-width: 52px;
-    max-width: 56px;
+    width: calc(52px * var(--table-font-scale, 1));
+    min-width: calc(52px * var(--table-font-scale, 1));
+    max-width: calc(56px * var(--table-font-scale, 1));
     text-align: center;
     border-right: 1px solid var(--brand-border);
   }
@@ -140,8 +122,7 @@
     width: auto; /* Takes all remaining width */
   }
 
-  .easteregg-container,
-  .weekend-container {
+  .easteregg-container {
     width: 100%;
     display: flex;
     align-items: center;
@@ -153,8 +134,7 @@
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   }
 
-  .easteregg-gif,
-  .weekend-gif {
+  .easteregg-gif {
     width: 280px;
     max-width: 100%;
     height: auto;
@@ -166,18 +146,17 @@
   @media (max-width: 400px) {
     thead th {
       padding: 0.55rem 0.25rem;
-      font-size: 0.825rem;
+      font-size: calc(0.825rem * var(--table-font-scale, 1));
     }
     .col-hour {
-      width: 48px;
-      min-width: 48px;
+      width: calc(48px * var(--table-font-scale, 1));
+      min-width: calc(48px * var(--table-font-scale, 1));
+      max-width: calc(52px * var(--table-font-scale, 1));
     }
-    .easteregg-container,
-    .weekend-container {
+    .easteregg-container {
       padding: 1.5rem 0.75rem;
     }
-    .easteregg-gif,
-    .weekend-gif {
+    .easteregg-gif {
       width: 220px;
     }
   }

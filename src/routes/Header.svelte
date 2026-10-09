@@ -1,7 +1,7 @@
 <script>
   import { page } from "$app/stores";
   import { base } from "$app/paths";
-  import { getSchoolHour, getDay } from "$lib/dateutils.js";
+  import { clockStore } from "$lib/dateutils.js";
   import { onDestroy, onMount } from "svelte";
   import PwaButton from "./PWAButton.svelte";
   import Tabs from "./Tabs.svelte";
@@ -17,16 +17,10 @@
     clearUserFromServiceWorker,
   } from "$lib/notifications.js";
 
-  let day = getDay();
-  let schoolHour = getSchoolHour();
-  let timeInterval;
+  $: day = $clockStore.day;
+  $: schoolHour = $clockStore.schoolHour;
   let substitutionInterval;
   let mounted = false;
-
-  function updateTime() {
-    schoolHour = getSchoolHour();
-    day = getDay();
-  }
 
   async function checkSubstitutions() {
     if (!$userEmail || !$notificationsEnabled) return;
@@ -48,8 +42,6 @@
 
   onMount(() => {
     mounted = true;
-    updateTime();
-    timeInterval = setInterval(updateTime, 1000);
     isLoading.set(false);
 
     checkNotificationPermission();
@@ -57,7 +49,6 @@
   });
 
   onDestroy(() => {
-    if (timeInterval) clearInterval(timeInterval);
     if (substitutionInterval) clearInterval(substitutionInterval);
   });
 

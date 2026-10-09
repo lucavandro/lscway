@@ -14,13 +14,46 @@
   import BellIcon from "$icons/BellIcon.svelte";
   import BellOffIcon from "$icons/BellOffIcon.svelte";
   import SocialIcon from "$icons/SocialIcon.svelte";
-  import { isLoading, userEmail, isTeacher, isMenuOpen, notificationsEnabled } from "$lib/stores.js";
+  import {
+    isLoading,
+    userEmail,
+    isTeacher,
+    isMenuOpen,
+    notificationsEnabled,
+    tableFontScale,
+    increaseTableFontScale,
+    decreaseTableFontScale,
+    resetTableFontScale,
+    TABLE_FONT_SCALE_MIN,
+    TABLE_FONT_SCALE_MAX,
+    TABLE_FONT_SCALE_STEP,
+    TABLE_FONT_SCALE_DEFAULT
+  } from "$lib/stores.js";
   import { theme, toggleTheme } from "$lib/theme.js";
   import { toggleNotifications } from "$lib/notifications.js";
   import { onDestroy } from "svelte";
 
   let closing = false;
   let previouslyFocusedEl = null;
+
+  const fontScaleSteps = Array.from(
+    { length: Math.round((TABLE_FONT_SCALE_MAX - TABLE_FONT_SCALE_MIN) / TABLE_FONT_SCALE_STEP) + 1 },
+    (_, i) => Math.round((TABLE_FONT_SCALE_MIN + i * TABLE_FONT_SCALE_STEP) * 100) / 100
+  );
+
+  $: fontScalePercent = Math.round(($tableFontScale || TABLE_FONT_SCALE_DEFAULT) * 100);
+  $: isCustomScale = Math.abs(($tableFontScale || TABLE_FONT_SCALE_DEFAULT) - TABLE_FONT_SCALE_DEFAULT) > 0.001;
+  $: fontScaleProgress =
+    ((($tableFontScale || TABLE_FONT_SCALE_DEFAULT) - TABLE_FONT_SCALE_MIN) /
+      (TABLE_FONT_SCALE_MAX - TABLE_FONT_SCALE_MIN)) *
+    100;
+
+  function handleFontSliderInput(e) {
+    const val = parseFloat(e.currentTarget.value);
+    if (!Number.isNaN(val)) {
+      tableFontScale.set(Math.round(val * 100) / 100);
+    }
+  }
 
   async function handleToggleNotifications() {
     await toggleNotifications();
@@ -59,6 +92,10 @@
 
   function handleTouchStart(e) {
     if (!e.touches || e.touches.length !== 1 || closing) return;
+    if (e.target && typeof e.target.closest === "function" && e.target.closest(".font-control-card")) {
+      isTrackingTouch = false;
+      return;
+    }
     touchStartX = e.touches[0].clientX;
     touchStartY = e.touches[0].clientY;
     touchCurrentX = touchStartX;
@@ -207,7 +244,7 @@
     >
       <div class="drawer-header">
         <div class="brand-group">
-          <img src="{base}/logo-blue.png?v=20261006-2" alt="Logo WAY Cortese" class="brand-logo" />
+          <img src="{base}/logo-blue.webp?v=20261009-2" alt="Logo WAY Cortese" class="brand-logo" width="36" height="36" loading="lazy" />
           <div class="brand-meta">
             <span class="brand-name">WAY Cortese</span>
             <span class="brand-sub">Liceo N. Cortese</span>
@@ -369,6 +406,87 @@
             </button>
           </li>
           <li>
+            <div class="font-control-card" role="group" aria-label="Dimensione testo tabelle">
+              <div class="font-control-header">
+                <div class="font-control-label">
+                  <span class="nav-icon font-icon" aria-hidden="true">
+                    <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                      <polyline points="4 7 4 4 20 4 20 7"></polyline>
+                      <line x1="9" y1="20" x2="15" y2="20"></line>
+                      <line x1="12" y1="4" x2="12" y2="20"></line>
+                    </svg>
+                  </span>
+                  <span class="nav-text">Testo tabelle</span>
+                </div>
+                <button
+                  type="button"
+                  class="font-scale-badge"
+                  class:is-custom={isCustomScale}
+                  title={isCustomScale ? "Tocca per ripristinare al 100%" : "Dimensione predefinita (100%)"}
+                  aria-label="Dimensione testo tabelle {fontScalePercent}%, tocca per ripristinare al 100%"
+                  on:click={resetTableFontScale}
+                >
+                  <span class="badge-value">{fontScalePercent}%</span>
+                  {#if isCustomScale}
+                    <span class="badge-reset-icon" aria-hidden="true">↺</span>
+                  {/if}
+                </button>
+              </div>
+
+              <div class="font-control-track-row">
+                <button
+                  type="button"
+                  class="font-step-btn step-down"
+                  aria-label="Riduci testo tabelle"
+                  title="Riduci testo tabelle"
+                  disabled={$tableFontScale <= TABLE_FONT_SCALE_MIN + 0.001}
+                  on:click={decreaseTableFontScale}
+                >
+                  <span class="step-label step-label-sm">A−</span>
+                </button>
+
+                <div class="font-slider-wrap">
+                  <input
+                    type="range"
+                    class="font-range-slider"
+                    min={TABLE_FONT_SCALE_MIN}
+                    max={TABLE_FONT_SCALE_MAX}
+                    step={TABLE_FONT_SCALE_STEP}
+                    value={$tableFontScale}
+                    style="--progress: {fontScaleProgress}%"
+                    aria-label="Cursore dimensione testo tabelle"
+                    aria-valuemin={Math.round(TABLE_FONT_SCALE_MIN * 100)}
+                    aria-valuemax={Math.round(TABLE_FONT_SCALE_MAX * 100)}
+                    aria-valuenow={fontScalePercent}
+                    aria-valuetext="{fontScalePercent}%"
+                    on:input={handleFontSliderInput}
+                  />
+                  <div class="font-slider-ticks" aria-hidden="true">
+                    {#each fontScaleSteps as stepVal}
+                      <span
+                        class="tick-dot"
+                        class:is-default={Math.abs(stepVal - TABLE_FONT_SCALE_DEFAULT) < 0.001}
+                        class:is-filled={stepVal <= $tableFontScale + 0.001}
+                        class:is-current={Math.abs(stepVal - $tableFontScale) < 0.001}
+                      ></span>
+                    {/each}
+                  </div>
+                </div>
+
+                <button
+                  type="button"
+                  class="font-step-btn step-up"
+                  aria-label="Ingrandisci testo tabelle"
+                  title="Ingrandisci testo tabelle"
+                  disabled={$tableFontScale >= TABLE_FONT_SCALE_MAX - 0.001}
+                  on:click={increaseTableFontScale}
+                >
+                  <span class="step-label step-label-lg">A+</span>
+                </button>
+              </div>
+            </div>
+          </li>
+          <li>
             <button type="button" class="nav-action-btn" on:click={reload}>
               <span class="nav-icon"><ReloadIcon /></span>
               <span class="nav-text">Aggiorna dati</span>
@@ -406,9 +524,7 @@
     bottom: 0;
     width: 100vw;
     height: 100dvh;
-    background: rgba(15, 23, 42, 0.55);
-    backdrop-filter: blur(6px);
-    -webkit-backdrop-filter: blur(6px);
+    background: rgba(15, 23, 42, 0.45);
     border: 0;
     padding: 0;
     margin: 0;
@@ -701,6 +817,317 @@
 
   .theme-switch.active .theme-switch-thumb {
     transform: translateX(18px);
+  }
+
+  /* Modern Table Font Scale Control Card (modern-web-guidance) */
+  .font-control-card {
+    --control-accent: var(--brand-primary);
+    --control-track-bg: color-mix(in oklab, var(--brand-border) 82%, var(--brand-surface-subtle));
+    --control-surface: color-mix(in oklab, var(--brand-surface-subtle) 65%, var(--brand-surface-card));
+    display: flex;
+    flex-direction: column;
+    gap: 0.55rem;
+    padding: 0.68rem 0.78rem 0.72rem;
+    margin: 0.15rem 0;
+    border-radius: 12px;
+    background: var(--control-surface);
+    border: 1px solid color-mix(in oklab, var(--brand-border) 85%, transparent);
+    box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.06);
+    box-sizing: border-box;
+    touch-action: manipulation;
+  }
+
+  .font-control-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+  }
+
+  .font-control-label {
+    display: inline-flex;
+    align-items: center;
+    min-width: 0;
+    color: var(--brand-text);
+    font-size: 0.98rem;
+    font-weight: 500;
+  }
+
+  .font-control-label .font-icon {
+    margin-right: 0.55rem;
+    color: var(--brand-primary);
+    background: color-mix(in oklab, var(--brand-primary) 12%, transparent);
+    width: 26px;
+    height: 26px;
+    border-radius: 7px;
+  }
+
+  .font-scale-badge {
+    appearance: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.22rem 0.52rem;
+    border-radius: 999px;
+    border: 1px solid color-mix(in oklab, var(--brand-border) 90%, transparent);
+    background: var(--brand-surface-card);
+    color: var(--brand-text-muted);
+    font-family: inherit;
+    font-size: 0.76rem;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+    letter-spacing: 0.01em;
+    line-height: 1.1;
+    cursor: pointer;
+    transition:
+      background-color 180ms ease,
+      color 180ms ease,
+      border-color 180ms ease,
+      transform 220ms var(--spring-easing, ease);
+  }
+
+  .font-scale-badge.is-custom {
+    background: color-mix(in oklab, var(--brand-primary) 13%, var(--brand-surface-card));
+    border-color: color-mix(in oklab, var(--brand-primary) 35%, var(--brand-border));
+    color: var(--brand-primary);
+  }
+
+  .font-scale-badge:hover {
+    border-color: color-mix(in oklab, var(--brand-primary) 50%, var(--brand-border));
+    color: var(--brand-primary);
+  }
+
+  .font-scale-badge:active {
+    transform: scale(0.95);
+  }
+
+  .font-scale-badge:focus-visible {
+    outline: 2px solid var(--brand-primary);
+    outline-offset: 2px;
+  }
+
+  .badge-reset-icon {
+    font-size: 0.8rem;
+    line-height: 1;
+    opacity: 0.85;
+  }
+
+  .font-control-track-row {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .font-step-btn {
+    appearance: none;
+    width: 36px;
+    height: 34px;
+    padding: 0;
+    margin: 0;
+    border-radius: 9px;
+    border: 1px solid var(--brand-border);
+    background: var(--brand-surface-card);
+    color: var(--brand-text);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.06);
+    transition:
+      background-color 150ms ease,
+      color 150ms ease,
+      border-color 150ms ease,
+      box-shadow 150ms ease,
+      transform 220ms var(--spring-easing, ease);
+  }
+
+  .font-step-btn:hover:not(:disabled) {
+    background: color-mix(in oklab, var(--brand-primary) 10%, var(--brand-surface-card));
+    border-color: color-mix(in oklab, var(--brand-primary) 42%, var(--brand-border));
+    color: var(--brand-primary);
+  }
+
+  .font-step-btn:active:not(:disabled) {
+    transform: scale(0.92);
+  }
+
+  .font-step-btn:focus-visible {
+    outline: 2px solid var(--brand-primary);
+    outline-offset: 2px;
+  }
+
+  .font-step-btn:disabled {
+    opacity: 0.38;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+
+  .step-label {
+    display: inline-block;
+    font-weight: 800;
+    line-height: 1;
+    letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums;
+    text-box: trim-both cap alphabetic;
+  }
+
+  .step-label-sm {
+    font-size: 0.82rem;
+  }
+
+  .step-label-lg {
+    font-size: 0.96rem;
+  }
+
+  .font-slider-wrap {
+    position: relative;
+    display: flex;
+    align-items: center;
+    height: 34px;
+    padding: 0 2px;
+  }
+
+  .font-range-slider {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 6px;
+    margin: 0;
+    border-radius: 999px;
+    background: linear-gradient(
+      to right,
+      var(--control-accent) 0%,
+      var(--control-accent) var(--progress, 42.85%),
+      var(--control-track-bg) var(--progress, 42.85%),
+      var(--control-track-bg) 100%
+    );
+    outline: none;
+    cursor: pointer;
+    position: relative;
+    z-index: 2;
+    touch-action: pan-x;
+  }
+
+  .font-range-slider:focus-visible {
+    outline: 2px solid var(--brand-primary);
+    outline-offset: 5px;
+  }
+
+  .font-range-slider::-webkit-slider-runnable-track {
+    height: 6px;
+    border-radius: 999px;
+    background: transparent;
+  }
+
+  .font-range-slider::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 18px;
+    height: 18px;
+    margin-top: -6px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2.5px solid var(--control-accent);
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.28);
+    cursor: grab;
+    transition:
+      transform 220ms var(--spring-easing, ease),
+      box-shadow 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .font-range-slider:hover::-webkit-slider-thumb {
+    transform: scale(1.12);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--control-accent) 18%, transparent);
+  }
+
+  .font-range-slider:active::-webkit-slider-thumb {
+    cursor: grabbing;
+    transform: scale(1.18);
+    background: var(--control-accent);
+    border-color: #ffffff;
+    box-shadow: 0 0 0 6px color-mix(in oklab, var(--control-accent) 24%, transparent);
+  }
+
+  .font-range-slider::-moz-range-track {
+    height: 6px;
+    border-radius: 999px;
+    background: transparent;
+  }
+
+  .font-range-slider::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffffff;
+    border: 2.5px solid var(--control-accent);
+    box-shadow: 0 1px 4px rgba(15, 23, 42, 0.28);
+    cursor: grab;
+    box-sizing: border-box;
+    transition:
+      transform 220ms var(--spring-easing, ease),
+      box-shadow 180ms ease,
+      background-color 180ms ease;
+  }
+
+  .font-range-slider:hover::-moz-range-thumb {
+    transform: scale(1.12);
+    box-shadow: 0 0 0 4px color-mix(in oklab, var(--control-accent) 18%, transparent);
+  }
+
+  .font-range-slider:active::-moz-range-thumb {
+    cursor: grabbing;
+    transform: scale(1.18);
+    background: var(--control-accent);
+    border-color: #ffffff;
+  }
+
+  .font-slider-ticks {
+    position: absolute;
+    inset-inline: 9px;
+    top: 50%;
+    transform: translateY(-50%);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .tick-dot {
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    background: color-mix(in oklab, var(--brand-text-muted) 45%, transparent);
+    transition: transform 150ms ease, background-color 150ms ease;
+  }
+
+  .tick-dot.is-default {
+    width: 5px;
+    height: 8px;
+    border-radius: 999px;
+    background: color-mix(in oklab, var(--brand-text-muted) 65%, transparent);
+  }
+
+  .tick-dot.is-filled {
+    background: color-mix(in oklab, var(--control-accent) 75%, #ffffff);
+  }
+
+  .tick-dot.is-current {
+    opacity: 0;
+  }
+
+  @media (forced-colors: active) {
+    .font-step-btn,
+    .font-scale-badge {
+      border: 1px solid ButtonText;
+    }
+
+    .font-range-slider {
+      forced-color-adjust: auto;
+    }
   }
 
   .drawer-footer {

@@ -5,7 +5,7 @@
   export let error = null;
   export let status = 500;
 
-  let imageSrc = `${base}/eastereggs/500.gif`;
+  let imageSrc = `${base}/eastereggs/500.webp`;
 
   onMount(async () => {
     // Se siamo offline, tenta preventivamente di recuperare il Blob dal Cache Storage
@@ -17,12 +17,9 @@
   async function tryGetBlobFromCache() {
     if (typeof window === "undefined" || !("caches" in window)) return false;
     try {
-      const cache = await caches.open("lscway-cache");
       const match =
-        (await cache.match(`${base}/eastereggs/500.gif`)) ||
-        (await cache.match(`${base}/eastereggs/500.gif`)) ||
-        (await cache.match("eastereggs/500.gif")) ||
-        (await cache.match("eastereggs/500.gif"));
+        (await caches.match(`${base}/eastereggs/500.webp`, { ignoreSearch: true })) ||
+        (await caches.match("eastereggs/500.webp", { ignoreSearch: true }));
       if (match) {
         const blob = await match.blob();
         imageSrc = URL.createObjectURL(blob);
@@ -54,7 +51,7 @@
     // Tentativo 2: fallback sul path alternativo
     if (!imgEl.dataset.fallback) {
       imgEl.dataset.fallback = "eastereggs";
-      imageSrc = `${base}/eastereggs/500.gif`;
+      imageSrc = `${base}/eastereggs/500.webp`;
     }
   }
 </script>

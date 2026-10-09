@@ -2,14 +2,11 @@
   export let rowData = [];
   export let hourIndex;
   export let fields;
-  import { getDay, getHourNum, weekdays, hours } from "$lib/dateutils.js";
-  import { onMount, onDestroy } from "svelte";
+  import { clockStore, weekdays, hours } from "$lib/dateutils.js";
   import { inclusioneInFondo } from "$lib/utils.js";
 
-  let currentDay = getDay();
-  let currentHour = getHourNum();
-  let interval;
-
+  $: currentDay = $clockStore.day;
+  $: currentHour = $clockStore.hourNum;
   $: hour = hours[hourIndex];
 
   $: filteredRowData = {
@@ -19,17 +16,6 @@
     GIO: rowData.filter((e) => e.day === "GIO").sort(inclusioneInFondo),
     VEN: rowData.filter((e) => e.day === "VEN").sort(inclusioneInFondo),
   };
-
-  onMount(() => {
-    interval = setInterval(() => {
-      currentDay = getDay();
-      currentHour = getHourNum();
-    }, 1000);
-  });
-
-  onDestroy(() => {
-    if (interval) clearInterval(interval);
-  });
 </script>
 
 <tr class="compact-row">
@@ -151,9 +137,9 @@
     box-shadow: -2px 0 0 0 var(--brand-surface-card), 2px 0 6px -2px rgba(0, 0, 0, 0.08);
     padding: 0.4rem 0.2rem;
     text-align: center;
-    width: 52px;
-    min-width: 52px;
-    max-width: 52px;
+    width: calc(52px * var(--table-font-scale, 1));
+    min-width: calc(52px * var(--table-font-scale, 1));
+    max-width: calc(52px * var(--table-font-scale, 1));
     vertical-align: middle;
   }
 
@@ -165,7 +151,7 @@
   }
 
   .hour-num {
-    font-size: 1rem;
+    font-size: calc(1rem * var(--table-font-scale, 1));
     font-weight: 700;
     color: var(--brand-text);
     line-height: 1;
@@ -173,7 +159,7 @@
 
   .hour-time-label {
     display: block;
-    font-size: 0.74rem;
+    font-size: calc(0.74rem * var(--table-font-scale, 1));
     font-weight: 500;
     color: var(--brand-text-muted);
     line-height: 1.1;
@@ -234,21 +220,21 @@
   }
 
   .class-label {
-    font-size: 0.925rem;
+    font-size: calc(0.925rem * var(--table-font-scale, 1));
     font-weight: 800;
     letter-spacing: -0.01em;
   }
 
   .teacher-label {
-    font-size: 0.875rem;
+    font-size: calc(0.875rem * var(--table-font-scale, 1));
     font-weight: 700;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 110px;
+    max-width: calc(110px * var(--table-font-scale, 1));
   }
 
   .fallback-subj {
-    font-size: 0.875rem;
+    font-size: calc(0.875rem * var(--table-font-scale, 1));
     font-weight: 700;
   }
 
@@ -268,7 +254,7 @@
   }
 
   .class-tag {
-    font-size: 0.8rem;
+    font-size: calc(0.8rem * var(--table-font-scale, 1));
     font-weight: 700;
     color: var(--brand-text);
     background: color-mix(in srgb, var(--brand-text) 7%, var(--brand-surface-subtle));
@@ -280,7 +266,7 @@
   }
 
   .subj-tag {
-    font-size: 0.8rem;
+    font-size: calc(0.8rem * var(--table-font-scale, 1));
     font-weight: 600;
     padding: 0.1rem 0.35rem;
     border-radius: 4px;
@@ -334,7 +320,7 @@
   }
 
   .room-sub {
-    font-size: 0.8rem;
+    font-size: calc(0.8rem * var(--table-font-scale, 1));
     font-weight: 600;
     color: #059669;
     background: rgba(16, 185, 129, 0.1);
@@ -346,7 +332,7 @@
   }
 
   .sec-sep {
-    font-size: 0.775rem;
+    font-size: calc(0.775rem * var(--table-font-scale, 1));
     color: var(--brand-text-muted);
     opacity: 0.6;
     line-height: 1;
@@ -363,19 +349,19 @@
   .empty-dot {
     color: var(--brand-text-muted);
     opacity: 0.3;
-    font-size: 0.9rem;
+    font-size: calc(0.9rem * var(--table-font-scale, 1));
     line-height: 1;
   }
 
   @media (min-width: 640px) {
     .hour-fixed-col {
-      width: 58px;
-      min-width: 58px;
-      max-width: 58px;
+      width: calc(58px * var(--table-font-scale, 1));
+      min-width: calc(58px * var(--table-font-scale, 1));
+      max-width: calc(58px * var(--table-font-scale, 1));
       padding: 0.45rem 0.25rem;
     }
     .hour-num {
-      font-size: 0.9rem;
+      font-size: calc(0.9rem * var(--table-font-scale, 1));
       font-weight: 800;
     }
     .hour-time-label {
@@ -391,16 +377,16 @@
       gap: 0.35rem;
     }
     .class-label {
-      font-size: 0.875rem;
+      font-size: calc(0.875rem * var(--table-font-scale, 1));
       font-weight: 800;
     }
     .teacher-label {
-      font-size: 0.825rem;
+      font-size: calc(0.825rem * var(--table-font-scale, 1));
       font-weight: 700;
-      max-width: 110px;
+      max-width: calc(110px * var(--table-font-scale, 1));
     }
     .fallback-subj {
-      font-size: 0.8rem;
+      font-size: calc(0.8rem * var(--table-font-scale, 1));
     }
     .line-secondary {
       display: inline-flex;
@@ -410,40 +396,40 @@
       width: auto;
     }
     .class-tag {
-      font-size: 0.75rem;
+      font-size: calc(0.75rem * var(--table-font-scale, 1));
       font-weight: 700;
       padding: 0.1rem 0.35rem;
       border-radius: 4px;
     }
     .subj-tag {
-      font-size: 0.75rem;
+      font-size: calc(0.75rem * var(--table-font-scale, 1));
       padding: 0.1rem 0.35rem;
       border-radius: 4px;
     }
     .room-sub {
-      font-size: 0.75rem;
+      font-size: calc(0.75rem * var(--table-font-scale, 1));
       font-weight: 700;
       padding: 0.1rem 0.35rem;
       border-radius: 4px;
     }
     .sec-sep {
       display: inline;
-      font-size: 0.75rem;
+      font-size: calc(0.75rem * var(--table-font-scale, 1));
     }
   }
 
   @media (min-width: 1024px) {
     .hour-fixed-col {
-      width: 72px;
-      min-width: 72px;
-      max-width: 72px;
+      width: calc(72px * var(--table-font-scale, 1));
+      min-width: calc(72px * var(--table-font-scale, 1));
+      max-width: calc(72px * var(--table-font-scale, 1));
       padding: 0.6rem 0.35rem;
     }
     .hour-num {
-      font-size: 1rem;
+      font-size: calc(1rem * var(--table-font-scale, 1));
     }
     .hour-time-label {
-      font-size: 0.725rem;
+      font-size: calc(0.725rem * var(--table-font-scale, 1));
     }
     .day-slot {
       padding: 0.65rem 0.5rem;
@@ -455,36 +441,36 @@
       gap: 0.45rem;
     }
     .class-label {
-      font-size: 0.95rem;
+      font-size: calc(0.95rem * var(--table-font-scale, 1));
     }
     .teacher-label {
-      font-size: 0.875rem;
+      font-size: calc(0.875rem * var(--table-font-scale, 1));
       max-width: none;
     }
     .fallback-subj {
-      font-size: 0.85rem;
+      font-size: calc(0.85rem * var(--table-font-scale, 1));
     }
     .line-secondary {
       gap: 0.4rem;
       margin-top: 0.25rem;
     }
     .class-tag {
-      font-size: 0.8rem;
+      font-size: calc(0.8rem * var(--table-font-scale, 1));
       padding: 0.12rem 0.45rem;
       border-radius: 5px;
     }
     .subj-tag {
-      font-size: 0.8rem;
+      font-size: calc(0.8rem * var(--table-font-scale, 1));
       padding: 0.12rem 0.45rem;
       border-radius: 5px;
     }
     .room-sub {
-      font-size: 0.8rem;
+      font-size: calc(0.8rem * var(--table-font-scale, 1));
       padding: 0.12rem 0.45rem;
       border-radius: 5px;
     }
     .sec-sep {
-      font-size: 0.8rem;
+      font-size: calc(0.8rem * var(--table-font-scale, 1));
     }
     .day-slot:hover {
       background: color-mix(in srgb, var(--brand-primary) 6%, var(--brand-surface-card));

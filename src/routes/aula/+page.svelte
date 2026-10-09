@@ -1,7 +1,7 @@
 <script>
   import { onDestroy, onMount } from "svelte";
   import { page } from "$app/stores";
-  import { getDay } from "$lib/dateutils.js";
+  import { clockStore } from "$lib/dateutils.js";
   import { getPrefClassroom, setPrefClassroom } from "$lib/utils.js";
   import { timetableData } from "$lib/stores.js";
   import ItemSelect from "./../ItemSelect.svelte";
@@ -10,11 +10,10 @@
   import FullTimeTableSwitch from "./../FullTimeTableSwitch.svelte";
 
   export let data;
-  export let params = undefined;
   let selectedClassroom = "";
   let showFullTimeTable = false;
-  let currenDay = getDay();
 
+  $: currenDay = $clockStore.day;
   $: activeData = $timetableData || data;
   $: classrooms = activeData?.aule ? activeData.aule.filter((e) => e != "") : [];
   $: classroomWeekData = activeData?.data?.filter((e) => e.aula === selectedClassroom) || [];

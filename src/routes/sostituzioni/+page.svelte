@@ -2,22 +2,15 @@
   import { userEmail, notificationPermission, notificationsEnabled } from "$lib/stores.js";
   import { goto } from "$app/navigation";
   import { onMount, onDestroy } from "svelte";
-  import { inviaConfermaSostituzione } from "$lib/data";
   import { enableNotifications } from "$lib/notifications.js";
-  import { getTodayDate, isDateBefore } from "$lib/utils.js";
+  import { getTodayDate } from "$lib/utils.js";
   import { base } from "$app/paths";
 
   let sostituzioni = [];
-  let loading = false;
   let error = null;
   let interval;
-  let confirmingIds = new Set();
-  let errorMessages = {};
 
   $: sostituzioniOggi = sostituzioni.filter((s) => s.data >= getTodayDate());
-  $: sostituzioniPassate = sostituzioni.filter((s) =>
-    isDateBefore(s.data, getTodayDate()),
-  );
 
   const API_URL = (
     import.meta.env.VITE_API_URL ||

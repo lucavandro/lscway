@@ -45,21 +45,21 @@
     ],
     "screenshots": [
         {
-            "src": "ss_1.png",
+            "src": "ss_1.webp",
             "sizes": "1290x2796",
-            "type": "image/png",
+            "type": "image/webp",
             "description": "Schermata docente"
         },
         {
-            "src": "ss_2.png",
+            "src": "ss_2.webp",
             "sizes": "1290x2796",
-            "type": "image/png",
+            "type": "image/webp",
             "description": "Schermata aula"
         },
         {
-            "src": "ss_3.png",
+            "src": "ss_3.webp",
             "sizes": "1592x1029",
-            "type": "image/png",
+            "type": "image/webp",
             "form_factor": "wide",
             "description": "Schermata aula"
         }

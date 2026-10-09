@@ -3,6 +3,7 @@
   import { page } from "$app/stores";
   import { hotspot } from "$lib/hotspot.js";
   import { getPrefClassroom, setPrefClassroom } from "$lib/utils.js";
+  import { timetableData } from "$lib/stores.js";
   import ItemSelect from "./../ItemSelect.svelte";
 
   export let data;
@@ -10,6 +11,7 @@
   let copiedKey = null;
   let copyTimeout;
 
+  $: activeData = $timetableData || data;
   $: classrooms = Object.keys(hotspot).map((name) =>
     name.includes("_") ? name.split("_")[0] : name,
   );
@@ -43,7 +45,7 @@
 
   onMount(async () => {
     let queryClass = $page.url.searchParams.get("q");
-    if (queryClass && data?.aule?.includes(queryClass)) {
+    if (queryClass && activeData?.aule?.includes(queryClass)) {
       selectedClassroom = queryClass;
     } else {
       selectedClassroom = getPrefClassroom() || classrooms[0] || "";

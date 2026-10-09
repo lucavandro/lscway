@@ -1,5 +1,3 @@
-import { hours } from "./dateutils"
-
 export function getPrefTeacher() {
    return localStorage.getItem("prefTeacher")
 }
@@ -27,11 +25,6 @@ export function setPrefClassroom(value) {
          localStorage.setItem("prefClassroom", value)
 }
 
-
-export function getDataByHourIndex(data, hour){
-    data.filter( e=> e.ora === hours[i])
-}
-
 // Funzione per validare l'email
 export function validateEmail(email) {
   return email && typeof email === 'string' && email.endsWith('@lscortese.com');
@@ -43,12 +36,6 @@ export function getTodayDate() {
   return today.toISOString().split('T')[0];
 }
 
-// Funzione per confrontare le date
-export function isDateBefore(date1, date2) {
-  return new Date(date1) < new Date(date2);
-}
-
-
 export const inclusioneInFondo = (a, b) => {
   const isA = a.materia === "INC" || a.materia === "MADISO";
   const isB = b.materia === "INC" || b.materia === "MADISO";
@@ -56,4 +43,3 @@ export const inclusioneInFondo = (a, b) => {
   if (!isA && isB) return -1;
   return 0;
 };
-

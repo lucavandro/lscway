@@ -199,21 +199,3 @@ export async function googleAuth(credential) {
         };
     }
 }
-
-export async function inviaConfermaSostituzione(id){
-    const res = await fetch(
-        `https://www.liceoscientificocortese.edu.it/app/way/docenti_sostituzioni_api.php`,
-        {
-            method: "POST",
-            mode: "cors",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ id: id }),
-        },
-        
-    );
-
-    const data = await res.json();
-    return data;
-}

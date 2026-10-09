@@ -1,6 +1,6 @@
 <script>
   import { onDestroy, onMount } from "svelte";
-  import { getHourNum, getDay } from "$lib/dateutils.js";
+  import { clockStore } from "$lib/dateutils.js";
   import ItemSelect from "./ItemSelect.svelte";
   import { getPrefClass, setPrefClass } from "$lib/utils.js";
   import { page } from "$app/stores";
@@ -10,13 +10,10 @@
   import FullTimeTableSwitch from "./FullTimeTableSwitch.svelte";
 
   export let data;
-  export let params = undefined;
-  let currentHour;
-  let currenDay = getDay();
   let selectedClass = "";
   let showFullTimeTable = false;
-  let interval;
 
+  $: currenDay = $clockStore.day;
   $: activeData = $timetableData || data;
   $: classes = activeData?.classi ? activeData.classi.filter((e) => e != "") : [];
   $: classWeekData = activeData?.data?.filter((e) => e.classe === selectedClass && e.materia != "INCL") || [];
@@ -37,11 +34,6 @@
       selectedClass = getPrefClass() || classes[0] || "";
     }
 
-    interval = setInterval(() => {
-      currenDay = getDay();
-      currentHour = getHourNum();
-    }, 1000);
-
     try {
       const saved = sessionStorage.getItem("lscway:classe:showFullTable");
       if (saved !== null) {
@@ -51,7 +43,6 @@
   });
 
   onDestroy(() => {
-    if (interval) clearInterval(interval);
     try {
       sessionStorage.setItem("lscway:classe:showFullTable", JSON.stringify(showFullTimeTable));
     } catch (e) {}

@@ -1,20 +1,31 @@
 <script>
 	import Header from "./Header.svelte";
-	import HeaderMenuPanel from "./HeaderMenuPanel.svelte";
-	import { getDay } from "$lib/dateutils.js";
-	import { onDestroy, onMount } from "svelte";
+	import { onMount } from "svelte";
 	import Footer from "./Footer.svelte";
 	import { base } from "$app/paths";
 	import { dev } from "$app/environment";
 	import { onNavigate } from "$app/navigation";
 	import { initTheme } from "$lib/theme.js";
-	import { isLoading } from "$lib/stores.js";
+	import { isLoading, isMenuOpen } from "$lib/stores.js";
 
-	export let data = undefined;
-	export let params = undefined;
+	let HeaderMenuPanelComponent = null;
+	let menuPanelPromise = null;
 
-	let day = getDay();
-	let intervalTimer;
+	function loadMenuPanel() {
+		if (!HeaderMenuPanelComponent && !menuPanelPromise) {
+			menuPanelPromise = import("./HeaderMenuPanel.svelte")
+				.then((mod) => {
+					HeaderMenuPanelComponent = mod.default;
+				})
+				.catch(() => {
+					menuPanelPromise = null;
+				});
+		}
+	}
+
+	$: if ($isMenuOpen && !HeaderMenuPanelComponent) {
+		loadMenuPanel();
+	}
 
 	// Modern View Transitions API for page navigation
 	onNavigate((navigation) => {
@@ -64,14 +75,20 @@
 
 		if (typeof window !== 'undefined') {
 			if ('requestIdleCallback' in window) {
-				window.requestIdleCallback(registerServiceWorker, { timeout: 2000 });
+				window.requestIdleCallback(() => {
+					loadMenuPanel();
+					registerServiceWorker();
+				}, { timeout: 2000 });
 			} else {
-				setTimeout(registerServiceWorker, 1000);
+				setTimeout(() => {
+					loadMenuPanel();
+					registerServiceWorker();
+				}, 1000);
 			}
 
 			// Precarica l'immagine 500 (Panda) con bassa priorità quando il browser è completamente inattivo
 			const preloadEasterEggs = () => {
-				fetch(`${base}/eastereggs/500.gif`, { priority: 'low' }).catch(() => {});
+				fetch(`${base}/eastereggs/500.webp`, { priority: 'low' }).catch(() => {});
 			};
 
 			setTimeout(() => {
@@ -81,16 +98,6 @@
 					preloadEasterEggs();
 				}
 			}, 4000);
-		}
-
-		intervalTimer = setInterval(() => {
-			day = getDay();
-		}, 60 * 1000);
-	});
-
-	onDestroy(() => {
-		if (intervalTimer) {
-			clearInterval(intervalTimer);
 		}
 	});
 </script>
@@ -108,7 +115,7 @@
 	<div id="app-splash" role="status" aria-live="polite" aria-label="Aggiornamento dati in corso">
 		<div class="app-splash__card">
 			<div class="app-splash__logo-wrap">
-				<img src="{base}/logo-blue.png?v=20261006-2" alt="Logo WAY Cortese" class="app-splash__logo" width="76" height="76" />
+				<img src="{base}/logo-blue.webp?v=20261009-2" alt="Logo WAY Cortese" class="app-splash__logo" width="76" height="76" />
 			</div>
 			<p class="app-splash__title">WAY Cortese</p>
 			<p class="app-splash__subtitle">Liceo Scientifico N. Cortese</p>
@@ -128,7 +135,9 @@
 	<Footer />
 </div>
 
-<HeaderMenuPanel />
+{#if HeaderMenuPanelComponent}
+	<svelte:component this={HeaderMenuPanelComponent} />
+{/if}
 
 <style>
 	.app {

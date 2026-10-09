@@ -10,33 +10,10 @@ function getValidatedUserEmail() {
   if (!validateEmail(email)) {
     // Se l'email non è valida, pulisci lo store
     userEmail.set(null);
-    localStorage.removeItem('user:email');
+    localStorage.removeItem('userEmail');
     return null;
   }
   return email;
-}
-
-export async function requestNotificationPermission() {
-	if (!('Notification' in window)) {
-		console.log('Le notifiche non sono supportate');
-		return false;
-	}
-
-	if (Notification.permission === 'granted') {
-		notificationPermission.set(true);
-		notificationsEnabled.set(true);
-		return true;
-	}
-
-	if (Notification.permission !== 'denied') {
-		const permission = await Notification.requestPermission();
-		const granted = permission === 'granted';
-		notificationPermission.set(granted);
-		notificationsEnabled.set(granted);
-		return granted;
-	}
-
-	return false;
 }
 
 export async function enableNotifications() {

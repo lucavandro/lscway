@@ -29,10 +29,6 @@ export function getHourNum() {
     return index !== -1 ? index + 1 : 0;
 }
 
-export function getHour(){
-        return getHourNum() > 0 ? hours[getHourNum()-1] : hours[0]
-}
-
 export function getDay() {
     const day = new Date().getDay();
     if (day === 6) return "SAB";
@@ -54,4 +50,28 @@ export function getSchoolHour() {
     const lessonHourList = ["Fuori orario", "I ora", "II ora", "III ora", "IV ora", "V ora", "VI ora", "VII ora"];
     return lessonHourList[hourNum];
 }
+
+import { readable } from "svelte/store";
+
+export const clockStore = readable(
+    {
+        day: getDay(),
+        hourNum: getHourNum(),
+        schoolHour: getSchoolHour(),
+        isChristmas: isChristmasPeriod()
+    },
+    (set) => {
+        if (typeof window === "undefined") return () => {};
+        const update = () => {
+            set({
+                day: getDay(),
+                hourNum: getHourNum(),
+                schoolHour: getSchoolHour(),
+                isChristmas: isChristmasPeriod()
+            });
+        };
+        const timer = setInterval(update, 15000);
+        return () => clearInterval(timer);
+    }
+);
 

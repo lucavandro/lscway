@@ -2,17 +2,31 @@
   export let data = [];
   export let fields;
   export let hourIndex;
-  import { hours, getHourNum } from "$lib/dateutils.js";
-  import { onMount, onDestroy } from "svelte";
+  import { hours, clockStore } from "$lib/dateutils.js";
   import { inclusioneInFondo } from "$lib/utils.js";
   import { base } from "$app/paths";
 
-  let currentHour = getHourNum();
-  let interval;
-
+  $: currentHour = $clockStore.hourNum;
   $: hour = hours[hourIndex];
   $: rowData = data.filter((e) => e.ora == hour).sort(inclusioneInFondo);
   $: isActive = hourIndex === currentHour - 1;
+
+  function isPotEntry(r) {
+    return r?.materia === "POT" || r?.materia === "sub_potenziamento";
+  }
+
+  function isRicEntry(r) {
+    return r?.materia === "RIC" || r?.materia === "sub_ricevimento";
+  }
+
+  $: isTeacherTable = Array.isArray(fields) && fields.includes("classe") && !fields.includes("docente");
+  $: isSpannedSpecialRow =
+    isTeacherTable &&
+    rowData.length > 0 &&
+    rowData.every((r) => isPotEntry(r) || isRicEntry(r));
+  $: specialRowTypes = isSpannedSpecialRow
+    ? Array.from(new Set(rowData.map((r) => (isRicEntry(r) ? "RIC" : "POT"))))
+    : [];
 
   function getFieldEntries(field, rows) {
     if (!rows || rows.length <= 1) return rows;
@@ -27,16 +41,6 @@
     }
     return rows;
   }
-
-  onMount(() => {
-    interval = setInterval(() => {
-      currentHour = getHourNum();
-    }, 1000);
-  });
-
-  onDestroy(() => {
-    if (interval) clearInterval(interval);
-  });
 
   const queryValue = (value) => encodeURIComponent(value ?? "");
 </script>
@@ -59,6 +63,27 @@
         <span class="dash">—</span>
       </td>
     {/each}
+  {:else if isSpannedSpecialRow}
+    <td class="data-cell spanned-cell" colspan={fields.length}>
+      <div class="cell-entries">
+        {#each specialRowTypes as type, index}
+          <div class="entry-item">
+            <span
+              class="subject-tag spanned-tag"
+              class:is-pot={type === "POT"}
+              class:is-ric={type === "RIC"}
+              title={type === "RIC" ? "RICEVIMENTO" : "POTENZIAMENTO"}
+            >
+              {type === "RIC" ? "RICEVIMENTO" : "POTENZIAMENTO"}
+            </span>
+          </div>
+
+          {#if index < specialRowTypes.length - 1}
+            <div class="entry-divider"></div>
+          {/if}
+        {/each}
+      </div>
+    </td>
   {:else}
     {#each fields as field}
       {@const entries = getFieldEntries(field, rowData)}
@@ -156,9 +181,9 @@
     text-align: center;
     border-right: 1px solid var(--brand-border);
     transition: background-color 0.15s ease;
-    width: 52px;
-    min-width: 52px;
-    max-width: 56px;
+    width: calc(52px * var(--table-font-scale, 1));
+    min-width: calc(52px * var(--table-font-scale, 1));
+    max-width: calc(56px * var(--table-font-scale, 1));
     vertical-align: middle;
   }
 
@@ -172,19 +197,19 @@
   }
 
   .hour-number {
-    font-size: 1.075rem;
+    font-size: calc(1.075rem * var(--table-font-scale, 1));
     font-weight: 700;
     color: var(--brand-text);
   }
 
   .hour-time {
-    font-size: 0.775rem;
+    font-size: calc(0.775rem * var(--table-font-scale, 1));
     font-weight: 500;
     color: var(--brand-text-muted);
   }
 
   .now-badge {
-    font-size: 0.675rem;
+    font-size: calc(0.675rem * var(--table-font-scale, 1));
     font-weight: 700;
     text-transform: uppercase;
     background: var(--brand-primary);
@@ -202,6 +227,10 @@
     overflow: hidden;
   }
 
+  .data-cell.spanned-cell {
+    padding: 0.45rem 1.25rem;
+  }
+
   .empty-cell {
     padding: 0.45rem 0.25rem;
     text-align: center;
@@ -211,7 +240,7 @@
   .dash {
     color: var(--brand-text-muted);
     opacity: 0.35;
-    font-size: 0.95rem;
+    font-size: calc(0.95rem * var(--table-font-scale, 1));
   }
 
   .cell-entries {
@@ -244,7 +273,7 @@
     max-width: 100%;
     padding: 0.25rem 0.5rem;
     border-radius: 6px;
-    font-size: 0.925rem;
+    font-size: calc(0.925rem * var(--table-font-scale, 1));
     font-weight: 600;
     text-decoration: none;
     transition: transform 0.12s ease, background 0.12s ease;
@@ -283,7 +312,7 @@
     max-width: 100%;
     padding: 0.2rem 0.45rem;
     border-radius: 5px;
-    font-size: 0.875rem;
+    font-size: calc(0.875rem * var(--table-font-scale, 1));
     font-weight: 700;
     letter-spacing: 0.02em;
     background: var(--brand-surface-subtle);
@@ -293,6 +322,18 @@
     overflow: hidden;
     text-overflow: ellipsis;
     line-height: 1.25;
+    box-sizing: border-box;
+  }
+
+  .subject-tag.spanned-tag {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: 0.28rem 0.85rem;
+    border-radius: 6px;
+    letter-spacing: 0.05em;
+    text-align: center;
   }
 
   .subject-tag.is-pot {
@@ -339,12 +380,16 @@
 
   .badge-chip {
     display: inline-block;
+    max-width: 100%;
     padding: 0.22rem 0.5rem;
     border-radius: 6px;
-    font-size: 0.875rem;
+    font-size: calc(0.875rem * var(--table-font-scale, 1));
     font-weight: 700;
     line-height: 1.25;
     white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    box-sizing: border-box;
   }
 
   .badge-chip.badge-ric {
@@ -374,7 +419,7 @@
   }
 
   .cell-text {
-    font-size: 0.925rem;
+    font-size: calc(0.925rem * var(--table-font-scale, 1));
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -382,26 +427,30 @@
 
   @media (max-width: 400px) {
     .hour-cell {
-      width: 48px;
-      min-width: 48px;
+      width: calc(48px * var(--table-font-scale, 1));
+      min-width: calc(48px * var(--table-font-scale, 1));
+      max-width: calc(52px * var(--table-font-scale, 1));
       padding: 0.4rem 0.15rem;
     }
     .hour-number {
-      font-size: 1rem;
+      font-size: calc(1rem * var(--table-font-scale, 1));
     }
     .hour-time {
-      font-size: 0.725rem;
+      font-size: calc(0.725rem * var(--table-font-scale, 1));
     }
     .data-cell {
       padding: 0.38rem 0.15rem;
     }
+    .data-cell.spanned-cell {
+      padding: 0.38rem 0.9rem;
+    }
     .link-chip {
       padding: 0.22rem 0.38rem;
-      font-size: 0.875rem;
+      font-size: calc(0.875rem * var(--table-font-scale, 1));
     }
     .subject-tag {
       padding: 0.18rem 0.35rem;
-      font-size: 0.825rem;
+      font-size: calc(0.825rem * var(--table-font-scale, 1));
     }
   }
 </style>

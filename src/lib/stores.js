@@ -61,5 +61,49 @@ if (typeof window !== 'undefined') {
     });
 }
 
+export const TABLE_FONT_SCALE_MIN = 0.7;
+export const TABLE_FONT_SCALE_MAX = 1.4;
+export const TABLE_FONT_SCALE_STEP = 0.1;
+export const TABLE_FONT_SCALE_DEFAULT = 1;
 
+function normalizeFontScale(value) {
+    const parsed = Number(value);
+    if (!Number.isFinite(parsed)) return TABLE_FONT_SCALE_DEFAULT;
+    const clamped = Math.min(TABLE_FONT_SCALE_MAX, Math.max(TABLE_FONT_SCALE_MIN, parsed));
+    return Math.round(clamped * 100) / 100;
+}
 
+const getInitialTableFontScale = () => {
+    if (typeof window === 'undefined') {
+        return TABLE_FONT_SCALE_DEFAULT;
+    }
+    const saved = window.localStorage.getItem('table_font_scale');
+    if (saved !== null) {
+        return normalizeFontScale(saved);
+    }
+    return TABLE_FONT_SCALE_DEFAULT;
+};
+
+export const tableFontScale = writable(getInitialTableFontScale());
+
+if (typeof window !== 'undefined') {
+    tableFontScale.subscribe((value) => {
+        const normalized = normalizeFontScale(value);
+        window.localStorage.setItem('table_font_scale', String(normalized));
+        if (typeof document !== 'undefined') {
+            document.documentElement.style.setProperty('--table-font-scale', String(normalized));
+        }
+    });
+}
+
+export function increaseTableFontScale() {
+    tableFontScale.update((current) => normalizeFontScale(current + TABLE_FONT_SCALE_STEP));
+}
+
+export function decreaseTableFontScale() {
+    tableFontScale.update((current) => normalizeFontScale(current - TABLE_FONT_SCALE_STEP));
+}
+
+export function resetTableFontScale() {
+    tableFontScale.set(TABLE_FONT_SCALE_DEFAULT);
+}

@@ -900,9 +900,5 @@
       padding: 0.45rem 2.25rem 0.45rem 0.75rem;
       border-radius: 10px;
     }
-
-    .select-label {
-      font-size: 0.725rem;
-    }
   }
 </style>

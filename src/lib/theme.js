@@ -13,11 +13,6 @@ export const themePreference = writable('system');
 let initialized = false;
 let mediaQueryList = null;
 
-function getSystemTheme() {
-  if (typeof window === 'undefined') return 'light';
-  return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
-}
-
 function applyThemeToDOM(effectiveTheme) {
   if (typeof document === 'undefined') return;
 
@@ -27,13 +22,6 @@ function applyThemeToDOM(effectiveTheme) {
   const colorSchemeMeta = document.querySelector('meta[name="color-scheme"]');
   if (colorSchemeMeta) {
     colorSchemeMeta.content = effectiveTheme;
-  }
-
-  // Update theme-color meta tags
-  const themeColorLight = document.querySelector('meta[name="theme-color"][media*="light"]');
-  const themeColorDark = document.querySelector('meta[name="theme-color"][media*="dark"]');
-  if (themeColorLight && themeColorDark) {
-    // Both exist, but if user manually selected theme, sync them or let browser match
   }
 }
 
@@ -92,24 +80,4 @@ export function toggleTheme() {
   themePreference.set(next);
   theme.set(next);
   applyThemeToDOM(next);
-}
-
-/**
- * Sets explicit preference ('light', 'dark', or 'system').
- */
-export function setTheme(pref) {
-  if (typeof window === 'undefined') return;
-
-  if (pref === 'system') {
-    localStorage.removeItem('theme');
-    themePreference.set('system');
-    const systemTheme = getSystemTheme();
-    theme.set(systemTheme);
-    applyThemeToDOM(systemTheme);
-  } else if (pref === 'light' || pref === 'dark') {
-    localStorage.setItem('theme', pref);
-    themePreference.set(pref);
-    theme.set(pref);
-    applyThemeToDOM(pref);
-  }
 }

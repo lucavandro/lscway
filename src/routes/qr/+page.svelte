@@ -64,7 +64,7 @@
     </div>
 
     <div class="qr-image-frame">
-      <img src="{base}/qr.png" alt="QR Code WAY Cortese" class="qr-image" />
+      <img src="{base}/qr.webp" alt="QR Code WAY Cortese" class="qr-image" width="200" height="200" />
     </div>
 
     <div class="actions-group">

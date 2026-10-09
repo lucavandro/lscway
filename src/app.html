@@ -6,16 +6,22 @@
 	<meta name="color-scheme" content="light dark" />
 	<meta name="viewport" content="width=device-width,initial-scale=1,minimum-scale=1,maximum-scale=1,user-scalable=no,interactive-widget=resizes-content">
 	<link rel="preconnect" href="https://www.liceoscientificocortese.edu.it" crossorigin />
-	<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
 	<script>
 		(function() {
-			var APP_VERSION = '2026-10-09-1';
+			var APP_VERSION = '2026-10-09-2';
 			try {
 				var saved = localStorage.getItem('theme');
 				var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
 				var theme = saved === 'dark' || saved === 'light' ? saved : (prefersDark ? 'dark' : 'light');
 				document.documentElement.setAttribute('data-theme', theme);
 				document.documentElement.style.colorScheme = theme;
+			} catch (e) {}
+
+			try {
+				var savedScale = parseFloat(localStorage.getItem('table_font_scale'));
+				if (!isNaN(savedScale) && savedScale >= 0.7 && savedScale <= 1.4) {
+					document.documentElement.style.setProperty('--table-font-scale', String(savedScale));
+				}
 			} catch (e) {}
 
 			var hasCachedOrario = false;
@@ -64,8 +70,8 @@
 	</script>
 	<link rel="icon" href="%sveltekit.assets%/favicon.png?v=20261006-12" />
 	<link rel="apple-touch-icon" href="%sveltekit.assets%/icon-192.png?v=20261006-12" />
-	<link rel="manifest" href="%sveltekit.assets%/manifest.json?v=20261006-12" />
-	<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.min.css" />
+	<link rel="manifest" href="%sveltekit.assets%/manifest.json?v=20261009-2" />
+	<link rel="stylesheet" href="%sveltekit.assets%/pico.min.css?v=20261009-2" />
 	<link rel="stylesheet" href="%sveltekit.assets%/app.css?v=20261006-12" />
 	<meta name="mobile-web-app-capable" content="yes">
 	<meta name="apple-mobile-web-app-capable" content="yes">
@@ -176,7 +182,7 @@
 	<div id="app-splash" role="status" aria-live="polite" aria-label="Caricamento applicazione">
 		<div class="app-splash__card">
 			<div class="app-splash__logo-wrap">
-				<img src="%sveltekit.assets%/logo-blue.png?v=20261006-2" alt="Logo WAY Cortese" class="app-splash__logo" width="76" height="76" fetchpriority="high" />
+				<img src="%sveltekit.assets%/logo-blue.webp?v=20261009-2" alt="Logo WAY Cortese" class="app-splash__logo" width="76" height="76" fetchpriority="high" />
 			</div>
 			<p class="app-splash__title">WAY Cortese</p>
 			<p class="app-splash__subtitle">Liceo Scientifico N. Cortese</p>
