@@ -1,14 +1,16 @@
 <script>
-  import { getRandomQuote } from "$lib/quotes.js";
+  import { getRandomQuote, getRandomOtherCategories } from "$lib/quotes.js";
 
   let currentQuote = getRandomQuote();
+  let otherCategories = getRandomOtherCategories(currentQuote?.category, 2);
   let isAnimating = false;
 
   $: isCuriosity = currentQuote?.type === "curiosity";
 
-  function nextQuote() {
+  function selectCategory(category) {
     isAnimating = true;
-    currentQuote = getRandomQuote(currentQuote);
+    currentQuote = getRandomQuote(currentQuote, category);
+    otherCategories = getRandomOtherCategories(currentQuote?.category, 2);
     setTimeout(() => {
       isAnimating = false;
     }, 200);
@@ -39,28 +41,42 @@
           — {currentQuote.author}{#if currentQuote.role}<span class="easteregg-quote__role">, {currentQuote.role}</span>{/if}
         {/if}
       </cite>
-      <button
-        type="button"
-        class="easteregg-quote__refresh"
-        on:click={nextQuote}
-        aria-label="Mostra un'altra citazione o curiosità"
-        title="Mostra un'altra citazione o curiosità"
-      >
-        <svg
-          width="15"
-          height="15"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="currentColor"
-          stroke-width="2"
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          aria-hidden="true"
+      <div class="easteregg-quote__actions" role="group" aria-label="Cambia citazione o categoria">
+        <button
+          type="button"
+          class="easteregg-quote__btn easteregg-quote__refresh"
+          on:click={() => selectCategory(currentQuote.category)}
+          aria-label="Altra voce della categoria {currentQuote.category}"
+          title="Mostra un'altra voce della categoria {currentQuote.category}"
         >
-          <polyline points="23 4 23 10 17 10"></polyline>
-          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
-        </svg>
-      </button>
+          <svg
+            width="13"
+            height="13"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            aria-hidden="true"
+          >
+            <polyline points="23 4 23 10 17 10"></polyline>
+            <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"></path>
+          </svg>
+          <span>{currentQuote.category}</span>
+        </button>
+        {#each otherCategories as cat (cat)}
+          <button
+            type="button"
+            class="easteregg-quote__btn easteregg-quote__category-btn"
+            on:click={() => selectCategory(cat)}
+            aria-label="Passa alla categoria {cat}"
+            title="Mostra una voce della categoria {cat}"
+          >
+            <span>{cat}</span>
+          </button>
+        {/each}
+      </div>
     </figcaption>
   </figure>
 {/if}
@@ -114,7 +130,7 @@
     flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.45rem;
+    gap: 0.55rem;
     width: 100%;
   }
 
@@ -131,36 +147,63 @@
     color: var(--brand-text-muted);
   }
 
-  .easteregg-quote__refresh {
+  .easteregg-quote__actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: center;
+    gap: 0.4rem;
+    width: 100%;
+  }
+
+  .easteregg-quote__btn {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 28px;
-    height: 28px;
+    gap: 0.32rem;
+    padding: 0.3rem 0.68rem;
     border-radius: 9999px;
-    color: var(--brand-text-muted);
-    background: transparent;
-    border: 1px solid transparent;
+    font-family: inherit;
+    font-size: 0.74rem;
+    font-weight: 600;
+    line-height: 1.2;
     cursor: pointer;
     transition: color 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
   }
 
-  .easteregg-quote__refresh:hover {
+  .easteregg-quote__refresh {
     color: var(--brand-primary);
     background: var(--brand-surface-card);
-    border-color: var(--brand-border);
+    border: 1px solid var(--brand-border);
   }
 
-  .easteregg-quote__refresh:active {
-    transform: rotate(45deg) scale(0.95);
+  .easteregg-quote__category-btn {
+    color: var(--brand-text-muted);
+    background: transparent;
+    border: 1px solid var(--brand-border);
+  }
+
+  .easteregg-quote__btn:hover {
+    color: var(--brand-primary);
+    background: var(--brand-surface-card);
+    border-color: var(--brand-primary);
+  }
+
+  .easteregg-quote__btn:active {
+    transform: scale(0.96);
+  }
+
+  .easteregg-quote__refresh:active svg {
+    transform: rotate(45deg);
   }
 
   @media (prefers-reduced-motion: reduce) {
     .easteregg-quote__text,
-    .easteregg-quote__refresh {
+    .easteregg-quote__btn {
       transition: none;
     }
-    .easteregg-quote__refresh:active {
+    .easteregg-quote__btn:active,
+    .easteregg-quote__refresh:active svg {
       transform: none;
     }
   }
@@ -182,5 +225,11 @@
     .easteregg-quote__author {
       font-size: 0.78rem;
     }
+
+    .easteregg-quote__btn {
+      font-size: 0.7rem;
+      padding: 0.26rem 0.58rem;
+    }
   }
 </style>
+

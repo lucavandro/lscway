@@ -32,11 +32,34 @@ test.describe('Error Pages & Offline', () => {
     expect(firstText?.trim().length).toBeGreaterThan(5);
 
     const refreshBtn = page.locator('.easteregg-quote__refresh');
+    const altBtns = page.locator('.easteregg-quote__category-btn');
     await expect(refreshBtn).toBeVisible();
-    await refreshBtn.click();
+    await expect(altBtns).toHaveCount(2);
 
+    const currentCatLabel = (await refreshBtn.textContent())?.trim();
+    const alt1Label = (await altBtns.nth(0).textContent())?.trim();
+    const alt2Label = (await altBtns.nth(1).textContent())?.trim();
+
+    expect(currentCatLabel).toBeTruthy();
+    expect(alt1Label).toBeTruthy();
+    expect(alt2Label).toBeTruthy();
+    expect(new Set([currentCatLabel, alt1Label, alt2Label]).size).toBe(3);
+
+    // Click fixed button: stays in the same category, extracts another quote
+    await refreshBtn.click();
     const secondText = await quoteText.textContent();
     expect(secondText?.trim().length).toBeGreaterThan(5);
     expect(secondText).not.toBe(firstText);
+    await expect(refreshBtn).toHaveText(currentCatLabel);
+
+    // Click one of the two random category buttons: switches current category to that choice
+    const targetCategory = (await altBtns.nth(0).textContent())?.trim();
+    await altBtns.nth(0).click();
+    await expect(refreshBtn).toHaveText(targetCategory);
+
+    const newAlt1 = (await altBtns.nth(0).textContent())?.trim();
+    const newAlt2 = (await altBtns.nth(1).textContent())?.trim();
+    expect(new Set([targetCategory, newAlt1, newAlt2]).size).toBe(3);
   });
 });
+

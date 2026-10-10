@@ -312,101 +312,121 @@ export const quotes = [
 
   // --- Citazioni e Aforismi sul Riposo, la Pausa e l'Otium Creativo ---
   {
+    category: "Riposo e Tempo Libero",
     text: "Anche un campo che ha riposato offre un raccolto più generoso.",
     author: "Ovidio",
     role: "poeta romano"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "L'arco non può restare sempre teso: anche la mente ha bisogno di una pausa per ritrovare il suo vigore.",
     author: "Fedro",
     role: "favolista antico"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "Il riposo appartiene al lavoro come le palpebre agli occhi.",
     author: "Rabindranath Tagore",
     role: "poeta e filosofo indiano"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "Ogni tanto staccati dal tuo lavoro e rilassati un poco: quando vi tornerai, il tuo giudizio sarà più sicuro, perché chi sta sempre sull'opera perde la capacità di vederne l'insieme.",
     author: "Leonardo da Vinci",
     role: "scienziato, inventore e artista"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "Il riposo non è ozio, e stendersi talvolta sull'erba sotto gli alberi in un giorno di sole, ascoltando il mormorio dell'acqua o guardando le nuvole nel cielo, non è affatto tempo perduto.",
     author: "John Lubbock",
     role: "naturalista, archeologo e saggista"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "Bisogna concedere qualche tregua alla mente: riposata, risorgerà migliore e più pronta.",
     author: "Lucio Anneo Seneca",
     role: "filosofo e drammaturgo romano"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "Quasi tutte le cose tornano a funzionare di nuovo se le stacchi dalla corrente per qualche minuto, incluso te stesso.",
     author: "Anne Lamott",
     role: "scrittrice"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "Saper usare bene il tempo libero è il grado più alto della civiltà e dell'intelligenza.",
     author: "Bertrand Russell",
     role: "filosofo, logico e matematico"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "Il riposo è il condimento che rende dolce la fatica.",
     author: "Plutarco",
     role: "filosofo e biografo greco"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "Nella quiete e nel silenzio del riposo maturano le intuizioni più luminose della mente.",
     author: "Michel de Montaigne",
     role: "filosofo e saggista"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "Ciò che non ha riposo non è mai duraturo: la pausa rigenera le forze e nutre lo spirito.",
     author: "Ovidio",
     role: "poeta romano"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "L'ozio creativo è quell'armonia in cui studio, gioco e riposo si fondono generando nuove idee.",
     author: "Domenico De Masi",
     role: "sociologo"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "Come nella musica le pause contano quanto le note, così nella vita il riposo dà ritmo e valore all'impegno.",
     author: "Stefan Zweig",
     role: "scrittore e drammaturgo"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "Un uomo libero si riconosce anche dalla nobiltà con cui sa abitare il proprio tempo di riposo.",
     author: "Marco Tullio Cicerone",
     role: "oratore, filosofo e politico romano"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "L'acqua ferma è come uno specchio perfetto: solo nella quiete della mente si riflettono con chiarezza il cielo e la terra.",
     author: "Zhuangzi",
     role: "filosofo cinese"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "Chi sa fermarsi al momento giusto non si esaurisce mai: dalla quiete nasce ogni movimento armonioso.",
     author: "Lao Tzu",
     role: "filosofo cinese"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "La saggezza della vita consiste nell'eliminare ciò che non è essenziale e nel saper gustare la pace di un pomeriggio libero.",
     author: "Lin Yutang",
     role: "scrittore e filosofo cinese"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "È proprio lo spazio vuoto tra un impegno e l'altro a dare respiro, equilibrio e bellezza alle nostre giornate.",
     author: "Yoshida Kenkō",
     role: "scrittore e filosofo giapponese"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "Sorridi, respira e vai piano: fermarsi a riposare non è perdere tempo, ma ritrovare chiarezza e presenza.",
     author: "Thích Nhất Hạnh",
     role: "monaco e poeta vietnamita"
   },
   {
+    category: "Riposo e Tempo Libero",
     text: "Quando cammini, cammina; quando studi, studia; quando ti riposi, riposati senza lasciare che la mente corra altrove.",
     author: "Proverbio Zen",
     role: "tradizione filosofica orientale"
@@ -683,46 +703,93 @@ export const quotes = [
   }
 ];
 
+/**
+ * Elenco delle categorie tematiche disponibili per citazioni, aforismi e curiosità.
+ */
+export const QUOTE_CATEGORIES = [
+  "Sapere e Cultura",
+  "Riposo e Tempo Libero",
+  "Nino Cortese",
+  "Storia di Maddaloni",
+  "Storia della Scienza",
+  "Storia dell'Informatica",
+  "Storia della Matematica"
+];
+
+// Normalizza il campo `category` su ogni elemento della collezione
+for (const item of quotes) {
+  if (!item.category) {
+    item.category = item.type === "curiosity" ? item.author : "Sapere e Cultura";
+  }
+}
+
 let lastQuoteIndex = -1;
 
 /**
- * Restituisce una citazione o curiosità casuale dalla collezione predefinita,
- * evitando di ripetere consecutivamente l'ultimo elemento estratto.
+ * Restituisce una citazione o curiosità casuale dalla collezione predefinita
+ * (opzionalmente filtrata per categoria), evitando di ripetere consecutivamente
+ * l'ultimo elemento estratto.
  *
- * @param {{ text: string, author: string, type?: string } | null} [previousQuote=null] Elemento precedente da escludere
- * @returns {{ text: string, author: string, type?: string }}
+ * @param {{ text: string, author: string, category?: string, type?: string } | null} [previousQuote=null] Elemento precedente da escludere
+ * @param {string | null} [category=null] Categoria specifica da cui estrarre l'elemento
+ * @returns {{ text: string, author: string, role?: string, category: string, type?: string }}
  */
-export function getRandomQuote(previousQuote = null) {
+export function getRandomQuote(previousQuote = null, category = null) {
   if (quotes.length === 0) {
-    return { text: "", author: "" };
-  }
-  if (quotes.length === 1) {
-    lastQuoteIndex = 0;
-    return quotes[0];
+    return { text: "", author: "", category: "" };
   }
 
-  let candidateIndex = Math.floor(Math.random() * quotes.length);
+  const filteredPool = category
+    ? quotes.filter((q) => q.category === category)
+    : quotes;
+  const pool = filteredPool.length > 0 ? filteredPool : quotes;
+
+  if (pool.length === 1) {
+    lastQuoteIndex = quotes.indexOf(pool[0]);
+    return pool[0];
+  }
+
+  let candidateIndex = Math.floor(Math.random() * pool.length);
   let attempts = 0;
 
   while (
     attempts < 10 &&
-    (candidateIndex === lastQuoteIndex ||
-      (previousQuote && quotes[candidateIndex].text === previousQuote.text))
+    ((previousQuote && pool[candidateIndex].text === previousQuote.text) ||
+      (!previousQuote && quotes.indexOf(pool[candidateIndex]) === lastQuoteIndex))
   ) {
-    candidateIndex = Math.floor(Math.random() * quotes.length);
+    candidateIndex = Math.floor(Math.random() * pool.length);
     attempts++;
   }
 
   if (
-    candidateIndex === lastQuoteIndex ||
-    (previousQuote && quotes[candidateIndex].text === previousQuote.text)
+    (previousQuote && pool[candidateIndex].text === previousQuote.text) ||
+    (!previousQuote && quotes.indexOf(pool[candidateIndex]) === lastQuoteIndex)
   ) {
     const prevIdx = previousQuote
-      ? quotes.findIndex((q) => q.text === previousQuote.text)
-      : lastQuoteIndex;
-    candidateIndex = (Math.max(0, prevIdx) + 1) % quotes.length;
+      ? pool.findIndex((q) => q.text === previousQuote.text)
+      : pool.findIndex((q) => quotes.indexOf(q) === lastQuoteIndex);
+    candidateIndex = (Math.max(0, prevIdx) + 1) % pool.length;
   }
 
-  lastQuoteIndex = candidateIndex;
-  return quotes[candidateIndex];
+  const selected = pool[candidateIndex];
+  lastQuoteIndex = quotes.indexOf(selected);
+  return selected;
 }
+
+/**
+ * Restituisce `count` categorie scelte casualmente, distinte tra loro e diverse da `currentCategory`.
+ *
+ * @param {string} currentCategory Categoria attualmente attiva da escludere
+ * @param {number} [count=2] Numero di categorie alternative da restituire
+ * @returns {string[]}
+ */
+export function getRandomOtherCategories(currentCategory, count = 2) {
+  const available = QUOTE_CATEGORIES.filter((cat) => cat !== currentCategory);
+  const shuffled = [...available];
+  for (let i = shuffled.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [shuffled[i], shuffled[j]] = [shuffled[j], shuffled[i]];
+  }
+  return shuffled.slice(0, count);
+}
+
