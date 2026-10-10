@@ -22,7 +22,11 @@
     </blockquote>
     <figcaption class="easteregg-quote__footer">
       <cite class="easteregg-quote__author">
-        {isCuriosity ? currentQuote.author : `— ${currentQuote.author}`}
+        {#if isCuriosity}
+          {currentQuote.author}
+        {:else}
+          — {currentQuote.author}{#if currentQuote.role}<span class="easteregg-quote__role">, {currentQuote.role}</span>{/if}
+        {/if}
       </cite>
     </figcaption>
   </figure>
@@ -78,6 +82,11 @@
     font-weight: 600;
     letter-spacing: 0.02em;
     color: var(--brand-primary);
+  }
+
+  .easteregg-quote__role {
+    font-weight: 500;
+    color: var(--brand-text-muted);
   }
 
   @media (max-width: 400px) {

@@ -11,217 +11,270 @@ export const quotes = [
   // --- Citazioni su Scienza, Filosofia, Cultura e Studio ---
   {
     text: "La mente non è un vaso da riempire, ma un fuoco da accendere.",
-    author: "Plutarco"
+    author: "Plutarco",
+    role: "filosofo e biografo greco"
   },
   {
     text: "Niente nella vita va temuto, dev'essere solamente compreso. Ora è tempo di comprendere di più, così possiamo temere di meno.",
-    author: "Marie Curie"
+    author: "Marie Curie",
+    role: "fisica e chimica"
   },
   {
     text: "L'importante è non smettere mai di fare domande. La curiosità ha il suo motivo di esistere.",
-    author: "Albert Einstein"
+    author: "Albert Einstein",
+    role: "fisico"
   },
   {
     text: "La scienza è un modo di pensare molto più che un insieme di conoscenze.",
-    author: "Carl Sagan"
+    author: "Carl Sagan",
+    role: "astronomo e divulgatore scientifico"
   },
   {
     text: "Non aver paura delle difficoltà che incontri: ricorda che l'aquilone si alza con il vento contrario, mai con quello a favore.",
-    author: "Rita Levi-Montalcini"
+    author: "Rita Levi-Montalcini",
+    role: "neurologa e senatrice a vita"
   },
   {
     text: "Considerate la vostra semenza: fatti non foste a viver come bruti, ma per seguir virtute e canoscenza.",
-    author: "Dante Alighieri"
+    author: "Dante Alighieri",
+    role: "poeta e scrittore"
   },
   {
     text: "L'istruzione è l'arma più potente che puoi utilizzare per cambiare il mondo.",
-    author: "Nelson Mandela"
+    author: "Nelson Mandela",
+    role: "statista e Premio Nobel per la pace"
   },
   {
     text: "Un bambino, un insegnante, un libro e una penna possono cambiare il mondo.",
-    author: "Malala Yousafzai"
+    author: "Malala Yousafzai",
+    role: "attivista e Premio Nobel per la pace"
   },
   {
     text: "La filosofia è scritta in questo grandissimo libro che continuamente ci sta aperto innanzi a gli occhi (io dico l'universo), ma non si può intendere se prima non s'impara a intender la lingua, e conoscer i caratteri, ne' quali è scritto. Egli è scritto in lingua matematica.",
-    author: "Galileo Galilei"
+    author: "Galileo Galilei",
+    role: "fisico, astronomo e matematico"
   },
   {
     text: "Sapere di non sapere è il principio di ogni vera saggezza.",
-    author: "Socrate"
+    author: "Socrate",
+    role: "filosofo greco"
   },
   {
     text: "Non per la scuola, ma per la vita impariamo.",
-    author: "Lucio Anneo Seneca"
+    author: "Lucio Anneo Seneca",
+    role: "filosofo e drammaturgo romano"
   },
   {
     text: "Non esiste vento favorevole per il marinaio che non sa dove andare.",
-    author: "Lucio Anneo Seneca"
+    author: "Lucio Anneo Seneca",
+    role: "filosofo e drammaturgo romano"
   },
   {
     text: "Se ho visto più lontano, è perché stavo sulle spalle di giganti.",
-    author: "Isaac Newton"
+    author: "Isaac Newton",
+    role: "fisico e matematico"
   },
   {
     text: "Prendete la vita con leggerezza, che leggerezza non è superficialità, ma planare sulle cose dall'alto, non avere macigni sul cuore.",
-    author: "Italo Calvino"
+    author: "Italo Calvino",
+    role: "scrittore"
   },
   {
     text: "Chi legge avrà vissuto cinquemila anni: c'era quando Caino uccise Abele, quando Renzo sposò Lucia e quando Leopardi ammirava l'infinito.",
-    author: "Umberto Eco"
+    author: "Umberto Eco",
+    role: "semiologo, filosofo e scrittore"
   },
   {
     text: "Cerca di imparare qualcosa su tutto e tutto su qualcosa.",
-    author: "Thomas Henry Huxley"
+    author: "Thomas Henry Huxley",
+    role: "biologo e filosofo"
   },
   {
     text: "Il dubbio non è una condizione piacevole, ma la certezza è assurda.",
-    author: "Voltaire"
+    author: "Voltaire",
+    role: "filosofo e scrittore"
   },
   {
     text: "Nessuna grande scoperta è mai stata fatta senza un'audace congettura.",
-    author: "Isaac Newton"
+    author: "Isaac Newton",
+    role: "fisico e matematico"
   },
   {
     text: "Il primo principio è che non devi ingannare te stesso, e tu sei la persona più facile da ingannare.",
-    author: "Richard Feynman"
+    author: "Richard Feynman",
+    role: "fisico"
   },
   {
     text: "La creatività non è altro che un'intelligenza che si diverte.",
-    author: "Albert Einstein"
+    author: "Albert Einstein",
+    role: "fisico"
   },
   {
     text: "Siamo fatti della stessa sostanza delle stelle: gli atomi del nostro corpo sono stati forgiati nel cuore degli astri.",
-    author: "Margherita Hack"
+    author: "Margherita Hack",
+    role: "astrofisica e divulgatrice scientifica"
   },
   {
     text: "Il futuro appartiene a coloro che credono nella bellezza dei propri sogni.",
-    author: "Eleanor Roosevelt"
+    author: "Eleanor Roosevelt",
+    role: "diplomatica e attivista"
   },
   {
     text: "Le radici dell'educazione sono amare, ma il frutto è dolcissimo.",
-    author: "Aristotele"
+    author: "Aristotele",
+    role: "filosofo e scienziato greco"
   },
   {
     text: "Siamo ciò che facciamo ripetutamente. L'eccellenza, quindi, non è un atto, ma un'abitudine.",
-    author: "Aristotele"
+    author: "Aristotele",
+    role: "filosofo e scienziato greco"
   },
   {
     text: "La fortuna aiuta le menti preparate.",
-    author: "Louis Pasteur"
+    author: "Louis Pasteur",
+    role: "chimico e microbiologo"
   },
   {
     text: "Comprendere la storia significa illuminare il cammino del presente con la consapevolezza di ciò che siamo stati.",
-    author: "Nino Cortese"
+    author: "Nino Cortese",
+    role: "storico e accademico"
   },
   {
     text: "Guarda le stelle e non i tuoi piedi. Cerca di dare un senso a ciò che vedi e chiediti cosa fa esistere l'universo.",
-    author: "Stephen Hawking"
+    author: "Stephen Hawking",
+    role: "astrofisico e cosmologo"
   },
   {
     text: "Studiare senza riflettere è vano; riflettere senza studiare è pericoloso.",
-    author: "Confucio"
+    author: "Confucio",
+    role: "filosofo cinese"
   },
   {
     text: "Sbagliando s'impara è un vecchio proverbio. Il nuovo potrebbe essere che sbagliando s'inventa.",
-    author: "Gianni Rodari"
+    author: "Gianni Rodari",
+    role: "scrittore e pedagogista"
   },
   {
     text: "Aiutami a fare da solo: questo è il segreto di ogni autentico apprendimento.",
-    author: "Maria Montessori"
+    author: "Maria Montessori",
+    role: "pedagogista, filosofa e medico"
   },
   {
     text: "La cultura è l'unico bene dell'umanità che, diviso fra tutti, anziché diminuire diventa più grande.",
-    author: "Hans-Georg Gadamer"
+    author: "Hans-Georg Gadamer",
+    role: "filosofo"
   },
   {
     text: "Amati il vero, il bello e il giusto: non vi è ricchezza più salda di una mente libera.",
-    author: "Marco Tullio Cicerone"
+    author: "Marco Tullio Cicerone",
+    role: "oratore, filosofo e politico romano"
   },
   {
     text: "L'acquisizione di qualsiasi conoscenza è sempre utile all'intelletto, perché potrà scacciare da sé le cose inutili e conservare le buone.",
-    author: "Leonardo da Vinci"
+    author: "Leonardo da Vinci",
+    role: "scienziato, inventore e artista"
   },
   {
     text: "Datemi un punto d'appoggio e vi solleverò il mondo.",
-    author: "Archimede"
+    author: "Archimede",
+    role: "matematico, fisico e inventore"
   },
   {
     text: "La felicità della tua vita dipende dalla qualità dei tuoi pensieri.",
-    author: "Marco Aurelio"
+    author: "Marco Aurelio",
+    role: "imperatore e filosofo romano"
   },
   {
     text: "Sapere aude! Abbi il coraggio di servirti della tua propria intelligenza.",
-    author: "Immanuel Kant"
+    author: "Immanuel Kant",
+    role: "filosofo"
   },
   {
     text: "Diffidate di chi vi offre soluzioni semplici per problemi complessi: studiare richiede fatica, ma regala libertà.",
-    author: "Piero Angela"
+    author: "Piero Angela",
+    role: "giornalista e divulgatore scientifico"
   },
   {
     text: "Amare il proprio lavoro e lo studio è la forma più concreta di felicità sulla terra.",
-    author: "Primo Levi"
+    author: "Primo Levi",
+    role: "scrittore e chimico"
   },
   {
     text: "La ricerca scientifica insegna il rispetto dei fatti, l'umiltà davanti all'ignoto e la bellezza della collaborazione.",
-    author: "Fabiola Gianotti"
+    author: "Fabiola Gianotti",
+    role: "fisica"
   },
 
   // --- Citazioni e Aforismi sul Riposo, la Pausa e l'Otium Creativo ---
   {
     text: "Anche un campo che ha riposato offre un raccolto più generoso.",
-    author: "Ovidio"
+    author: "Ovidio",
+    role: "poeta romano"
   },
   {
     text: "L'arco non può restare sempre teso: anche la mente ha bisogno di una pausa per ritrovare il suo vigore.",
-    author: "Fedro"
+    author: "Fedro",
+    role: "favolista antico"
   },
   {
     text: "Il riposo appartiene al lavoro come le palpebre agli occhi.",
-    author: "Rabindranath Tagore"
+    author: "Rabindranath Tagore",
+    role: "poeta e filosofo"
   },
   {
     text: "Ogni tanto staccati dal tuo lavoro e rilassati un poco: quando vi tornerai, il tuo giudizio sarà più sicuro, perché chi sta sempre sull'opera perde la capacità di vederne l'insieme.",
-    author: "Leonardo da Vinci"
+    author: "Leonardo da Vinci",
+    role: "scienziato, inventore e artista"
   },
   {
     text: "Il riposo non è ozio, e stendersi talvolta sull'erba sotto gli alberi in un giorno di sole, ascoltando il mormorio dell'acqua o guardando le nuvole nel cielo, non è affatto tempo perduto.",
-    author: "John Lubbock"
+    author: "John Lubbock",
+    role: "naturalista, archeologo e saggista"
   },
   {
     text: "Bisogna concedere qualche tregua alla mente: riposata, risorgerà migliore e più pronta.",
-    author: "Lucio Anneo Seneca"
+    author: "Lucio Anneo Seneca",
+    role: "filosofo e drammaturgo romano"
   },
   {
     text: "Quasi tutte le cose tornano a funzionare di nuovo se le stacchi dalla corrente per qualche minuto, incluso te stesso.",
-    author: "Anne Lamott"
+    author: "Anne Lamott",
+    role: "scrittrice"
   },
   {
     text: "Saper usare bene il tempo libero è il grado più alto della civiltà e dell'intelligenza.",
-    author: "Bertrand Russell"
+    author: "Bertrand Russell",
+    role: "filosofo, logico e matematico"
   },
   {
     text: "Il riposo è il condimento che rende dolce la fatica.",
-    author: "Plutarco"
+    author: "Plutarco",
+    role: "filosofo e biografo greco"
   },
   {
     text: "Nella quiete e nel silenzio del riposo maturano le intuizioni più luminose della mente.",
-    author: "Michel de Montaigne"
+    author: "Michel de Montaigne",
+    role: "filosofo e saggista"
   },
   {
     text: "Ciò che non ha riposo non è mai duraturo: la pausa rigenera le forze e nutre lo spirito.",
-    author: "Ovidio"
+    author: "Ovidio",
+    role: "poeta romano"
   },
   {
     text: "L'ozio creativo è quell'armonia in cui studio, gioco e riposo si fondono generando nuove idee.",
-    author: "Domenico De Masi"
+    author: "Domenico De Masi",
+    role: "sociologo"
   },
   {
     text: "Come nella musica le pause contano quanto le note, così nella vita il riposo dà ritmo e valore all'impegno.",
-    author: "Stefan Zweig"
+    author: "Stefan Zweig",
+    role: "scrittore e drammaturgo"
   },
   {
     text: "Un uomo libero si riconosce anche dalla nobiltà con cui sa abitare il proprio tempo di riposo.",
-    author: "Marco Tullio Cicerone"
+    author: "Marco Tullio Cicerone",
+    role: "oratore, filosofo e politico romano"
   },
 
   // --- Curiosità: Chi era Nino Cortese ---

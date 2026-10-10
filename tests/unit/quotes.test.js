@@ -2,7 +2,7 @@ import { describe, it, expect } from 'vitest';
 import { quotes, getRandomQuote } from '$lib/quotes.js';
 
 describe('quotes module', () => {
-  it('contains a rich collection of valid quotes and curiosities with text and author', () => {
+  it('contains a rich collection of valid quotes (with role) and curiosities', () => {
     expect(Array.isArray(quotes)).toBe(true);
     expect(quotes.length).toBeGreaterThanOrEqual(70);
 
@@ -11,6 +11,11 @@ describe('quotes module', () => {
       expect(item.text.trim().length).toBeGreaterThan(0);
       expect(typeof item.author).toBe('string');
       expect(item.author.trim().length).toBeGreaterThan(0);
+
+      if (item.type !== 'curiosity') {
+        expect(typeof item.role).toBe('string');
+        expect(item.role.trim().length).toBeGreaterThan(0);
+      }
     }
 
     const curiosities = quotes.filter((q) => q.type === 'curiosity');
