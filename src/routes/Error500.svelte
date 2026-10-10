@@ -252,13 +252,13 @@
     font-size: 0.75rem;
   }
 
-  @media (max-width: 480px) {
+  @media (max-width: 640px) {
     .error-card {
       padding: 2rem 1.25rem;
     }
 
     .error-gif {
-      width: 200px;
+      width: 160px;
     }
 
     .error-title {

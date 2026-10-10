@@ -149,6 +149,16 @@
     -webkit-user-drag: none;
   }
 
+  @media (max-width: 640px) {
+    .easteregg-container {
+      padding: 1.5rem 0.75rem;
+      gap: 1rem;
+    }
+    .easteregg-gif {
+      width: 176px;
+    }
+  }
+
   @media (max-width: 400px) {
     thead th {
       padding: 0.55rem 0.25rem;
@@ -158,13 +168,6 @@
       width: calc(48px * var(--table-font-scale, 1));
       min-width: calc(48px * var(--table-font-scale, 1));
       max-width: calc(52px * var(--table-font-scale, 1));
-    }
-    .easteregg-container {
-      padding: 1.5rem 0.75rem;
-      gap: 1rem;
-    }
-    .easteregg-gif {
-      width: 220px;
     }
   }
 </style>
