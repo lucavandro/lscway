@@ -279,6 +279,36 @@ export const quotes = [
     author: "Maryam Mirzakhani",
     role: "matematica iraniana e Medaglia Fields"
   },
+  {
+    text: "Ciò che è più utile nell'aritmetica e nell'algebra è ciò di cui gli uomini hanno costantemente bisogno nelle loro ricerche, nella misura della terra e nell'osservazione del cielo.",
+    author: "Muḥammad ibn Mūsā al-Khwārizmī",
+    role: "matematico e astronomo persiano della Casa della Sapienza"
+  },
+  {
+    text: "Non dobbiamo vergognarci di apprezzare la verità e di accoglierla da qualsiasi fonte essa provenga, anche se giunge da popoli lontani e diversi da noi.",
+    author: "Al-Kindī",
+    role: "filosofo, matematico e scienziato arabo"
+  },
+  {
+    text: "L'algebra è un'arte scientifica che insegna a trovare le quantità incognite mettendole in armonica relazione con quelle note.",
+    author: "Omar Khayyām",
+    role: "matematico, astronomo e poeta persiano"
+  },
+  {
+    text: "La verità nella scienza e nella medicina è una meta inesauribile, ma ogni generazione di studiosi aggiunge una lampada lungo il cammino.",
+    author: "Al-Rāzī (Rhazes)",
+    role: "medico, chimico e filosofo persiano"
+  },
+  {
+    text: "La geometria illumina l'intelletto e addestra la mente a pensare con ordine, perché tutte le sue dimostrazioni sono chiare e rigorose.",
+    author: "Ibn Khaldūn",
+    role: "storico, filosofo e matematico arabo"
+  },
+  {
+    text: "L'osservazione paziente del cielo corregge gli errori del passato e avvicina l'intelletto umano alla misura dell'universo.",
+    author: "Al-Battānī",
+    role: "astronomo e matematico arabo"
+  },
 
   // --- Citazioni e Aforismi sul Riposo, la Pausa e l'Otium Creativo ---
   {
@@ -477,6 +507,26 @@ export const quotes = [
     text: "Molti secoli prima che giungessero in Occidente, nella Cina antica erano già stati inventati la carta (II secolo a.C.), la bussola magnetica, la stampa a caratteri mobili (ideata da Bi Sheng nel 1040) e il primo sismografo della storia (realizzato dall'astronomo Zhang Heng nel 132 d.C.).",
     author: "Storia della Scienza"
   },
+  {
+    type: "curiosity",
+    text: "La maggior parte dei nomi delle stelle più brillanti che usiamo ancora oggi — come Aldebaran, Altair, Betelgeuse, Deneb, Rigel e Vega — così come termini scientifici quali 'zenit', 'nadir', 'azimut', 'alchimia' e 'alambicco', provengono direttamente dalla tradizione astronomica e scientifica araba.",
+    author: "Storia della Scienza"
+  },
+  {
+    type: "curiosity",
+    text: "Nel 1242 il medico arabo Ibn al-Nafīs, formatosi tra Damasco e il Cairo, descrisse per la prima volta nella storia la circolazione polmonare del sangue dal ventricolo destro al sinistro attraverso i polmoni, tre secoli prima che fosse riscoperta in Europa.",
+    author: "Storia della Scienza"
+  },
+  {
+    type: "curiosity",
+    text: "Intorno all'anno 1000 a Cordova, nella Spagna araba (al-Andalus), il medico al-Zahrāwī (Albucasis) compose un'enciclopedia medica in 30 volumi illustrando oltre 200 strumenti chirurgici da lui progettati e introducendo per primo il filo riassorbibile per le suture.",
+    author: "Storia della Scienza"
+  },
+  {
+    type: "curiosity",
+    text: "Nell'XI secolo lo scienziato al-Bīrūnī ideò un ingegnoso metodo trigonometrico per calcolare il raggio e la circonferenza della Terra: gli bastò misurare l'altezza di una montagna e l'angolo di depressione dell'orizzonte dalla sua vetta, ottenendo un valore che differisce di meno dell'1% da quello reale.",
+    author: "Storia della Scienza"
+  },
 
   // --- Curiosità: Storia dell'Informatica ---
   {
@@ -604,6 +654,31 @@ export const quotes = [
   {
     type: "curiosity",
     text: "Nel 2014 la matematica iraniana Maryam Mirzakhani è diventata la prima donna e la prima scienziata mediorientale a vincere la Medaglia Fields, il massimo riconoscimento mondiale per la matematica, per i suoi studi sulla geometria delle superfici di Riemann.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Intorno all'820 d.C. a Baghdad il matematico al-Khwārizmī scrisse il 'Kitāb al-jabr wa l-muqābala': dalla parola araba 'al-jabr' (che significa 'ricomposizione' o 'completamento' dei termini di un'equazione) è nata la parola 'algebra' e l'algebra come disciplina autonoma.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Furono i matematici e astronomi del mondo arabo tra il IX e il X secolo, come al-Battānī e Abū l-Wafā', a introdurre sistematicamente le sei funzioni trigonometriche moderne (seno, coseno, tangente, cotangente, secante e cosecante) e il teorema dei seni.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Nell'XI secolo il matematico e astronomo persiano Omar Khayyām classificò e risolse geometricamente tutte le equazioni algebriche di terzo grado (cubiche) mediante l'intersezione di sezioni coniche, oltre a calcolare la durata dell'anno solare con un margine d'errore di pochi secondi.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Intorno all'anno 1000 il matematico arabo-persiano al-Karajī utilizzò per la prima volta il principio di induzione matematica per dimostrare la somma dei cubi interi e costruì la tabella dei coefficienti binomiali secoli prima del triangolo di Tartaglia-Pascal.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Nel IX secolo lo scienziato arabo al-Kindī scrisse a Baghdad il 'Manoscritto sulla decifrazione dei messaggi crittografici', inventando il metodo dell'analisi delle frequenze delle lettere: nacquero così la crittanalisi matematica e la statistica applicata ai codici segreti.",
     author: "Storia della Matematica"
   }
 ];
