@@ -300,12 +300,20 @@ Il liceo adotta la convenzione di Google Workspace:
 ### 8.4. `HeaderMenuPanel.svelte`
 - Pannello di navigazione laterale drawer con supporto per swipe touch per la chiusura.
 - Include controlli per:
-  - Navigazione a tutte le sezioni (Home, Docente, Aula, Sostituzioni, Hotspot, Social, QR).
-  - Toggle Notifiche.
-  - Toggle Tema chiaro / scuro.
-  - Regolatore dimensione caratteri tabella (con pulsanti `-` / `+`, slider e tasto reset).
-  - Pulsante "Aggiorna orario" (`reload()` che pulisce Cache Storage, Service Worker e ricarica i dati freschi).
-  - Accesso / Logout utente.
+  - **Navigazione:** accesso a tutte le sezioni interne (Home, Docente, Aula, Sostituzioni, Hotspot, Social, QR).
+  - **Prenotazioni (Moduli Google esterni con `target="_blank"`):**
+    - *Sportello Psicologico* (`https://forms.gle/UPLBbEKaK56fpDaL6`): accessibile a tutti gli utenti (studenti, famiglie e docenti).
+    - *Portatili in comodato d'uso* (`https://forms.gle/NzWrea6g8ZDpwCQ8A`): visibile esclusivamente ai docenti autenticati (`$isTeacher === true`).
+  - **Link Rapidi (Risorse esterne con `target="_blank"`):**
+    - *Indirizzi gruppi mail scolastici* (`https://docs.google.com/spreadsheets/d/1CHoQed5cFo5ryTkfugP5-4K2jlOuV_RiNbSYj_wD6G4/edit?usp=sharing`)
+    - *Moduli Web 2.0* (`https://forms.gle/UPLBbEKaK56fpDaL6`)
+    - *ELS Cortese* (`https://www.liceoscientificocortese.edu.it/els/`)
+  - **Azioni:**
+    - Toggle Notifiche.
+    - Toggle Tema chiaro / scuro.
+    - Regolatore dimensione caratteri tabella (con pulsanti `-` / `+`, slider e tasto reset).
+    - Pulsante "Aggiorna dati" (`reload()` che pulisce Cache Storage, Service Worker e ricarica i dati freschi).
+    - Accesso / Logout utente.
 
 ---
 
@@ -392,7 +400,7 @@ L'integrità del software e l'assenza di regressioni sono garantite da una doppi
 - **Scenari E2E coperti (`tests/e2e/`):**
   - `home-timetable.spec.js`: caricamento home, brand, tab navigation, selettore classe con ricerca, tabella giornaliera, toggle e matrice orario settimanale completo.
   - `navigation-tabs.spec.js`: transizione fluida tra schede Classe, Docente e Aula con aggiornamento reattivo dei dati.
-  - `header-menu.spec.js`: apertura/chiusura drawer menu, cambio tema chiaro/scuro in tempo reale, variazione dimensione font tabella con controlli dedicati.
+  - `header-menu.spec.js`: apertura/chiusura drawer menu, cambio tema chiaro/scuro in tempo reale, variazione dimensione font tabella con controlli dedicati, visibilità sezioni *Prenotazioni* (Sportello Psicologico per tutti, Portatili riservato docenti) e *Link Rapidi*.
   - `hotspot.spec.js`: consultazione password Wi-Fi LIM aula e verifica operazione di copia.
   - `qr-social.spec.js`: rendering codice QR con link di condivisione e bacheca canali social ufficiali (Facebook, Instagram, TikTok, YouTube).
   - `sostituzioni.spec.js`: controllo accessi (avviso per utenti non autenticati) e visualizzazione schede sostituzione con badge orario e classe per docenti loggati.
