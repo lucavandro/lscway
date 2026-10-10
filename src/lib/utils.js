@@ -27,7 +27,7 @@ export function setPrefClassroom(value) {
 
 // Funzione per validare l'email
 export function validateEmail(email) {
-  return email && typeof email === 'string' && email.endsWith('@lscortese.com');
+  return Boolean(email && typeof email === 'string' && email.endsWith('@lscortese.com'));
 }
 
 // Funzione per ottenere la data odierna in formato YYYY-MM-DD

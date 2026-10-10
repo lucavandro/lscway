@@ -40,6 +40,21 @@
 
 ---
 
+### 1.3. Esecuzione Obbligatoria dei Test e Protocollo di Risoluzione Automatica (Self-Healing)
+- **Quando eseguire i test:** per qualsiasi modifica rilevante al codice (modifica di logica applicativa, componenti UI, routing, store reattivi, utility, notifiche o gestione cache), l'agente **DEVE** eseguire i test pertinenti prima del commit:
+  - `npm test` o `npm run test:unit` per i test unitari (Vitest).
+  - `npm run test:e2e` per i test end-to-end (Playwright).
+  - `npm run test:all` per l'esecuzione congiunta dell'intera suite.
+- **Protocollo vincolante in caso di fallimento:**  
+  Se uno o più test falliscono:
+  1. 🚫 **Divieto di commit:** è tassativamente vietato effettuare il commit o la push di codice con test falliti.
+  2. 🔍 **Analisi automatica del problema:** l'agente deve ispezionare tempestivamente l'output della console, l'asserzione fallita, lo stack trace e l'eventuale file di contesto generato da Playwright (in `test-results/`).
+  3. 🛠️ **Diagnosi e soluzione:** identificare la causa radice (es. regressione nel codice, selettore UI disallineato, mock incompleto o tipo restituito non conforme) e applicare la modifica risolutiva.
+  4. 🔁 **Riesecuzione dei test:** rieseguire i test e iterare finché tutti i test non passano con `exit code 0`.
+  5. 🛑 **Escalation all'utente (solo se bloccante):** se dopo iterazioni motivate l'agente rileva un blocco strutturale o un'ambiguità nei requisiti che richiede una decisione dell'utente, deve arrestarsi e spiegare dettagliatamente il problema all'utente.
+
+---
+
 ## 2. Invarianti Tecniche del Progetto
 
 Qualsiasi intervento sul codice deve preservare i seguenti pilastri architetturali:
@@ -74,7 +89,7 @@ Qualsiasi intervento sul codice deve preservare i seguenti pilastri architettura
 
 ## 3. Workflow Standard dell'Agente per Ogni Task
 
-Per garantire la massima affidabilità con qualsiasi sistema di harness o pipeline autonoma, l'agente deve seguire questo ciclo di esecuzione a 6 fasi:
+Per garantire la massima affidabilità con qualsiasi sistema di harness o pipeline autonoma, l'agente deve seguire questo ciclo di esecuzione a 7 fasi:
 
 ```mermaid
 flowchart TD
@@ -85,30 +100,42 @@ flowchart TD
     E --> F["3. Esecuzione Modifiche"]
     C -- "Sì / Nuova Spec" --> F
     F --> G["Aggiorna SPECS.md (se nuova feature)"]
-    G --> H["4. Validazione (`npm run build`)"]
+    G --> H["4. Validazione Build (`npm run build`)"]
     H --> I{"Build OK?"}
     I -- "No" --> J["Correggi errori di compilazione"]
     J --> H
-    I -- "Sì" --> K["5. Git Commit & Push su origin"]
-    K --> L["6. Risposta all'utente con link ai file"]
+    I -- "Sì" --> T["5. Esecuzione Test (`npm run test:all`)"]
+    T --> U{"Test superati?"}
+    U -- "No (Fallimento)" --> V["Analisi automatica log e diagnosi causa radice"]
+    V --> W["Applica correzione al codice o test"]
+    W --> T
+    U -- "Sì (100% Pass)" --> K["6. Git Commit & Push su origin"]
+    K --> L["7. Risposta all'utente con link ai file"]
 ```
 
 ### Dettaglio delle Fasi:
 1. **Analisi e Ispezione:** leggere i requisiti dell'utente ed esaminare il codice impattato insieme a [`SPECS.md`](file:///c:/Users/Luca/git/lscway/SPECS.md).
 2. **Risoluzione delle Discrepanze:** se c'è un conflitto con le specifiche, formulare la domanda all'utente prima di applicare modifiche distruttive o incoerenti.
 3. **Modifica Chirurgica:** scrivere codice pulito, modulare e leggibile, preservando i commenti esistenti. Se vengono aggiunte nuove funzionalità, aggiornare contestualmente `SPECS.md`.
-4. **Verifica Locale:** eseguire sempre:
+4. **Verifica della Build Locale:** eseguire sempre:
    ```bash
    npm run build
    ```
-   e accertarsi che termini con `exit code 0` senza errori o warning critici.
-5. **Versionamento e Distribuzione:**
+   e accertarsi che termini con `exit code 0` senza errori.
+5. **Esecuzione e Collaudo della Suite di Test:** eseguire:
+   ```bash
+   npm test          # Per verifiche rapide unitari (Vitest)
+   # oppure
+   npm run test:all  # Per l'intera suite unit ed e2e (Vitest + Playwright)
+   ```
+   Se si verificano fallimenti, attivare il **protocollo di auto-risoluzione**: leggere lo stack trace / assertion diff, correggere la regressione o il disallineamento e rieseguire finché tutti i test non passano.
+6. **Versionamento e Distribuzione:**
    ```bash
    git add <file-modificati>
    git commit -m "<tipo>: <descrizione sintetica>"
    git push origin <branch>
    ```
-6. **Riepilogo:** fornire all'utente un resoconto chiaro e sintetico con collegamenti cliccabili ai file modificati nel formato Markdown `[nome_file](file:///percorso/assoluto)`.
+7. **Riepilogo:** fornire all'utente un resoconto chiaro e sintetico con collegamenti cliccabili ai file modificati nel formato Markdown `[nome_file](file:///percorso/assoluto)`.
 
 ---
 

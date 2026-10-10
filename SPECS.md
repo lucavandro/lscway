@@ -349,4 +349,54 @@ npm run build
 
 # Visualizzare in anteprima la build statica
 npm run preview
+
+# Esecuzione rapida unit test con Vitest
+npm test
+npm run test:unit
+
+# Esecuzione unit test in modalità interattiva / watch
+npm run test:unit:watch
+
+# Esecuzione test End-to-End completi con Playwright
+npm run test:e2e
+
+# Esecuzione congiunta di tutta la suite (Unit + E2E)
+npm run test:all
 ```
+
+---
+
+## 11. Suite di Test e Verifica di Qualità (Unit & E2E)
+
+L'integrità del software e l'assenza di regressioni sono garantite da una doppia suite di test automatizzati:
+
+### 11.1. Unit & Integration Testing (Vitest)
+- **Configurazione:** `vitest.config.js` con ambiente `jsdom` e mock virtuali dei moduli runtime di SvelteKit (`$app/paths`, `$app/stores`, `$app/navigation`, `$app/environment` situati in `tests/mocks/app/`).
+- **File di test (`tests/unit/`):**
+  - `dateutils.test.js`: fasce orarie lezioni (8 ore), calcolo indice ora corrente, rilevamento giorni della settimana e periodo natalizio, store orologio.
+  - `stores.test.js`: discriminazione docenti/studenti (`isTeacher`), persistenza email, clamping del fattore di scala font tabelle (`TABLE_FONT_SCALE_MIN/MAX`), stati menu e loading.
+  - `data.test.js`: normalizzazione orario (pulizia caratteri `.` e `*`, normalizzazione materie speciali `POT`/`RIC`), decodifica Google JWT OAuth 2.0 e vincolo dominio scolastico `@lscortese.com`.
+  - `utils.test.js`: persistenza preferenze in `localStorage` (docente, classe, aula), validatore booleano email scolastica, data odierna YYYY-MM-DD, ordinamento materie sostegno/inclusione in fondo.
+  - `hotspot.test.js`: consistenza database credenziali Wi-Fi LIM per tutte le aule dei tre plessi A, B e C e hotspot docenti.
+  - `notifications.test.js`: permessi Web Notifications, notifiche per sostituzioni del giorno con deduplicazione, messaggistica con il Service Worker.
+  - `theme.test.js`: transizione temi light/dark e persistenza DOM/`localStorage`.
+
+### 11.2. End-to-End Testing (Playwright)
+- **Configurazione:** `playwright.config.js` con avvio automatico del web server di preview (`npm run preview -- --port 4173`), browser Chromium headless, risoluzione del base path `/app/way/tmp`.
+- **Intercettazione e Mocking API (`tests/e2e/fixtures/helpers.js`):** le chiamate API remote verso `liceoscientificocortese.edu.it` vengono intercettate via RegExp e servite con dati deterministici (`mockData.js`), evitando dipendenze da reti esterne o downtime dei server della scuola.
+- **Scenari E2E coperti (`tests/e2e/`):**
+  - `home-timetable.spec.js`: caricamento home, brand, tab navigation, selettore classe con ricerca, tabella giornaliera, toggle e matrice orario settimanale completo.
+  - `navigation-tabs.spec.js`: transizione fluida tra schede Classe, Docente e Aula con aggiornamento reattivo dei dati.
+  - `header-menu.spec.js`: apertura/chiusura drawer menu, cambio tema chiaro/scuro in tempo reale, variazione dimensione font tabella con controlli dedicati.
+  - `hotspot.spec.js`: consultazione password Wi-Fi LIM aula e verifica operazione di copia.
+  - `qr-social.spec.js`: rendering codice QR con link di condivisione e bacheca canali social ufficiali (Facebook, Instagram, TikTok, YouTube).
+  - `sostituzioni.spec.js`: controllo accessi (avviso per utenti non autenticati) e visualizzazione schede sostituzione con badge orario e classe per docenti loggati.
+  - `error-pages.spec.js`: fallback per modalità offline (`/offline`) e pagina errore 500 (`/500`) con illustrazione del panda.
+
+### 11.3. Regola Operativa di Auto-Risoluzione dei Fallimenti
+In ottemperanza ad `AGENTS.md`, qualsiasi agente AI o harness che rileva un fallimento nei test deve:
+1. Arrestare qualsiasi operazione di commit o push.
+2. Analizzare i log di errore (stack trace, assertion diff, contesti Playwright).
+3. Diagnosticare la causa radice ed applicare autonomamente la correzione al codice o ai test.
+4. Rieseguire i test fino ad ottenere il 100% di esito positivo (`exit code 0`).
+
