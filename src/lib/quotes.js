@@ -204,6 +204,81 @@ export const quotes = [
     author: "Fabiola Gianotti",
     role: "fisica"
   },
+  {
+    text: "Un viaggio di mille miglia comincia sempre con il primo passo.",
+    author: "Lao Tzu",
+    role: "filosofo cinese"
+  },
+  {
+    text: "Chi conosce tutte le risposte non si è ancora posto tutte le domande.",
+    author: "Confucio",
+    role: "filosofo cinese"
+  },
+  {
+    text: "La grande persona è colui che non perde mai il cuore limpido e curioso di un bambino.",
+    author: "Mencio",
+    role: "filosofo cinese"
+  },
+  {
+    text: "Chi cerca la verità non è colui che studia gli scritti degli antichi riponendovi cieca fiducia, ma colui che mette alla prova ogni affermazione con la ragione e l'esperimento.",
+    author: "Ibn al-Haytham (Alhazen)",
+    role: "fisico, matematico e astronomo arabo"
+  },
+  {
+    text: "La conoscenza di qualsiasi cosa, poiché ogni cosa ha delle cause, non è completa se non è compresa attraverso le sue cause.",
+    author: "Avicenna (Ibn Sīnā)",
+    role: "medico, filosofo e scienziato persiano"
+  },
+  {
+    text: "Il sapere è l'unico tesoro che non teme i ladri e che si moltiplica ogni volta che viene condiviso.",
+    author: "Al-Biruni",
+    role: "matematico, astronomo e filosofo persiano"
+  },
+  {
+    text: "L'ignoranza porta alla paura, la paura porta all'odio e l'odio porta alla violenza: questa è l'equazione.",
+    author: "Averroè (Ibn Rushd)",
+    role: "filosofo, medico e giurista arabo"
+  },
+  {
+    text: "Ieri ero intelligente e volevo cambiare il mondo. Oggi sono saggio e voglio migliorare me stesso.",
+    author: "Jalāl al-Dīn Rūmī",
+    role: "poeta e filosofo persiano"
+  },
+  {
+    text: "Il vero maestro non ti invita a entrare nella casa della sua sapienza, ma ti guida con pazienza fino alla soglia della tua mente.",
+    author: "Kahlil Gibran",
+    role: "poeta, pittore e filosofo libanese"
+  },
+  {
+    text: "Non cercare di seguire ciecamente le orme dei saggi del passato: cerca piuttosto ciò che essi cercavano.",
+    author: "Matsuo Bashō",
+    role: "poeta giapponese"
+  },
+  {
+    text: "Chi esplora l'ignoto deve avere il coraggio di avventurarsi lungo sentieri che nessuno ha ancora tracciato.",
+    author: "Hideki Yukawa",
+    role: "fisico giapponese e Premio Nobel"
+  },
+  {
+    text: "Lo spirito della vera scienza non dipende dalla ricchezza degli strumenti, ma dall'incessante ricerca della verità.",
+    author: "Chandrasekhara Venkata Raman",
+    role: "fisico indiano e Premio Nobel"
+  },
+  {
+    text: "I sogni non sono quelli che fai mentre dormi, ma quelli che ti spingono a dare il meglio di te da sveglio.",
+    author: "A. P. J. Abdul Kalam",
+    role: "ingegnere aerospaziale e statista indiano"
+  },
+  {
+    text: "Vivi come se dovessi morire domani. Impara come se dovessi vivere per sempre.",
+    author: "Mahatma Gandhi",
+    role: "pensatore e statista indiano"
+  },
+  {
+    text: "La bellezza della matematica si mostra solo ai suoi seguaci più pazienti.",
+    author: "Maryam Mirzakhani",
+    role: "matematica iraniana e Medaglia Fields"
+  },
 
   // --- Citazioni e Aforismi sul Riposo, la Pausa e l'Otium Creativo ---
   {
@@ -219,7 +294,7 @@ export const quotes = [
   {
     text: "Il riposo appartiene al lavoro come le palpebre agli occhi.",
     author: "Rabindranath Tagore",
-    role: "poeta e filosofo"
+    role: "poeta e filosofo indiano"
   },
   {
     text: "Ogni tanto staccati dal tuo lavoro e rilassati un poco: quando vi tornerai, il tuo giudizio sarà più sicuro, perché chi sta sempre sull'opera perde la capacità di vederne l'insieme.",
@@ -275,6 +350,36 @@ export const quotes = [
     text: "Un uomo libero si riconosce anche dalla nobiltà con cui sa abitare il proprio tempo di riposo.",
     author: "Marco Tullio Cicerone",
     role: "oratore, filosofo e politico romano"
+  },
+  {
+    text: "L'acqua ferma è come uno specchio perfetto: solo nella quiete della mente si riflettono con chiarezza il cielo e la terra.",
+    author: "Zhuangzi",
+    role: "filosofo cinese"
+  },
+  {
+    text: "Chi sa fermarsi al momento giusto non si esaurisce mai: dalla quiete nasce ogni movimento armonioso.",
+    author: "Lao Tzu",
+    role: "filosofo cinese"
+  },
+  {
+    text: "La saggezza della vita consiste nell'eliminare ciò che non è essenziale e nel saper gustare la pace di un pomeriggio libero.",
+    author: "Lin Yutang",
+    role: "scrittore e filosofo cinese"
+  },
+  {
+    text: "È proprio lo spazio vuoto tra un impegno e l'altro a dare respiro, equilibrio e bellezza alle nostre giornate.",
+    author: "Yoshida Kenkō",
+    role: "scrittore e filosofo giapponese"
+  },
+  {
+    text: "Sorridi, respira e vai piano: fermarsi a riposare non è perdere tempo, ma ritrovare chiarezza e presenza.",
+    author: "Thích Nhất Hạnh",
+    role: "monaco e poeta vietnamita"
+  },
+  {
+    text: "Quando cammini, cammina; quando studi, studia; quando ti riposi, riposati senza lasciare che la mente corra altrove.",
+    author: "Proverbio Zen",
+    role: "tradizione filosofica orientale"
   },
 
   // --- Curiosità: Chi era Nino Cortese ---

@@ -108,7 +108,9 @@ lscway/
     │
     ├── icons/                  # Componenti Svelte icone SVG scalabili
     │   ├── BellIcon.svelte / BellOffIcon.svelte
+    │   ├── BookingIcon.svelte
     │   ├── HomeIcon.svelte
+    │   ├── LinkIcon.svelte
     │   ├── LoginIcon.svelte / LogoutIcon.svelte
     │   ├── MoonIcon.svelte / SunIcon.svelte
     │   ├── ReloadIcon.svelte
@@ -154,6 +156,10 @@ lscway/
         ├── sostituzioni/       # Pagina bacheca ore di SOSTITUZIONE (riservata docenti)
         │   └── +page.svelte
         ├── hotspot/            # Pagina ricerca password hotspot Wi-Fi LIM per aula
+        │   └── +page.svelte
+        ├── prenotazioni/       # Pagina moduli di prenotazione (Sportello Psicologico e Portatili docenti)
+        │   └── +page.svelte
+        ├── link/               # Pagina link rapidi e risorse esterne dell'istituto
         │   └── +page.svelte
         ├── qr/                 # Pagina codice QR e condivisione applicazione
         │   └── +page.svelte
@@ -297,23 +303,23 @@ Il liceo adotta la convenzione di Google Workspace:
 - Header giorno corrente evidenziato con un indicatore ("today dot").
 - Supporta scorrimento orizzontale fluido con ombreggiatura di scorrimento sui dispositivi mobili.
 
-### 8.4. `HeaderMenuPanel.svelte`
+### 8.4. `HeaderMenuPanel.svelte` e Pagine `/prenotazioni` e `/link`
 - Pannello di navigazione laterale drawer con supporto per swipe touch per la chiusura.
 - Include controlli per:
-  - **Navigazione:** accesso a tutte le sezioni interne (Home, Docente, Aula, Sostituzioni, Hotspot, Social, QR).
-  - **Prenotazioni (Moduli Google esterni con `target="_blank"`):**
-    - *Sportello Psicologico* (`https://forms.gle/UPLBbEKaK56fpDaL6`): accessibile a tutti gli utenti (studenti, famiglie e docenti).
-    - *Portatili in comodato d'uso* (`https://forms.gle/NzWrea6g8ZDpwCQ8A`): visibile esclusivamente ai docenti autenticati (`$isTeacher === true`).
-  - **Link Rapidi (Risorse esterne con `target="_blank"`):**
-    - *Indirizzi gruppi mail scolastici* (`https://docs.google.com/spreadsheets/d/1CHoQed5cFo5ryTkfugP5-4K2jlOuV_RiNbSYj_wD6G4/edit?usp=sharing`)
-    - *Moduli Web 2.0* (`https://forms.gle/UPLBbEKaK56fpDaL6`)
-    - *ELS Cortese* (`https://www.liceoscientificocortese.edu.it/els/`)
+  - **Navigazione:** accesso a tutte le sezioni interne (Home, Hotspot LIM, Sostituzioni, Login Docenti, Prenotazioni `/prenotazioni`, Link Rapidi `/link`, Canali Social `/social`, Condividi App `/qr`).
   - **Azioni:**
     - Toggle Notifiche.
     - Toggle Tema chiaro / scuro.
     - Regolatore dimensione caratteri tabella (con pulsanti `-` / `+`, slider e tasto reset).
     - Pulsante "Aggiorna dati" (`reload()` che pulisce Cache Storage, Service Worker e ricarica i dati freschi).
     - Accesso / Logout utente.
+- **Pagina `/prenotazioni` (`src/routes/prenotazioni/+page.svelte`):** bacheca a card (sullo stile di `social/+page.svelte`, con pulsanti *Apri*, *Condividi* e *Copia link*) contenente:
+  - *Sportello Psicologico* (`https://forms.gle/UPLBbEKaK56fpDaL6`): accessibile a tutti gli utenti (studenti, famiglie e docenti).
+  - *Portatili in comodato d'uso* (`https://forms.gle/NzWrea6g8ZDpwCQ8A`): card visibile esclusivamente ai docenti autenticati (`$isTeacher === true`).
+- **Pagina `/link` (`src/routes/link/+page.svelte`):** bacheca a card per le risorse esterne (con apertura `target="_blank"`, *Condividi* e *Copia link*):
+  - *Indirizzi gruppi mail scolastici* (`https://docs.google.com/spreadsheets/d/1CHoQed5cFo5ryTkfugP5-4K2jlOuV_RiNbSYj_wD6G4/edit?usp=sharing`)
+  - *Moduli Web 2.0* (`https://forms.gle/UPLBbEKaK56fpDaL6`)
+  - *ELS Cortese* (`https://www.liceoscientificocortese.edu.it/els/`)
 
 ---
 

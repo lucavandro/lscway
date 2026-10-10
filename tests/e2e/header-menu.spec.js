@@ -50,7 +50,7 @@ test.describe('Header Menu - Drawer, Temi e Font Scale', () => {
     }
   });
 
-  test('shows public Prenotazioni and Link Rapidi for non-teacher users, hiding teacher-only laptop form', async ({ page }) => {
+  test('navigates from drawer to Prenotazioni page and hides teacher-only laptop card for non-teachers', async ({ page }) => {
     await page.addInitScript(() => {
       window.localStorage.removeItem('userEmail');
     });
@@ -61,47 +61,67 @@ test.describe('Header Menu - Drawer, Temi e Font Scale', () => {
     const drawerPanel = page.locator('.drawer-panel');
     await expect(drawerPanel).toBeVisible();
 
-    // Public booking link is visible
-    const sportelloLink = drawerPanel.locator('a', { hasText: 'Sportello Psicologico' });
-    await expect(sportelloLink).toBeVisible();
-    await expect(sportelloLink).toHaveAttribute('href', 'https://forms.gle/UPLBbEKaK56fpDaL6');
-    await expect(sportelloLink).toHaveAttribute('target', '_blank');
+    const prenotazioniNavLink = drawerPanel.locator('a.nav-link', { hasText: 'Prenotazioni' });
+    await expect(prenotazioniNavLink).toBeVisible();
+    await prenotazioniNavLink.click();
 
-    // Teacher-only laptop booking link is hidden
-    const portatiliLink = drawerPanel.locator('a', { hasText: "Portatili in comodato d'uso" });
-    await expect(portatiliLink).toHaveCount(0);
+    await expect(page).toHaveURL(/\/app\/way\/tmp\/prenotazioni$/);
+    await expect(page.locator('h1.page-title')).toContainText('Prenotazioni');
 
-    // Quick external links are visible
-    const mailLink = drawerPanel.locator('a', { hasText: 'Indirizzi gruppi mail scolastici' });
-    await expect(mailLink).toBeVisible();
-    await expect(mailLink).toHaveAttribute(
-      'href',
-      'https://docs.google.com/spreadsheets/d/1CHoQed5cFo5ryTkfugP5-4K2jlOuV_RiNbSYj_wD6G4/edit?usp=sharing'
-    );
+    // Public booking card is visible
+    const sportelloCard = page.locator('.sportello-psicologico-card');
+    await expect(sportelloCard).toBeVisible();
+    await expect(sportelloCard.locator('a.btn-visit')).toHaveAttribute('href', 'https://forms.gle/UPLBbEKaK56fpDaL6');
+    await expect(sportelloCard.locator('a.btn-visit')).toHaveAttribute('target', '_blank');
 
-    const moduliLink = drawerPanel.locator('a', { hasText: 'Moduli Web 2.0' });
-    await expect(moduliLink).toBeVisible();
-    await expect(moduliLink).toHaveAttribute('href', 'https://forms.gle/UPLBbEKaK56fpDaL6');
-
-    const elsLink = drawerPanel.locator('a', { hasText: 'ELS Cortese' });
-    await expect(elsLink).toBeVisible();
-    await expect(elsLink).toHaveAttribute('href', 'https://www.liceoscientificocortese.edu.it/els/');
+    // Teacher-only laptop booking card is hidden
+    const portatiliCard = page.locator('.portatili-comodato-card');
+    await expect(portatiliCard).toHaveCount(0);
   });
 
-  test('shows Portatili in comodato d\'uso booking link when logged in as teacher', async ({ page }) => {
+  test('displays Portatili in comodato d\'uso card on Prenotazioni page when logged in as teacher', async ({ page }) => {
     await page.addInitScript(() => {
       window.localStorage.setItem('userEmail', 'rossi@lscortese.com');
     });
 
+    await page.goto('/app/way/tmp/prenotazioni');
+
+    const sportelloCard = page.locator('.sportello-psicologico-card');
+    await expect(sportelloCard).toBeVisible();
+
+    const portatiliCard = page.locator('.portatili-comodato-card');
+    await expect(portatiliCard).toBeVisible();
+    await expect(portatiliCard.locator('a.btn-visit')).toHaveAttribute('href', 'https://forms.gle/NzWrea6g8ZDpwCQ8A');
+    await expect(portatiliCard.locator('a.btn-visit')).toHaveAttribute('target', '_blank');
+  });
+
+  test('navigates from drawer to Link Rapidi page and displays external resource cards', async ({ page }) => {
     await page.goto('/app/way/tmp/');
     await page.locator('.hamburger-btn').click();
 
     const drawerPanel = page.locator('.drawer-panel');
     await expect(drawerPanel).toBeVisible();
 
-    const portatiliLink = drawerPanel.locator('a', { hasText: "Portatili in comodato d'uso" });
-    await expect(portatiliLink).toBeVisible();
-    await expect(portatiliLink).toHaveAttribute('href', 'https://forms.gle/NzWrea6g8ZDpwCQ8A');
-    await expect(portatiliLink).toHaveAttribute('target', '_blank');
+    const linkRapidiNavLink = drawerPanel.locator('a.nav-link', { hasText: 'Link Rapidi' });
+    await expect(linkRapidiNavLink).toBeVisible();
+    await linkRapidiNavLink.click();
+
+    await expect(page).toHaveURL(/\/app\/way\/tmp\/link$/);
+    await expect(page.locator('h1.page-title')).toContainText('Link Rapidi');
+
+    const mailCard = page.locator('.gruppi-mail-card a.btn-visit');
+    await expect(mailCard).toBeVisible();
+    await expect(mailCard).toHaveAttribute(
+      'href',
+      'https://docs.google.com/spreadsheets/d/1CHoQed5cFo5ryTkfugP5-4K2jlOuV_RiNbSYj_wD6G4/edit?usp=sharing'
+    );
+
+    const moduliCard = page.locator('.moduli-web-card a.btn-visit');
+    await expect(moduliCard).toBeVisible();
+    await expect(moduliCard).toHaveAttribute('href', 'https://forms.gle/UPLBbEKaK56fpDaL6');
+
+    const elsCard = page.locator('.els-cortese-card a.btn-visit');
+    await expect(elsCard).toBeVisible();
+    await expect(elsCard).toHaveAttribute('href', 'https://www.liceoscientificocortese.edu.it/els/');
   });
 });
