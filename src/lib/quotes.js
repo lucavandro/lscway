@@ -228,123 +228,123 @@ export const quotes = [
   {
     type: "curiosity",
     text: "Nino Cortese (1896–1972), a cui è intitolato il nostro Liceo, è stato uno dei più autorevoli storici italiani del Novecento: allievo di Benedetto Croce, fu professore di Storia del Risorgimento e Storia Moderna e Preside della Facoltà di Lettere e Filosofia dell'Università Federico II di Napoli.",
-    author: "Lo sapevi? • Nino Cortese"
+    author: "Nino Cortese"
   },
   {
     type: "curiosity",
     text: "A Nino Cortese si deve la monumentale edizione critica delle Opere complete di Francesco De Sanctis e fondamentali ricerche sulla storia del Mezzogiorno d'Italia e dell'Università di Napoli fin dalla sua fondazione federiciana del 1224.",
-    author: "Lo sapevi? • Nino Cortese"
+    author: "Nino Cortese"
   },
   {
     type: "curiosity",
     text: "Prima di dedicarsi interamente alla ricerca storica e all'insegnamento universitario tra Messina, Pavia e Napoli, il giovane Nino Cortese lavorò presso l'Archivio di Stato di Napoli, riordinando e salvando preziosi fondi documentari sui secoli XVII–XIX.",
-    author: "Lo sapevi? • Nino Cortese"
+    author: "Nino Cortese"
   },
 
   // --- Curiosità: Maddaloni e il Territorio ---
   {
     type: "curiosity",
     text: "Nel territorio di Maddaloni sorgeva l'antica città di Calatia, snodo strategico lungo la Via Appia tra Capua e Benevento: i suoi reperti, dall'età del Ferro all'epoca romana, sono oggi custoditi nel Museo Archeologico di Calatia.",
-    author: "Lo sapevi? • Storia di Maddaloni"
+    author: "Storia di Maddaloni"
   },
   {
     type: "curiosity",
     text: "I celebri 'Ponti della Valle' dell'Acquedotto Carolino, progettati nel Settecento da Luigi Vanvitelli a pochi chilometri da Maddaloni per alimentare la Reggia di Caserta, sono stati dichiarati Patrimonio dell'Umanità UNESCO nel 1997.",
-    author: "Lo sapevi? • Storia di Maddaloni"
+    author: "Storia di Maddaloni"
   },
   {
     type: "curiosity",
     text: "Nel 1563 il quindicenne Filippo Bruno, poi divenuto celebre in tutta Europa come il filosofo Giordano Bruno, soggiornò e studiò per un periodo presso il convento di San Domenico a Maddaloni prima di trasferirsi a Napoli.",
-    author: "Lo sapevi? • Storia di Maddaloni"
+    author: "Storia di Maddaloni"
   },
   {
     type: "curiosity",
     text: "A Maddaloni si conserva la tela dipinta ad olio più grande del mondo: un'opera settecentesca di oltre 720 metri quadrati realizzata da Giovanni Funaro e custodita nel salone storico del Convitto Nazionale 'Giordano Bruno'.",
-    author: "Lo sapevi? • Storia di Maddaloni"
+    author: "Storia di Maddaloni"
   },
   {
     type: "curiosity",
     text: "Il Castello e le torri medievali che dominano Maddaloni dall'alto della collina risalgono all'epoca longobarda e normanna e fecero da cornice per secoli alla storia del Ducato della famiglia Carafa.",
-    author: "Lo sapevi? • Storia di Maddaloni"
+    author: "Storia di Maddaloni"
   },
 
   // --- Curiosità: Storia delle Scienze ---
   {
     type: "curiosity",
     text: "Nel III secolo a.C. il matematico e astronomo greco Eratostene di Cirene calcolò la circonferenza della Terra misurando l'angolo dell'ombra di uno gnomone a mezzogiorno del solstizio d'estate, sbagliando di appena l'1% rispetto ai satelliti moderni.",
-    author: "Lo sapevi? • Storia della Scienza"
+    author: "Storia della Scienza"
   },
   {
     type: "curiosity",
     text: "Marie Skłodowska Curie è l'unica persona nella storia ad aver vinto il Premio Nobel in due diverse discipline scientifiche: per la Fisica nel 1903 e per la Chimica nel 1911 grazie alla scoperta del radio e del polonio.",
-    author: "Lo sapevi? • Storia della Scienza"
+    author: "Storia della Scienza"
   },
   {
     type: "curiosity",
     text: "Nel gennaio 1610 Galileo Galilei puntò il suo cannocchiale verso Giove e scoprì quattro satelliti naturali (Io, Europa, Ganimede e Callisto), dimostrando per la prima volta con un'osservazione diretta che non tutti i corpi celesti orbitano attorno alla Terra.",
-    author: "Lo sapevi? • Storia della Scienza"
+    author: "Storia della Scienza"
   },
   {
     type: "curiosity",
     text: "Nel 1869 il chimico Dmitrij Mendeleev ideò la Tavola Periodica degli elementi lasciando coraggiosamente delle caselle vuote per elementi non ancora conosciuti, prevedendone con straordinaria precisione il peso atomico e le proprietà chimiche.",
-    author: "Lo sapevi? • Storia della Scienza"
+    author: "Storia della Scienza"
   },
   {
     type: "curiosity",
     text: "Durante gli anni '30 a Roma, il gruppo di giovanissimi fisici guidato da Enrico Fermi — i celebri 'Ragazzi di via Panisperna', tutti tra i venti e i trent'anni — rivoluzionò la fisica mondiale scoprendo le proprietà dei neutroni lenti.",
-    author: "Lo sapevi? • Storia della Scienza"
+    author: "Storia della Scienza"
   },
   {
     type: "curiosity",
     text: "Il 4 luglio 2012 al CERN di Ginevra è stata annunciata la scoperta del bosone di Higgs: a coordinare l'esperimento ATLAS, con oltre 3.000 fisici internazionali, era la scienziata italiana Fabiola Gianotti.",
-    author: "Lo sapevi? • Storia della Scienza"
+    author: "Storia della Scienza"
   },
   {
     type: "curiosity",
     text: "Negli anni '40, non potendo frequentare l'università, una giovanissima Rita Levi-Montalcini allestì un minuscolo laboratorio scientifico nella propria camera da letto, avviando gli studi sul fattore di crescita nervoso (NGF) che le valsero il Nobel nel 1986.",
-    author: "Lo sapevi? • Storia della Scienza"
+    author: "Storia della Scienza"
   },
 
   // --- Curiosità: Storia dell'Informatica ---
   {
     type: "curiosity",
     text: "Nel 1843 la matematica inglese Ada Lovelace scrisse il primo algoritmo della storia destinato a essere eseguito da una macchina (la Macchina Analitica di Charles Babbage), diventando la prima programmatrice del mondo.",
-    author: "Lo sapevi? • Storia dell'Informatica"
+    author: "Storia dell'Informatica"
   },
   {
     type: "curiosity",
     text: "Il termine informatico 'bug' (e 'debugging') divenne celebre il 9 settembre 1947, quando il team di Grace Hopper ad Harvard trovò una vera falena intrappolata in un relè del computer Mark II e la incollò sul registro di bordo.",
-    author: "Lo sapevi? • Storia dell'Informatica"
+    author: "Storia dell'Informatica"
   },
   {
     type: "curiosity",
     text: "La parola 'algoritmo' deriva dal nome latinizzato del grande matematico e astronomo persiano del IX secolo Muḥammad ibn Mūsā al-Khwārizmī, dal cui trattato matematico deriva anche il termine 'algebra'.",
-    author: "Lo sapevi? • Storia dell'Informatica"
+    author: "Storia dell'Informatica"
   },
   {
     type: "curiosity",
     text: "Nel 1965 il team italiano guidato dall'ingegnere Pier Giorgio Perotto in Olivetti presentò la 'Programma 101', considerata il primo personal computer desktop della storia e utilizzata anche dalla NASA per i calcoli della missione Apollo 11.",
-    author: "Lo sapevi? • Storia dell'Informatica"
+    author: "Storia dell'Informatica"
   },
   {
     type: "curiosity",
     text: "Il software di guida che salvò l'allunaggio dell'Apollo 11 il 20 luglio 1969 da un sovraccarico del computer di bordo fu sviluppato al MIT dal team diretto da Margaret Hamilton, pioniera che coniò l'espressione 'ingegneria del software'.",
-    author: "Lo sapevi? • Storia dell'Informatica"
+    author: "Storia dell'Informatica"
   },
   {
     type: "curiosity",
     text: "Il primo microprocessore commerciale su singolo chip della storia, l'Intel 4004 del 1971, fu progettato dal fisico italiano Federico Faggin, che incise le proprie iniziali 'F.F.' sul silicio aprendo l'era dei computer moderni.",
-    author: "Lo sapevi? • Storia dell'Informatica"
+    author: "Storia dell'Informatica"
   },
   {
     type: "curiosity",
     text: "Il World Wide Web nacque nel 1989 al CERN di Ginevra da un'idea di Tim Berners-Lee per permettere agli scienziati di condividere ricerche e documenti; nel 1993 il CERN rese la tecnologia del Web pubblica e gratuita per tutta l'umanità.",
-    author: "Lo sapevi? • Storia dell'Informatica"
+    author: "Storia dell'Informatica"
   },
   {
     type: "curiosity",
     text: "Nel 1936, prima ancora che esistessero i computer elettronici, il matematico Alan Turing ideò la 'Macchina di Turing', il modello teorico su cui si fonda ancora oggi il funzionamento di ogni computer e smartphone.",
-    author: "Lo sapevi? • Storia dell'Informatica"
+    author: "Storia dell'Informatica"
   }
 ];
 

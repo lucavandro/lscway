@@ -7,6 +7,9 @@
 
 {#if currentQuote && currentQuote.text}
   <figure class="easteregg-quote">
+    {#if isCuriosity}
+      <p class="easteregg-quote__title">Lo sapevi?</p>
+    {/if}
     <blockquote
       class="easteregg-quote__text"
       class:easteregg-quote__text--curiosity={isCuriosity}
@@ -38,7 +41,15 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    gap: 0.6rem;
+    gap: 0.5rem;
+  }
+
+  .easteregg-quote__title {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    line-height: 1.3;
+    color: var(--brand-primary);
   }
 
   .easteregg-quote__text {
@@ -72,7 +83,11 @@
   @media (max-width: 400px) {
     .easteregg-quote {
       padding: 0.85rem 1rem;
-      gap: 0.5rem;
+      gap: 0.45rem;
+    }
+
+    .easteregg-quote__title {
+      font-size: 0.96rem;
     }
 
     .easteregg-quote__text {
