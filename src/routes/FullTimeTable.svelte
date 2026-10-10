@@ -73,7 +73,7 @@
   .compact-timetable {
     width: 100%;
     min-width: calc(640px * var(--table-font-scale, 1));
-    table-layout: fixed;
+    table-layout: auto;
     border-collapse: separate;
     border-spacing: 0;
     margin: 0;
@@ -114,6 +114,7 @@
   }
 
   .weekday-header {
+    width: 20%;
     min-width: calc(116px * var(--table-font-scale, 1));
     border-right: 1px solid var(--brand-border);
     transition: background-color 0.15s ease;

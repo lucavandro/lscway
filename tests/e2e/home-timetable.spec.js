@@ -46,4 +46,29 @@ test.describe('Home Page - Orario Classe', () => {
     await expect(fullTable.locator('thead')).toContainText('LUN');
     await expect(fullTable.locator('thead')).toContainText('VEN');
   });
+
+  test('displays full teacher name on a single line without ellipsis truncation on mobile in weekly view', async ({ page }) => {
+    await page.setViewportSize({ width: 375, height: 667 });
+    await page.goto('/app/way/tmp/');
+
+    const fullTableSwitch = page.locator('.segment-btn', { hasText: 'Settimana' });
+    await fullTableSwitch.click();
+
+    const teacherLabel = page.locator('.compact-timetable .teacher-label').first();
+    await expect(teacherLabel).toBeVisible();
+
+    const metrics = await teacherLabel.evaluate((el) => {
+      const style = window.getComputedStyle(el);
+      return {
+        textOverflow: style.textOverflow,
+        whiteSpace: style.whiteSpace,
+        scrollWidth: el.scrollWidth,
+        clientWidth: el.clientWidth
+      };
+    });
+
+    expect(metrics.textOverflow).not.toBe('ellipsis');
+    expect(metrics.whiteSpace).toBe('nowrap');
+    expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1);
+  });
 });

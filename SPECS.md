@@ -292,7 +292,8 @@ Il liceo adotta la convenzione di Google Workspace:
 - Link cliccabili tra entità: cliccando sull'aula si naviga su `/aula?q=...`; cliccando sul docente si naviga su `/docente?q=...`.
 
 ### 8.3. `FullTimeTable.svelte` e `FullTimeTableRow.svelte`
-- Tabella a matrice settimanale completa (colonna ore fissa a sinistra, 5 colonne per i giorni LUN-VEN).
+- Tabella a matrice settimanale completa (colonna ore fissa a sinistra, 5 colonne per i giorni LUN-VEN) con `table-layout: auto` così che le colonne si allarghino automaticamente in base al contenuto.
+- Il nome del docente (`.teacher-label`) viene mostrato sempre per esteso su una singola riga senza troncamento con puntini (`text-overflow: ellipsis`), anche su viewport mobile.
 - Header giorno corrente evidenziato con un indicatore ("today dot").
 - Supporta scorrimento orizzontale fluido con ombreggiatura di scorrimento sui dispositivi mobili.
 

@@ -173,7 +173,6 @@
     vertical-align: middle;
     border-right: 1px solid var(--brand-border);
     transition: background-color 0.15s ease;
-    overflow: hidden;
   }
 
   .day-slot.is-today {
@@ -228,9 +227,6 @@
   .teacher-label {
     font-size: calc(0.875rem * var(--table-font-scale, 1));
     font-weight: 700;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    max-width: calc(110px * var(--table-font-scale, 1));
   }
 
   .fallback-subj {
@@ -383,7 +379,6 @@
     .teacher-label {
       font-size: calc(0.825rem * var(--table-font-scale, 1));
       font-weight: 700;
-      max-width: calc(110px * var(--table-font-scale, 1));
     }
     .fallback-subj {
       font-size: calc(0.8rem * var(--table-font-scale, 1));
@@ -445,7 +440,6 @@
     }
     .teacher-label {
       font-size: calc(0.875rem * var(--table-font-scale, 1));
-      max-width: none;
     }
     .fallback-subj {
       font-size: calc(0.85rem * var(--table-font-scale, 1));
