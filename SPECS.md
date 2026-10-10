@@ -26,7 +26,7 @@
 | **Framework Frontend** | Svelte / SvelteKit | `svelte` 4.2.7, `@sveltejs/kit` 2.0.0 |
 | **Adapter SvelteKit** | `@sveltejs/adapter-static` | 3.0.9 (configurato come SPA pura: `ssr: false`, `prerender: false`, fallback `index.html`) |
 | **Bundler & Dev Server** | Vite | 5.0.3, porta locale `1987`, binding `--host` |
-| **UI Framework & Stili** | PicoCSS + Custom CSS Tokens | `pico.min.css` (custom dark/light tokens, font scaler, view transitions) |
+| **UI Framework & Stili** | Pure CSS Design System | `app.css` (custom dark/light tokens, `:where()` reset, font scaler, view transitions) |
 | **State Management** | Svelte Stores (Writable / Readable) | Store reattivi con sincronizzazione `localStorage` |
 | **PWA & Offline** | Workbox CDN 5.1.2 + Custom Service Worker | Manifest V3, strategie `CacheFirst` per bundle immutabili, `StaleWhileRevalidate` per asset statici e shell SPA |
 | **Autenticazione** | Google Identity Services (GIS) | OAuth 2.0 client-side JWT decode ristretto al dominio `@lscortese.com` |
@@ -86,13 +86,12 @@ lscway/
 │
 ├── static/                     # Risorse statiche servite direttamente
 │   ├── .htaccess               # Direttive Apache per routing SPA e cache control
-│   ├── app.css                 # Design System, variabili CSS e stili globali
+│   ├── app.css                 # Design System, reset moderno, variabili CSS e stili globali
 │   ├── favicon.png             # Favicon applicazione
 │   ├── icon-192.png            # Icona PWA 192x192
 │   ├── icon-512.png            # Icona PWA 512x512
 │   ├── logo-blue.webp          # Logo ufficiale WAY Cortese
 │   ├── manifest.json           # Manifest PWA (display standalone, shortcuts, screenshots)
-│   ├── pico.min.css            # Base CSS minimale PicoCSS
 │   ├── qr.webp                 # Immagine QR code per condivisione (WebP)
 │   ├── service-worker.js       # Service worker PWA (Workbox, caching e background check)
 │   └── eastereggs/             # Immagini di stato ed Easter Eggs

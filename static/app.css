@@ -109,7 +109,32 @@
   }
 }
 
+/* Modern Baseline Normalization (Zero-specificity via :where) */
+:where(*, *::before, *::after) {
+  box-sizing: border-box;
+  background-repeat: no-repeat;
+}
+
+:where(:root) {
+  -webkit-tap-highlight-color: transparent;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+  overflow-wrap: break-word;
+}
+
 /* Modern Typography & Legibility */
+:where(h1, h2, h3, h4, h5, h6) {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  line-height: 1.2;
+}
+
+:where(h1) { font-size: 1.75rem; }
+:where(h2) { font-size: 1.35rem; }
+:where(h3) { font-size: 1.15rem; }
+
 h1, h2, h3, h4, h5, h6 {
   text-wrap: balance;
   letter-spacing: -0.015em;
@@ -117,8 +142,75 @@ h1, h2, h3, h4, h5, h6 {
   font-weight: 600;
 }
 
+:where(p, ul, ol, dl, pre, blockquote) {
+  margin-top: 0;
+  margin-bottom: 0.75rem;
+}
+
 p, .description, .note {
   text-wrap: pretty;
+}
+
+:where(a) {
+  color: var(--brand-primary);
+  text-decoration: none;
+  transition: color 0.15s ease;
+}
+
+:where(a:hover) {
+  color: var(--brand-primary-hover);
+  text-decoration: underline;
+}
+
+:where(button, input, select, textarea) {
+  margin: 0;
+  font-family: inherit;
+  font-size: 1rem;
+  line-height: inherit;
+  letter-spacing: inherit;
+  color: inherit;
+}
+
+:where(button, [type="button"], [type="reset"], [type="submit"]) {
+  -webkit-appearance: button;
+  appearance: button;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+}
+
+:where(button:disabled, input:disabled, select:disabled, textarea:disabled) {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+:where(img, svg, video, canvas, audio, iframe) {
+  vertical-align: middle;
+}
+
+:where(img) {
+  max-width: 100%;
+  height: auto;
+  border-style: none;
+}
+
+:where(svg:not([fill])) {
+  fill: currentColor;
+}
+
+:where(table) {
+  width: 100%;
+  border-collapse: collapse;
+  border-spacing: 0;
+}
+
+:where(code, kbd, samp, pre) {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.875em;
+}
+
+[hidden], template {
+  display: none !important;
 }
 
 /* Custom Scrollbars adhering to modern-web-guidance */
@@ -143,6 +235,8 @@ p, .description, .note {
 
 /* Global App Shell */
 html, body {
+  margin: 0;
+  width: 100%;
   min-height: 100dvh;
   background-color: var(--brand-surface-subtle);
   color: var(--brand-text);

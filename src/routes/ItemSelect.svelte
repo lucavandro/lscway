@@ -598,15 +598,15 @@
   .search-input {
     flex: 1;
     width: 100%;
-    height: 100% !important;
-    min-height: unset !important;
-    max-height: unset !important;
-    margin: 0 !important;
-    padding: 0 !important;
-    border: none !important;
-    background: transparent !important;
-    box-shadow: none !important;
-    outline: none !important;
+    height: 100%;
+    min-height: unset;
+    max-height: unset;
+    margin: 0;
+    padding: 0;
+    border: none;
+    background: transparent;
+    box-shadow: none;
+    outline: none;
     color: var(--brand-text);
     font-size: 0.875rem;
     line-height: 1.25;
@@ -614,9 +614,9 @@
   }
 
   .search-input:focus {
-    outline: none !important;
-    box-shadow: none !important;
-    border: none !important;
+    outline: none;
+    box-shadow: none;
+    border: none;
   }
 
   .clear-btn {
@@ -657,12 +657,12 @@
     width: 100%;
     height: 32px;
     min-height: 32px;
-    margin: 0 !important;
-    padding: 0 0.65rem !important;
+    margin: 0;
+    padding: 0 0.65rem;
     background: transparent;
-    border: none !important;
+    border: none;
     border-radius: 4px;
-    box-shadow: none !important;
+    box-shadow: none;
     font-size: 0.85rem;
     font-weight: 500;
     color: var(--brand-text);
@@ -855,12 +855,12 @@
     justify-content: space-between;
     width: 100%;
     min-height: 48px;
-    margin: 0 0 6px 0 !important;
-    padding: 0.65rem 1rem !important;
+    margin: 0 0 6px 0;
+    padding: 0.65rem 1rem;
     background: var(--brand-surface-card);
-    border: 1px solid var(--brand-border) !important;
+    border: 1px solid var(--brand-border);
     border-radius: 10px;
-    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02) !important;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.02);
     font-size: 1.05rem;
     font-weight: 600;
     color: var(--brand-text);
@@ -873,12 +873,12 @@
 
   .sheet-option-item:active {
     background: var(--brand-surface-subtle);
-    border-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary);
   }
 
   .sheet-option-item.is-selected {
     background: color-mix(in srgb, var(--brand-primary) 12%, transparent);
-    border-color: var(--brand-primary) !important;
+    border-color: var(--brand-primary);
     color: var(--brand-primary);
     font-weight: 700;
   }

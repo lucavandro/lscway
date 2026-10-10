@@ -1,6 +1,6 @@
 // This is the service worker with the combined offline experience (Offline page + Offline copy of pages)
 
-const CACHE_VERSION = "v2026-10-09-2";
+const CACHE_VERSION = "v2026-10-10-1";
 const CACHE = `lscway-cache-${CACHE_VERSION}`;
 let userEmail = null;
 let notificationsEnabled = true;
@@ -120,7 +120,7 @@ const immutableCacheFirstStrategy = new workbox.strategies.CacheFirst({
   cacheName: CACHE
 });
 
-// StaleWhileRevalidate per asset statici (CSS, icone, immagini, CDN PicoCSS)
+// StaleWhileRevalidate per asset statici (CSS, icone, immagini)
 const staticStaleWhileRevalidateStrategy = new workbox.strategies.StaleWhileRevalidate({
   cacheName: CACHE
 });
