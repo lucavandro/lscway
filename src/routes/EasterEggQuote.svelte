@@ -110,11 +110,12 @@
   }
 
   .easteregg-quote__footer {
-    display: inline-flex;
+    display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
-    gap: 0.5rem;
-    flex-wrap: wrap;
+    gap: 0.45rem;
+    width: 100%;
   }
 
   .easteregg-quote__author {
