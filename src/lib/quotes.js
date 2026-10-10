@@ -462,6 +462,21 @@ export const quotes = [
     text: "Negli anni '40, non potendo frequentare l'università, una giovanissima Rita Levi-Montalcini allestì un minuscolo laboratorio scientifico nella propria camera da letto, avviando gli studi sul fattore di crescita nervoso (NGF) che le valsero il Nobel nel 1986.",
     author: "Storia della Scienza"
   },
+  {
+    type: "curiosity",
+    text: "Tra l'VIII e il XIII secolo la 'Casa della Sapienza' (Bayt al-Ḥikma) di Baghdad fu uno dei maggiori centri scientifici del mondo: studiosi arabi, persiani, siriaci ed ebrei vi tradussero opere greche e indiane, sviluppando l'algebra, l'ottica sperimentale, l'astronomia e la medicina.",
+    author: "Storia della Scienza"
+  },
+  {
+    type: "curiosity",
+    text: "Intorno all'anno 1015 lo scienziato arabo Ibn al-Haytham (Alhazen) dimostrò sperimentalmente con la camera oscura (in arabo 'qamr', da cui deriva la parola 'camera') che la visione avviene perché la luce entra nell'occhio, fondando l'ottica moderna e anticipando il metodo scientifico.",
+    author: "Storia della Scienza"
+  },
+  {
+    type: "curiosity",
+    text: "Molti secoli prima che giungessero in Occidente, nella Cina antica erano già stati inventati la carta (II secolo a.C.), la bussola magnetica, la stampa a caratteri mobili (ideata da Bi Sheng nel 1040) e il primo sismografo della storia (realizzato dall'astronomo Zhang Heng nel 132 d.C.).",
+    author: "Storia della Scienza"
+  },
 
   // --- Curiosità: Storia dell'Informatica ---
   {
@@ -502,6 +517,16 @@ export const quotes = [
   {
     type: "curiosity",
     text: "Nel 1936, prima ancora che esistessero i computer elettronici, il matematico Alan Turing ideò la 'Macchina di Turing', il modello teorico su cui si fonda ancora oggi il funzionamento di ogni computer e smartphone.",
+    author: "Storia dell'Informatica"
+  },
+  {
+    type: "curiosity",
+    text: "Nell'850 d.C. a Baghdad i tre fratelli matematici e ingegneri persiani Banū Mūsā descrissero nel loro 'Libro dei dispositivi ingegnosi' un flauto automatico azionato dall'acqua i cui cilindri chiodati potevano essere sostituiti per cambiare melodia: è considerato il primo esempio di macchina programmabile della storia.",
+    author: "Storia dell'Informatica"
+  },
+  {
+    type: "curiosity",
+    text: "Nel 1206 l'ingegnere e matematico mesopotamico Ismail al-Jazarī progettò complessi orologi monumentali ad acqua e automi meccanici programmabili dotati di alberi a camme, anticipando di secoli concetti cardine dell'automazione e della robotica.",
     author: "Storia dell'Informatica"
   },
 
@@ -554,6 +579,31 @@ export const quotes = [
   {
     type: "curiosity",
     text: "Nel 1915 la matematica Emmy Noether dimostrò un teorema fondamentale della fisica moderna secondo cui a ogni simmetria della natura corrisponde una legge di conservazione, come la conservazione dell'energia o della quantità di moto.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Nel trattato cinese 'I nove capitoli sulle arti matematiche' (I secolo a.C. – I secolo d.C.) è già descritto il metodo per risolvere sistemi di equazioni lineari mediante tabelle di coefficienti e numeri negativi, ben diciotto secoli prima della formulazione europea di Gauss.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Nel V secolo d.C. il matematico e astronomo cinese Zu Chongzhi calcolò Pi greco con sette cifre decimali esatte (tra 3,1415926 e 3,1415927) e introdusse la frazione 355/113, stabilendo un primato mondiale di precisione che durò quasi mille anni.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Oltre due secoli prima di Newton e Leibniz, nel XIV secolo il matematico indiano Mādhava di Sangamagrāma e la Scuola del Kerala scoprirono gli sviluppi in serie infinita per le funzioni trigonometriche (seno, coseno e arcotangente) e per il calcolo di Pi greco.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Cresciuto nel sud dell'India studiando quasi da autodidatta, il genio matematico Srinivasa Ramanujan (1887–1920) riempì i suoi taccuini con quasi 4.000 teoremi e identità sulle serie infinite e la teoria dei numeri, molti dei quali trovano oggi applicazione nella fisica dei buchi neri.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Nel 2014 la matematica iraniana Maryam Mirzakhani è diventata la prima donna e la prima scienziata mediorientale a vincere la Medaglia Fields, il massimo riconoscimento mondiale per la matematica, per i suoi studi sulla geometria delle superfici di Riemann.",
     author: "Storia della Matematica"
   }
 ];

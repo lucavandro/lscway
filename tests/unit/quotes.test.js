@@ -4,7 +4,7 @@ import { quotes, getRandomQuote } from '$lib/quotes.js';
 describe('quotes module', () => {
   it('contains a rich collection of valid quotes (with role) and curiosities', () => {
     expect(Array.isArray(quotes)).toBe(true);
-    expect(quotes.length).toBeGreaterThanOrEqual(80);
+    expect(quotes.length).toBeGreaterThanOrEqual(110);
 
     for (const item of quotes) {
       expect(typeof item.text).toBe('string');
@@ -19,10 +19,10 @@ describe('quotes module', () => {
     }
 
     const curiosities = quotes.filter((q) => q.type === 'curiosity');
-    expect(curiosities.length).toBeGreaterThanOrEqual(30);
+    expect(curiosities.length).toBeGreaterThanOrEqual(40);
 
     const mathCuriosities = curiosities.filter((q) => q.author === 'Storia della Matematica');
-    expect(mathCuriosities.length).toBeGreaterThanOrEqual(8);
+    expect(mathCuriosities.length).toBeGreaterThanOrEqual(14);
   });
 
   it('returns a valid random quote or curiosity from the collection', () => {
