@@ -8,7 +8,7 @@
 	<link rel="preconnect" href="https://www.liceoscientificocortese.edu.it" crossorigin />
 	<script>
 		(function() {
-			var APP_VERSION = '2026-10-10-3';
+			var APP_VERSION = '2026-10-10-4';
 			try {
 				var saved = localStorage.getItem('theme');
 				var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -48,6 +48,9 @@
 				var prevVersion = localStorage.getItem('lscway_app_version');
 				if (prevVersion !== APP_VERSION) {
 					localStorage.setItem('lscway_app_version', APP_VERSION);
+					['docente', 'aula'].forEach(function(route) {
+						fetch('%sveltekit.assets%/' + route, { cache: 'reload', credentials: 'same-origin' }).catch(function() {});
+					});
 					if ('serviceWorker' in navigator) {
 						navigator.serviceWorker.getRegistrations().then(function(regs) {
 							regs.forEach(function(r) { r.update().catch(function() {}); });

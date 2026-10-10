@@ -1,6 +1,6 @@
 // This is the service worker with the combined offline experience (Offline page + Offline copy of pages)
 
-const CACHE_VERSION = "v2026-10-10-3";
+const CACHE_VERSION = "v2026-10-10-4";
 const CACHE = `lscway-cache-${CACHE_VERSION}`;
 let userEmail = null;
 let notificationsEnabled = true;
@@ -150,6 +150,13 @@ self.addEventListener('activate', (event) => {
       // Elimina tutte le cache delle versioni precedenti
       await Promise.all(oldCaches.map((name) => caches.delete(name)));
 
+      // Invalida eventuali vecchi redirect 301 (verso http://) rimasti nella HTTP disk cache del browser
+      await Promise.allSettled(
+        ['./', './docente', './aula'].map((route) =>
+          fetch(route, { cache: 'reload', credentials: 'same-origin' }).catch(() => {})
+        )
+      );
+
       await self.clients.claim();
     })()
   );
@@ -168,6 +175,20 @@ const isApiRequest = (url) =>
 
 const STATIC_ASSET_REGEX = /\.(?:css|js|mjs|webp|png|jpg|jpeg|gif|svg|ico|woff2?|ttf|otf|json)$/i;
 
+const isSpaShellRequest = ({ request, url }) => {
+  if (request.method !== 'GET' || isDevModuleRequest(url) || isApiRequest(url)) {
+    return false;
+  }
+  if (request.mode === 'navigate') {
+    return true;
+  }
+  return (
+    url.origin === self.location.origin &&
+    !url.pathname.includes('/_app/immutable/') &&
+    !STATIC_ASSET_REGEX.test(url.pathname)
+  );
+};
+
 // CacheFirst per i bundle immutabili di SvelteKit (hanno già hash nel nome file)
 const immutableCacheFirstStrategy = new workbox.strategies.CacheFirst({
   cacheName: CACHE
@@ -181,10 +202,10 @@ const staticStaleWhileRevalidateStrategy = new workbox.strategies.StaleWhileReva
   }
 });
 
-// Gestione navigazione pagina (SPA): Stale-While-Revalidate sull'index.html della SPA
-// per avvio istantaneo con aggiornamento in background
+// Gestione navigazione e route SPA: Stale-While-Revalidate sull'index.html della SPA
+// per avvio istantaneo con aggiornamento in background (copre anche fetch a route SPA come /docente o /aula)
 workbox.routing.registerRoute(
-  ({ request, url }) => request.mode === 'navigate' && !isDevModuleRequest(url),
+  isSpaShellRequest,
   async ({ event, request }) => {
     const cache = await caches.open(CACHE);
     const scopeRootUrl = self.registration ? new URL('./', self.registration.scope).href : offlineFallbackPage;
@@ -192,6 +213,10 @@ workbox.routing.registerRoute(
     const cachedShell =
       (await cache.match(scopeRootUrl, { ignoreSearch: true })) ||
       (await cache.match(offlineFallbackPage, { ignoreSearch: true }));
+
+    if (cachedShell && request.mode !== 'navigate') {
+      return cachedShell;
+    }
 
     const networkFetch = fetch(scopeRootUrl, {
       cache: 'no-cache',

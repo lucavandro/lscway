@@ -1,4 +1,5 @@
 <IfModule mod_headers.c>
+    Header set Content-Security-Policy "upgrade-insecure-requests"
 <FilesMatch "\.(html|json)$|service-worker\.js$">
     Header set Cache-Control "no-cache, max-age=0, must-revalidate"
 </FilesMatch>
@@ -7,12 +8,15 @@
 </FilesMatch>
 </IfModule>
 
+<IfModule mod_dir.c>
+    DirectorySlash Off
+</IfModule>
+
 <IfModule mod_rewrite.c>
     RewriteEngine On
 
-    # Se il file o la directory fisica richiesta esistono, servili direttamente
-    RewriteCond %{REQUEST_FILENAME} -f [OR]
-    RewriteCond %{REQUEST_FILENAME} -d
+    # Se il file fisico richiesto esiste, servilo direttamente
+    RewriteCond %{REQUEST_FILENAME} -f
     RewriteRule ^ - [L]
 
     # Altrimenti riscrivi tutto su index.html (SPA fallback)
