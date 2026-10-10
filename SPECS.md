@@ -306,7 +306,7 @@ Il liceo adotta la convenzione di Google Workspace:
 ### 8.4. `HeaderMenuPanel.svelte` e Pagine `/prenotazioni` e `/link`
 - Pannello di navigazione laterale drawer con supporto per swipe touch per la chiusura.
 - Include controlli per:
-  - **Navigazione:** accesso a tutte le sezioni interne (Home, Hotspot LIM, Sostituzioni, Login Docenti, Prenotazioni `/prenotazioni`, Link Rapidi `/link`, Canali Social `/social`, Condividi App `/qr`).
+  - **Navigazione:** accesso a tutte le sezioni interne: Home, Hotspot LIM (solo docenti), Sostituzioni (solo docenti), Link Rapidi `/link` (solo docenti), Login Docenti (se non autenticato come docente), Prenotazioni `/prenotazioni`, Canali Social `/social`, Condividi App `/qr`.
   - **Azioni:**
     - Toggle Notifiche.
     - Toggle Tema chiaro / scuro.
@@ -316,7 +316,7 @@ Il liceo adotta la convenzione di Google Workspace:
 - **Pagina `/prenotazioni` (`src/routes/prenotazioni/+page.svelte`):** bacheca a card (sullo stile di `social/+page.svelte`, con pulsanti *Apri*, *Condividi* e *Copia link*) contenente:
   - *Sportello Psicologico* (`https://forms.gle/UPLBbEKaK56fpDaL6`): accessibile a tutti gli utenti (studenti, famiglie e docenti).
   - *Portatili in comodato d'uso* (`https://forms.gle/NzWrea6g8ZDpwCQ8A`): card visibile esclusivamente ai docenti autenticati (`$isTeacher === true`).
-- **Pagina `/link` (`src/routes/link/+page.svelte`):** bacheca a card per le risorse esterne (con apertura `target="_blank"`, *Condividi* e *Copia link*):
+- **Pagina `/link` (`src/routes/link/+page.svelte`):** bacheca a card per le risorse esterne **riservata ai docenti autenticati** (`$isTeacher === true`, reindirizza alla home se non autenticato come docente; con apertura `target="_blank"`, *Condividi* e *Copia link*):
   - *Indirizzi gruppi mail scolastici* (`https://docs.google.com/spreadsheets/d/1CHoQed5cFo5ryTkfugP5-4K2jlOuV_RiNbSYj_wD6G4/edit?usp=sharing`)
   - *Moduli Web 2.0* (`https://forms.gle/UPLBbEKaK56fpDaL6`)
   - *ELS Cortese* (`https://www.liceoscientificocortese.edu.it/els/`)

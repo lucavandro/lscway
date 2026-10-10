@@ -50,7 +50,7 @@ test.describe('Header Menu - Drawer, Temi e Font Scale', () => {
     }
   });
 
-  test('navigates from drawer to Prenotazioni page and hides teacher-only laptop card for non-teachers', async ({ page }) => {
+  test('navigates from drawer to Prenotazioni page and hides teacher-only items for non-teachers', async ({ page }) => {
     await page.addInitScript(() => {
       window.localStorage.removeItem('userEmail');
     });
@@ -60,6 +60,9 @@ test.describe('Header Menu - Drawer, Temi e Font Scale', () => {
 
     const drawerPanel = page.locator('.drawer-panel');
     await expect(drawerPanel).toBeVisible();
+
+    // Link Rapidi must be hidden in drawer for non-teachers
+    await expect(drawerPanel.locator('a.nav-link', { hasText: 'Link Rapidi' })).toHaveCount(0);
 
     const prenotazioniNavLink = drawerPanel.locator('a.nav-link', { hasText: 'Prenotazioni' });
     await expect(prenotazioniNavLink).toBeVisible();
@@ -95,7 +98,11 @@ test.describe('Header Menu - Drawer, Temi e Font Scale', () => {
     await expect(portatiliCard.locator('a.btn-visit')).toHaveAttribute('target', '_blank');
   });
 
-  test('navigates from drawer to Link Rapidi page and displays external resource cards', async ({ page }) => {
+  test('navigates from drawer to Link Rapidi page when logged in as teacher and displays external resource cards', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('userEmail', 'rossi@lscortese.com');
+    });
+
     await page.goto('/app/way/tmp/');
     await page.locator('.hamburger-btn').click();
 

@@ -315,6 +315,17 @@
                 <span class="nav-text">Sostituzioni</span>
               </a>
             </li>
+            <li>
+              <a
+                href="{base}/link"
+                class="nav-link"
+                class:active={$page.url.pathname === base + "/link"}
+                on:click={closeMenu}
+              >
+                <span class="nav-icon"><LinkIcon /></span>
+                <span class="nav-text">Link Rapidi</span>
+              </a>
+            </li>
           {:else}
             <li>
               <a
@@ -338,18 +349,6 @@
             >
               <span class="nav-icon"><BookingIcon /></span>
               <span class="nav-text">Prenotazioni</span>
-            </a>
-          </li>
-
-          <li>
-            <a
-              href="{base}/link"
-              class="nav-link"
-              class:active={$page.url.pathname === base + "/link"}
-              on:click={closeMenu}
-            >
-              <span class="nav-icon"><LinkIcon /></span>
-              <span class="nav-text">Link Rapidi</span>
             </a>
           </li>
 

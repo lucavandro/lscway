@@ -1,5 +1,8 @@
 <script>
   import { onMount } from "svelte";
+  import { isTeacher } from "$lib/stores.js";
+  import { goto } from "$app/navigation";
+  import { base } from "$app/paths";
 
   let copiedItemId = null;
   let copyTimeout = null;
@@ -54,6 +57,10 @@
   ];
 
   onMount(() => {
+    if (!$isTeacher) {
+      goto(base || "/");
+      return;
+    }
     canShare = typeof navigator !== "undefined" && !!navigator.share;
   });
 
@@ -91,127 +98,129 @@
   <title>Link Rapidi - WAY Cortese</title>
 </svelte:head>
 
-<div class="social-page">
-  <!-- Header Intro Card -->
-  <header class="social-intro-card">
-    <div class="intro-badge-icon" aria-hidden="true">
-      <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
-        <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
-      </svg>
-    </div>
-    <h1 class="page-title">Link Rapidi e Risorse</h1>
-    <p class="page-subtitle">
-      Accedi rapidamente ai portali, agli elenchi email e alle risorse digitali esterne del <strong>Liceo Scientifico Nino Cortese</strong>.
-    </p>
-  </header>
+{#if $isTeacher}
+  <div class="social-page">
+    <!-- Header Intro Card -->
+    <header class="social-intro-card">
+      <div class="intro-badge-icon" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path>
+          <path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path>
+        </svg>
+      </div>
+      <h1 class="page-title">Link Rapidi e Risorse</h1>
+      <p class="page-subtitle">
+        Accedi rapidamente ai portali, agli elenchi email e alle risorse digitali esterne riservate ai docenti del <strong>Liceo Scientifico Nino Cortese</strong>.
+      </p>
+    </header>
 
-  <!-- Quick Links Cards Grid -->
-  <div class="social-grid" role="list" aria-label="Link rapidi e risorse esterne del Liceo Cortese">
-    {#each quickLinks as item (item.id)}
-      <article
-        class="social-card {item.id}-card"
-        role="listitem"
-        style="--channel-color: {item.themeColor}; --channel-bg: {item.bgTint}; --channel-border: {item.borderTint}; --channel-text: {item.textColor};"
-      >
-        <div class="card-main">
-          <div class="card-header">
-            <div class="platform-icon-wrap" aria-hidden="true">
-              {#if item.icon === "mail"}
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <rect x="2" y="4" width="20" height="16" rx="2"></rect>
-                  <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
-                </svg>
-              {:else if item.icon === "forms"}
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                  <polyline points="14 2 14 8 20 8"></polyline>
-                  <line x1="16" y1="13" x2="8" y2="13"></line>
-                  <line x1="16" y1="17" x2="8" y2="17"></line>
-                  <line x1="10" y1="9" x2="8" y2="9"></line>
-                </svg>
-              {:else if item.icon === "globe"}
-                <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                  <circle cx="12" cy="12" r="10"></circle>
-                  <line x1="2" y1="12" x2="22" y2="12"></line>
-                  <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
-                </svg>
-              {/if}
-            </div>
-
-            <div class="platform-meta">
-              <div class="name-row">
-                <span class="platform-name">{item.name}</span>
-                <span class="platform-badge">{item.badge}</span>
+    <!-- Quick Links Cards Grid -->
+    <div class="social-grid" role="list" aria-label="Link rapidi e risorse esterne del Liceo Cortese">
+      {#each quickLinks as item (item.id)}
+        <article
+          class="social-card {item.id}-card"
+          role="listitem"
+          style="--channel-color: {item.themeColor}; --channel-bg: {item.bgTint}; --channel-border: {item.borderTint}; --channel-text: {item.textColor};"
+        >
+          <div class="card-main">
+            <div class="card-header">
+              <div class="platform-icon-wrap" aria-hidden="true">
+                {#if item.icon === "mail"}
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="2" y="4" width="20" height="16" rx="2"></rect>
+                    <path d="m22 7-8.97 5.7a1.94 1.94 0 0 1-2.06 0L2 7"></path>
+                  </svg>
+                {:else if item.icon === "forms"}
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                    <polyline points="14 2 14 8 20 8"></polyline>
+                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                    <line x1="10" y1="9" x2="8" y2="9"></line>
+                  </svg>
+                {:else if item.icon === "globe"}
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <line x1="2" y1="12" x2="22" y2="12"></line>
+                    <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                  </svg>
+                {/if}
               </div>
-              <span class="platform-handle">{item.handle}</span>
+
+              <div class="platform-meta">
+                <div class="name-row">
+                  <span class="platform-name">{item.name}</span>
+                  <span class="platform-badge">{item.badge}</span>
+                </div>
+                <span class="platform-handle">{item.handle}</span>
+              </div>
             </div>
+
+            <p class="platform-description">{item.description}</p>
           </div>
 
-          <p class="platform-description">{item.description}</p>
-        </div>
+          <!-- Action Row -->
+          <div class="card-actions">
+            <a
+              href={item.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              class="btn btn-visit"
+              aria-label="Apri {item.name} (si apre in una nuova scheda)"
+            >
+              <span>{item.actionLabel}</span>
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                <polyline points="15 3 21 3 21 9"></polyline>
+                <line x1="10" y1="14" x2="21" y2="3"></line>
+              </svg>
+            </a>
 
-        <!-- Action Row -->
-        <div class="card-actions">
-          <a
-            href={item.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            class="btn btn-visit"
-            aria-label="Apri {item.name} (si apre in una nuova scheda)"
-          >
-            <span>{item.actionLabel}</span>
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-              <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-              <polyline points="15 3 21 3 21 9"></polyline>
-              <line x1="10" y1="14" x2="21" y2="3"></line>
-            </svg>
-          </a>
+            <div class="utility-actions">
+              {#if canShare}
+                <button
+                  type="button"
+                  class="btn-icon"
+                  title="Condividi {item.name}"
+                  aria-label="Condividi link {item.name}"
+                  on:click={() => shareItem(item)}
+                >
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="18" cy="5" r="3"></circle>
+                    <circle cx="6" cy="12" r="3"></circle>
+                    <circle cx="18" cy="19" r="3"></circle>
+                    <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
+                    <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
+                  </svg>
+                </button>
+              {/if}
 
-          <div class="utility-actions">
-            {#if canShare}
               <button
                 type="button"
                 class="btn-icon"
-                title="Condividi {item.name}"
-                aria-label="Condividi link {item.name}"
-                on:click={() => shareItem(item)}
+                class:copied={copiedItemId === item.id}
+                title={copiedItemId === item.id ? "Link copiato!" : "Copia link"}
+                aria-label={copiedItemId === item.id ? "Link copiato negli appunti" : "Copia link di " + item.name}
+                on:click={() => copyLink(item)}
               >
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <circle cx="18" cy="5" r="3"></circle>
-                  <circle cx="6" cy="12" r="3"></circle>
-                  <circle cx="18" cy="19" r="3"></circle>
-                  <line x1="8.59" y1="13.51" x2="15.42" y2="17.49"></line>
-                  <line x1="15.41" y1="6.51" x2="8.59" y2="10.49"></line>
-                </svg>
+                {#if copiedItemId === item.id}
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <polyline points="20 6 9 17 4 12"></polyline>
+                  </svg>
+                {:else}
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
+                    <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
+                  </svg>
+                {/if}
               </button>
-            {/if}
-
-            <button
-              type="button"
-              class="btn-icon"
-              class:copied={copiedItemId === item.id}
-              title={copiedItemId === item.id ? "Link copiato!" : "Copia link"}
-              aria-label={copiedItemId === item.id ? "Link copiato negli appunti" : "Copia link di " + item.name}
-              on:click={() => copyLink(item)}
-            >
-              {#if copiedItemId === item.id}
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
-                  <polyline points="20 6 9 17 4 12"></polyline>
-                </svg>
-              {:else}
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                  <rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect>
-                  <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path>
-                </svg>
-              {/if}
-            </button>
+            </div>
           </div>
-        </div>
-      </article>
-    {/each}
+        </article>
+      {/each}
+    </div>
   </div>
-</div>
+{/if}
 
 <style>
   .social-page {
