@@ -398,6 +398,58 @@ export const quotes = [
     type: "curiosity",
     text: "Nel 1936, prima ancora che esistessero i computer elettronici, il matematico Alan Turing ideò la 'Macchina di Turing', il modello teorico su cui si fonda ancora oggi il funzionamento di ogni computer e smartphone.",
     author: "Storia dell'Informatica"
+  },
+
+  // --- Curiosità: Storia della Matematica ---
+  {
+    type: "curiosity",
+    text: "A soli nove anni, il futuro matematico Carl Friedrich Gauss stupì il suo maestro calcolando in pochi istanti la somma dei numeri da 1 a 100: accoppiò mentalmente gli estremi (1+100, 2+99, 3+98...), ottenendo 50 coppie di somma 101, cioè 5050.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Nel 1202 il matematico pisano Leonardo Fibonacci pubblicò il 'Liber Abaci', facendo conoscere in Europa le cifre indo-arabiche e il sistema posizionale decimale, oltre alla celebre successione (1, 1, 2, 3, 5, 8, 13...) presente anche nella disposizione di petali e semi in natura.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Sebbene i Babilonesi usassero già un segno segnaposto, fu il matematico e astronomo indiano Brahmagupta, nel 628 d.C., a definire per la prima volta lo zero come un vero e proprio numero dotato di precise regole aritmetiche.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Nel 1637 Pierre de Fermat annotò sul margine di un libro di aver scoperto una 'meravigliosa dimostrazione' del suo Ultimo Teorema, ma che il margine era troppo stretto per contenerla: i matematici impiegarono 358 anni per dimostrarlo, fino all'impresa di Andrew Wiles nel 1994.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Secondo la tradizione, René Descartes (Cartesio) ebbe l'intuizione delle coordinate cartesiane osservando una mosca camminare sul soffitto della sua stanza e accorgendosi di poterne individuare la posizione tramite la distanza da due pareti perpendicolari.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Nel 1736 Leonhard Euler (Eulero) risolse il celebre enigma dei sette ponti di Königsberg dimostrando che era impossibile attraversarli tutti una sola volta: da quel problema nacque la teoria dei grafi, oggi alla base di Internet e dei navigatori satellitari.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Nel III secolo a.C. Archimede di Siracusa riuscì a calcolare un'approssimazione straordinariamente precisa di Pi greco (3,1408 < π < 3,1428) inscrivendo e circoscrivendo a un cerchio poligoni regolari fino a 96 lati.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Vissuta tra il IV e il V secolo d.C., Ipazia di Alessandria fu una delle prime grandi matematiche e astronome della storia: guidò la celebre scuola alessandrina e curò importanti studi sull'Aritmetica di Diofanto e sulle sezioni coniche di Apollonio.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Nel 1748 la matematica milanese Maria Gaetana Agnesi pubblicò le 'Instituzioni analitiche ad uso della gioventù italiana', uno dei primi e più completi trattati europei di calcolo differenziale e integrale, ricevendo nel 1750 la cattedra di matematica all'Università di Bologna.",
+    author: "Storia della Matematica"
+  },
+  {
+    type: "curiosity",
+    text: "Nel 1915 la matematica Emmy Noether dimostrò un teorema fondamentale della fisica moderna secondo cui a ogni simmetria della natura corrisponde una legge di conservazione, come la conservazione dell'energia o della quantità di moto.",
+    author: "Storia della Matematica"
   }
 ];
 

@@ -30,6 +30,13 @@ test.describe('Error Pages & Offline', () => {
 
     const firstText = await quoteText.textContent();
     expect(firstText?.trim().length).toBeGreaterThan(5);
-    await expect(page.locator('.easteregg-quote__refresh')).toHaveCount(0);
+
+    const refreshBtn = page.locator('.easteregg-quote__refresh');
+    await expect(refreshBtn).toBeVisible();
+    await refreshBtn.click();
+
+    const secondText = await quoteText.textContent();
+    expect(secondText?.trim().length).toBeGreaterThan(5);
+    expect(secondText).not.toBe(firstText);
   });
 });
