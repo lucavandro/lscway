@@ -17,7 +17,7 @@
     resetMessages();
     const result = await googleAuth(response.credential);
     if (result.success) {
-      goto(base || "/");
+      goto(`${base}/`);
     } else {
       errorMessage = result.message;
     }
@@ -69,7 +69,7 @@
 
   onMount(async () => {
     if ($userEmail) {
-      goto(base || "/");
+      goto(`${base}/`);
       return;
     }
     await loadGoogleAuth();
@@ -125,7 +125,7 @@
         </div>
         <h3>Accesso effettuato</h3>
         <p class="signed-email">{$userEmail}</p>
-        <a href="{base || '/'}" class="btn-return">Torna all'orario</a>
+        <a href="{base}/" class="btn-return">Torna all'orario</a>
       </div>
     </div>
   {/if}

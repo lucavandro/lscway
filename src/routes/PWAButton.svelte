@@ -10,16 +10,26 @@
       installButtonVisible = true;
     }
 
-    window.addEventListener("beforeinstallprompt", (e) => {
+    const handleBeforeInstallPrompt = (e) => {
       e.preventDefault();
+      window.deferredInstallPrompt = e;
       deferredPrompt = e;
       installButtonVisible = true;
-    });
+    };
 
-    window.addEventListener("appinstalled", () => {
+    const handleAppInstalled = () => {
       installButtonVisible = false;
       deferredPrompt = null;
-    });
+      window.deferredInstallPrompt = null;
+    };
+
+    window.addEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+    window.addEventListener("appinstalled", handleAppInstalled);
+
+    return () => {
+      window.removeEventListener("beforeinstallprompt", handleBeforeInstallPrompt);
+      window.removeEventListener("appinstalled", handleAppInstalled);
+    };
   });
 
   async function installApp() {

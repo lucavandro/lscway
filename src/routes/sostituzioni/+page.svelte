@@ -51,7 +51,7 @@
 
   onMount(() => {
     if (!$userEmail) {
-      goto(base || "/");
+      goto(`${base}/`);
     } else {
       fetchSostituzioni();
       interval = setInterval(fetchSostituzioni, 60000);

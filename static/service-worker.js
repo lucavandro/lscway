@@ -1,11 +1,27 @@
 // This is the service worker with the combined offline experience (Offline page + Offline copy of pages)
 
-const CACHE_VERSION = "v2026-10-10-2";
+const CACHE_VERSION = "v2026-10-10-3";
 const CACHE = `lscway-cache-${CACHE_VERSION}`;
 let userEmail = null;
 let notificationsEnabled = true;
 let notifiedSubstitutions = new Set();
 let checkInterval = null;
+
+// Protegge Cache.prototype.put da errori di rete transitori (es. stream interrotto durante navigazione)
+// e impedisce il salvataggio in cache di risposte redirezionate o in errore
+if (typeof Cache !== 'undefined' && Cache.prototype && Cache.prototype.put) {
+  const originalCachePut = Cache.prototype.put;
+  Cache.prototype.put = function (request, response) {
+    try {
+      if (!response || !response.ok || response.type === 'error' || response.redirected) {
+        return Promise.resolve();
+      }
+      return originalCachePut.call(this, request, response).catch(() => {});
+    } catch (err) {
+      return Promise.resolve();
+    }
+  };
+}
 
 importScripts('https://storage.googleapis.com/workbox-cdn/releases/5.1.2/workbox-sw.js');
 
@@ -78,7 +94,14 @@ self.addEventListener('install', (event) => {
       await Promise.allSettled(
         PRECACHE_ASSETS.map(async (asset) => {
           try {
-            await cache.add(new Request(asset, { cache: 'no-cache' }));
+            const res = await fetch(asset, {
+              cache: 'no-cache',
+              credentials: 'same-origin',
+              redirect: 'follow'
+            });
+            if (res && res.ok && !res.redirected) {
+              await cache.put(asset, res);
+            }
           } catch (err) {
             console.warn(`[Service Worker] Failed to precache asset ${asset}:`, err);
           }
@@ -114,7 +137,7 @@ self.addEventListener('activate', (event) => {
                 const existing = await newCache.match(req);
                 if (!existing) {
                   const res = await oldCache.match(req);
-                  if (res && res.ok) {
+                  if (res && res.ok && !res.redirected) {
                     await newCache.put(req, res);
                   }
                 }
@@ -143,6 +166,8 @@ const isApiRequest = (url) =>
   url.pathname.includes('/api/') ||
   url.pathname.endsWith('.php');
 
+const STATIC_ASSET_REGEX = /\.(?:css|js|mjs|webp|png|jpg|jpeg|gif|svg|ico|woff2?|ttf|otf|json)$/i;
+
 // CacheFirst per i bundle immutabili di SvelteKit (hanno già hash nel nome file)
 const immutableCacheFirstStrategy = new workbox.strategies.CacheFirst({
   cacheName: CACHE
@@ -150,14 +175,17 @@ const immutableCacheFirstStrategy = new workbox.strategies.CacheFirst({
 
 // StaleWhileRevalidate per asset statici (CSS, icone, immagini)
 const staticStaleWhileRevalidateStrategy = new workbox.strategies.StaleWhileRevalidate({
-  cacheName: CACHE
+  cacheName: CACHE,
+  fetchOptions: {
+    cache: 'no-cache'
+  }
 });
 
 // Gestione navigazione pagina (SPA): Stale-While-Revalidate sull'index.html della SPA
 // per avvio istantaneo con aggiornamento in background
 workbox.routing.registerRoute(
   ({ request, url }) => request.mode === 'navigate' && !isDevModuleRequest(url),
-  async ({ request }) => {
+  async ({ event, request }) => {
     const cache = await caches.open(CACHE);
     const scopeRootUrl = self.registration ? new URL('./', self.registration.scope).href : offlineFallbackPage;
 
@@ -170,15 +198,18 @@ workbox.routing.registerRoute(
       credentials: 'same-origin',
       redirect: 'follow'
     })
-      .then((freshResponse) => {
-        if (freshResponse && freshResponse.ok) {
-          cache.put(scopeRootUrl, freshResponse.clone()).catch(() => {});
+      .then(async (freshResponse) => {
+        if (freshResponse && freshResponse.ok && !freshResponse.redirected) {
+          await cache.put(scopeRootUrl, freshResponse.clone());
         }
         return freshResponse;
       })
       .catch(() => null);
 
     if (cachedShell) {
+      if (event && typeof event.waitUntil === 'function') {
+        event.waitUntil(networkFetch);
+      }
       return cachedShell;
     }
 
@@ -198,16 +229,19 @@ workbox.routing.registerRoute(
 workbox.routing.registerRoute(
   ({ request, url }) =>
     request.method === 'GET' &&
+    url.origin === self.location.origin &&
     url.pathname.includes('/_app/immutable/') &&
     !isDevModuleRequest(url),
   immutableCacheFirstStrategy
 );
 
-// 2. Risorse statiche (CSS, JS, immagini, icone, font) -> StaleWhileRevalidate
+// 2. Risorse statiche dello stesso dominio (CSS, JS, immagini, icone, font, manifest) -> StaleWhileRevalidate
 workbox.routing.registerRoute(
   ({ request, url }) =>
     request.method === 'GET' &&
     request.mode !== 'navigate' &&
+    url.origin === self.location.origin &&
+    STATIC_ASSET_REGEX.test(url.pathname) &&
     !url.pathname.includes('/_app/immutable/') &&
     !isApiRequest(url) &&
     !isDevModuleRequest(url),
@@ -217,7 +251,7 @@ workbox.routing.registerRoute(
 // Gestione del background sync
 self.addEventListener('sync', function(event) {
   if (event.tag === 'check-substitutions') {
-    if (notificationsEnabled) {
+    if (userEmail && notificationsEnabled) {
       event.waitUntil(checkSubstitutionsInBackground());
     }
   }
@@ -226,7 +260,6 @@ self.addEventListener('sync', function(event) {
 async function checkSubstitutionsInBackground() {
   // Verifica che l'utente sia loggato e le notifiche siano abilitate
   if (!userEmail || !notificationsEnabled) {
-    console.log('Service Worker: Skip controllo sostituzioni (utente non loggato o notifiche disabilitate)');
     return;
   }
 

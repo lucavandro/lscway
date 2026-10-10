@@ -46,7 +46,9 @@
     isLoading.set(false);
 
     checkNotificationPermission();
-    setupBackgroundSync().catch(() => {});
+    if ($userEmail && $notificationsEnabled) {
+      setupBackgroundSync().catch(() => {});
+    }
   });
 
   onDestroy(() => {
@@ -95,7 +97,7 @@
           </svg>
         </button>
 
-        <a href={base || "/"} class="logo-link">
+        <a href="{base}/" class="logo-link">
           <div class="logo-text">
             <span class="brand-title">WAY Cortese</span>
             <span class="brand-subtitle">Liceo N. Cortese</span>

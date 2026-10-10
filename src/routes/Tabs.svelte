@@ -16,7 +16,7 @@
   <nav class="tabs-nav" aria-label="Sezioni orario" data-sveltekit-preload-code="viewport">
     <div class="tabs-tray" role="tablist">
       <a
-        href="{base || '/'}"
+        href="{base}/"
         class="tab-pill"
         class:active={isHome}
         role="tab"

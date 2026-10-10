@@ -56,13 +56,13 @@ L'applicazione viene compilata come una SPA statica (senza SSR a runtime Node.js
       base: '/app/way/tmp'
   }
   ```
-- **Invariante per Agenti AI:** qualsiasi route interna, link, o fetch ad asset interni **deve** utilizzare o tenere conto del prefisso `base` importato da `$app/paths` (es. `<a href="{base}/docente">`).
+- **Invariante per Agenti AI:** qualsiasi route interna, link, o fetch ad asset interni **deve** utilizzare o tenere conto del prefisso `base` importato da `$app/paths` (es. `<a href="{base}/docente">`). Per i link e i redirect alla home page usare sempre `${base}/` con slash finale (e mai `base || "/"` senza slash finale), così da evitare redirect `301` di Apache verso `http://` dietro reverse proxy.
 
 ### 3.2. Caching, Indicizzazione O(1) e Avvio Istantaneo (Stale-While-Revalidate)
 1. **Preload anticipato in `app.html`:** prima ancora che il bundle JS di Svelte si carichi, un piccolo script inline in `app.html` avvia la fetch dei dati orario salvando la Promise in `window.__lscwayInitialDataPromise`.
 2. **Memoria locale (`localStorage`) e Indicizzazione `O(1)`:** i dati dell'orario vengono salvati sotto la chiave `lscway_orario_cache_v1` in modo asincrono con `requestIdleCallback` e arricchiti in memoria con una proprietà non-enumerabile `_index` (`byClass`, `byTeacher`, `byAula`) per lookup istantanei $O(1)$ al cambio selezione.
 3. **Ripristino immediato e Revalidation intelligente:** all'apertura dell'app, se i dati sono in cache vengono immediatamente mostrati; la revalidation in background aggiorna lo store `timetableData` e `localStorage` **solo se il payload ricevuto differisce effettivamente da quello in cache**, evitando re-render ridondanti.
-4. **Migrazione Chunk Immutabili nel Service Worker:** ad ogni cambio di `CACHE_VERSION`, l'evento `activate` di `static/service-worker.js` migra nella nuova cache i file `/_app/immutable/` già presenti nella cache precedente prima di rimuoverla, azzerando il riscaricamento dei bundle invariati.
+4. **Migrazione Chunk Immutabili e Filtro Risorse nel Service Worker:** ad ogni cambio di `CACHE_VERSION`, l'evento `activate` di `static/service-worker.js` migra nella nuova cache i file `/_app/immutable/` già presenti nella cache precedente prima di rimuoverla, azzerando il riscaricamento dei bundle invariati. La strategia `StaleWhileRevalidate` intercetta esclusivamente asset statici con estensione nota dello stesso dominio (`STATIC_ASSET_REGEX`) ignorando route SPA e risposte redirezionate, con guardia `Cache.prototype.put` contro interruzioni di rete.
 
 ### 3.3. Tema Dinamico e Accessibilità
 - **Modalità Dark / Light:** implementata in `src/lib/theme.js` tramite attributo `data-theme` su `<html>` e proprietà CSS `color-scheme`. Supporta rilevamento delle preferenze di sistema (`prefers-color-scheme`) e memorizzazione in `localStorage`.

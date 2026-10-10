@@ -282,7 +282,7 @@
         <ul class="nav-list">
           <li>
             <a
-              href={base || "/"}
+              href="{base}/"
               class="nav-link"
               class:active={$page.url.pathname === base || $page.url.pathname === base + "/"}
               on:click={closeMenu}

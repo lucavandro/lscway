@@ -58,7 +58,7 @@
 
   onMount(() => {
     if (!$isTeacher) {
-      goto(base || "/");
+      goto(`${base}/`);
       return;
     }
     canShare = typeof navigator !== "undefined" && !!navigator.share;

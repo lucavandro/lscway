@@ -7,6 +7,7 @@ import {
   showSubstitutionNotification,
   checkSubstitutionsForNotifications,
   clearNotifiedSubstitutions,
+  setupBackgroundSync,
   syncUserEmailWithServiceWorker,
   syncNotificationsWithServiceWorker,
   clearUserFromServiceWorker
@@ -136,5 +137,24 @@ describe('notifications module', () => {
       type: 'SET_USER_EMAIL',
       email: null
     });
+  });
+
+  it('only registers background sync when user is logged in and notifications are enabled', async () => {
+    globalThis.ServiceWorkerRegistration = function () {};
+    globalThis.ServiceWorkerRegistration.prototype.sync = {};
+    const registration = await navigator.serviceWorker.ready;
+
+    userEmail.set(null);
+    await setupBackgroundSync();
+    expect(registration.sync.register).not.toHaveBeenCalled();
+
+    userEmail.set('docente@lscortese.com');
+    notificationsEnabled.set(false);
+    await setupBackgroundSync();
+    expect(registration.sync.register).not.toHaveBeenCalled();
+
+    notificationsEnabled.set(true);
+    await setupBackgroundSync();
+    expect(registration.sync.register).toHaveBeenCalledWith('check-substitutions');
   });
 });

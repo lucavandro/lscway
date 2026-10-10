@@ -126,23 +126,27 @@ export function clearNotifiedSubstitutions() {
 export async function setupBackgroundSync() {
 	if ('serviceWorker' in navigator) {
 		const registration = await navigator.serviceWorker.ready;
+		const currentEmail = getValidatedUserEmail();
+		const enabled = get(notificationsEnabled);
+		const targetWorker = navigator.serviceWorker.controller || registration?.active;
 		
 		// Sincronizza sempre l'email dell'utente con il service worker
-		syncUserEmailWithServiceWorker();
-		syncNotificationsWithServiceWorker(get(notificationsEnabled));
+		syncUserEmailWithServiceWorker(targetWorker);
+		syncNotificationsWithServiceWorker(enabled, targetWorker);
 		
-		// Setup del controllo periodico
-		if ('sync' in window.ServiceWorkerRegistration.prototype) {
+		// Setup del controllo periodico solo se l'utente è autenticato e ha le notifiche abilitate
+		if (currentEmail && enabled && 'sync' in window.ServiceWorkerRegistration.prototype) {
 			return registration.sync.register('check-substitutions');
 		}
 	}
 }
 
 // Funzione per sincronizzare l'email dell'utente con il service worker
-export function syncUserEmailWithServiceWorker() {
-	if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
+export function syncUserEmailWithServiceWorker(worker) {
+	const target = worker || ('serviceWorker' in navigator ? navigator.serviceWorker.controller : null);
+	if (target) {
 		const currentEmail = getValidatedUserEmail();
-		navigator.serviceWorker.controller.postMessage({
+		target.postMessage({
 			type: 'SET_USER_EMAIL',
 			email: currentEmail,
 			notificationsEnabled: get(notificationsEnabled)
@@ -151,9 +155,10 @@ export function syncUserEmailWithServiceWorker() {
 }
 
 // Funzione per sincronizzare l'abilitazione delle notifiche con il service worker
-export function syncNotificationsWithServiceWorker(enabled) {
-	if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-		navigator.serviceWorker.controller.postMessage({
+export function syncNotificationsWithServiceWorker(enabled, worker) {
+	const target = worker || ('serviceWorker' in navigator ? navigator.serviceWorker.controller : null);
+	if (target) {
+		target.postMessage({
 			type: 'SET_NOTIFICATIONS_ENABLED',
 			enabled: !!enabled
 		});
@@ -161,9 +166,10 @@ export function syncNotificationsWithServiceWorker(enabled) {
 }
 
 // Funzione per rimuovere l'utente dal service worker
-export function clearUserFromServiceWorker() {
-	if ('serviceWorker' in navigator && navigator.serviceWorker.controller) {
-		navigator.serviceWorker.controller.postMessage({
+export function clearUserFromServiceWorker(worker) {
+	const target = worker || ('serviceWorker' in navigator ? navigator.serviceWorker.controller : null);
+	if (target) {
+		target.postMessage({
 			type: 'SET_USER_EMAIL',
 			email: null
 		});

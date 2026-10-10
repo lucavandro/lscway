@@ -102,15 +102,6 @@
 	});
 </script>
 
-<svelte:head>
-	<script>
-		window.addEventListener("beforeinstallprompt", (event) => {
-			event.preventDefault();
-			window.deferredInstallPrompt = event;
-		});
-	</script>
-</svelte:head>
-
 {#if $isLoading}
 	<div id="app-splash" role="status" aria-live="polite" aria-label="Aggiornamento dati in corso">
 		<div class="app-splash__card">
