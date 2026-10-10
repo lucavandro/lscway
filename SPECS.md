@@ -122,6 +122,7 @@ lscway/
     │   ├── dateutils.js        # Ore lezioni, calcolo ora corrente, giorni, store orologio
     │   ├── hotspot.js          # Tabella statica SSID / password hotspot LIM per aula
     │   ├── notifications.js    # Richiesta permessi, trigger notifiche, sync con SW
+    │   ├── quotes.js           # Collezione citazioni/aforismi scolastici e selettore random
     │   ├── stores.js           # Svelte stores globali reattivi
     │   ├── theme.js            # Gestore tema chiaro/scuro e preferenze utente
     │   ├── utils.js            # Preferenze utente (localStorage), validazione email, ordinamento
@@ -132,7 +133,8 @@ lscway/
         ├── +layout.svelte      # Layout radice: Header, Footer, Menu drawer, Splash
         ├── +page.svelte        # Vista principale: Orario per CLASSE
         ├── +error.svelte       # Pagina errore generica (404 o fallback 500)
-        ├── Error500.svelte     # Componente errore 500 con easter egg Panda offline
+        ├── Error500.svelte     # Componente errore 500 con easter egg Panda offline e citazione
+        ├── EasterEggQuote.svelte # Box citazione/aforisma casuale con pulsante di cambio rapido
         ├── Header.svelte       # Header superiore: hamburger, brand, orologio, install PWA
         ├── HeaderMenuPanel.svelte # Drawer laterale con swipe-to-close, impostazioni, font scale
         ├── Footer.svelte       # Piè di pagina con collegamenti e crediti
@@ -260,6 +262,7 @@ Definita in `src/lib/dateutils.js`:
 - **Sabato e Domenica:** le tabelle orario giornaliere mostrano illustrazioni a tema weekend (`saturday.webp`, `sunday.webp`).
 - **Periodo Natalizio (`isChristmasPeriod()`):** dal 23 Dicembre al 6 Gennaio vengono visualizzate animazioni natalizie (`xmas1.webp`, `xmas2.webp`, `xmas3.webp`).
 - **Errore 500 / Crash Rete (`Error500.svelte`):** include una speciale illustrazione del panda (`500.webp`) precaricata con bassa priorità e recuperata anche direttamente da Cache Storage in modalità offline.
+- **Citazioni e Aforismi Casuali (`EasterEggQuote.svelte` & `src/lib/quotes.js`):** tutte le viste con easter egg (Sabato, Domenica, periodo natalizio in `TimeTable.svelte` e pagina errore `Error500.svelte`) sono accompagnate in basso da una citazione o aforisma scelto casualmente da una collezione predefinita (`quotes`), curata per il contesto scolastico liceale (scienza, filosofia, letteratura, cultura, educazione e riposo). La funzione `getRandomQuote()` evita ripetizioni consecutive e il componente offre un pulsante discreto per estrarre una nuova citazione.
 
 ### 7.3. Riconoscimento Ruolo Utente
 Il liceo adotta la convenzione di Google Workspace:
@@ -379,6 +382,7 @@ L'integrità del software e l'assenza di regressioni sono garantite da una doppi
   - `utils.test.js`: persistenza preferenze in `localStorage` (docente, classe, aula), validatore booleano email scolastica, data odierna YYYY-MM-DD, ordinamento materie sostegno/inclusione in fondo.
   - `hotspot.test.js`: consistenza database credenziali Wi-Fi LIM per tutte le aule dei tre plessi A, B e C e hotspot docenti.
   - `notifications.test.js`: permessi Web Notifications, notifiche per sostituzioni del giorno con deduplicazione, messaggistica con il Service Worker.
+  - `quotes.test.js`: validazione integrità collezione citazioni scolastiche, estrazione casuale e prevenzione ripetizioni consecutive.
   - `theme.test.js`: transizione temi light/dark e persistenza DOM/`localStorage`.
 
 ### 11.2. End-to-End Testing (Playwright)

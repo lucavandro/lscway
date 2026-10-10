@@ -1,5 +1,6 @@
 <script>
   import TimeTableRow from "./TimeTableRow.svelte";
+  import EasterEggQuote from "./EasterEggQuote.svelte";
   import { base } from "$app/paths";
   import { clockStore } from "$lib/dateutils.js";
 
@@ -24,6 +25,7 @@
       alt="Buone Feste!"
       class="easteregg-gif"
     />
+    <EasterEggQuote />
   </div>
 {:else if isSaturday}
   <div class="easteregg-container">
@@ -32,6 +34,7 @@
       alt="Sabato"
       class="easteregg-gif"
     />
+    <EasterEggQuote />
   </div>
 {:else if isSunday}
   <div class="easteregg-container">
@@ -40,6 +43,7 @@
       alt="Domenica"
       class="easteregg-gif"
     />
+    <EasterEggQuote />
   </div>
 {:else}
   <div class="daily-table-container">
@@ -125,8 +129,10 @@
   .easteregg-container {
     width: 100%;
     display: flex;
+    flex-direction: column;
     align-items: center;
     justify-content: center;
+    gap: 1.25rem;
     padding: 2rem 1rem;
     border-radius: 12px;
     border: 1px solid var(--brand-border);
@@ -155,6 +161,7 @@
     }
     .easteregg-container {
       padding: 1.5rem 0.75rem;
+      gap: 1rem;
     }
     .easteregg-gif {
       width: 220px;

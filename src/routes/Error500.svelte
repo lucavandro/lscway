@@ -1,6 +1,7 @@
 <script>
   import { base } from "$app/paths";
   import { onMount } from "svelte";
+  import EasterEggQuote from "./EasterEggQuote.svelte";
 
   export let error = null;
   export let status = 500;
@@ -75,6 +76,8 @@
       <h2 class="error-title">Si è verificato un problema</h2>
       <p class="error-subtitle">Un panda altamente addestrato sta cercando di risolverlo.</p>
     </div>
+
+    <EasterEggQuote />
 
     <div class="error-actions">
       <button type="button" on:click={retry} class="btn btn-primary">
