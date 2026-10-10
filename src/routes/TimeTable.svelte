@@ -9,7 +9,7 @@
   export let isChristmas = undefined;
 
   const xmasWebps = ["xmas1.webp", "xmas2.webp", "xmas3.webp"];
-  let randomXmasGif = xmasWebps[Math.floor(Math.random() * xmasWebps.length)];
+  let randomXmasWebp = xmasWebps[Math.floor(Math.random() * xmasWebps.length)];
 
   $: activeDay = day !== undefined ? day : $clockStore.day;
   $: activeIsChristmas = isChristmas !== undefined ? isChristmas : $clockStore.isChristmas;
@@ -20,7 +20,7 @@
 {#if activeIsChristmas}
   <div class="easteregg-container">
     <img
-      src="{base}/eastereggs/{randomXmasGif}"
+      src="{base}/eastereggs/{randomXmasWebp}"
       alt="Buone Feste!"
       class="easteregg-gif"
     />

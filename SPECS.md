@@ -93,7 +93,7 @@ lscway/
 │   ├── logo-blue.webp          # Logo ufficiale WAY Cortese
 │   ├── manifest.json           # Manifest PWA (display standalone, shortcuts, screenshots)
 │   ├── pico.min.css            # Base CSS minimale PicoCSS
-│   ├── qr.png / qr.webp        # Immagini QR code per condivisione
+│   ├── qr.webp                 # Immagine QR code per condivisione (WebP)
 │   ├── service-worker.js       # Service worker PWA (Workbox, caching e background check)
 │   └── eastereggs/             # Immagini di stato ed Easter Eggs
 │       ├── 500.webp            # Panda di errore 500
