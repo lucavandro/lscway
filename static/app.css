@@ -179,6 +179,10 @@ p, .description, .note {
   cursor: pointer;
 }
 
+:where(a, button, input, select, textarea, [role="button"], [role="tab"], [role="option"], [role="switch"]) {
+  touch-action: manipulation;
+}
+
 :where(button:disabled, input:disabled, select:disabled, textarea:disabled) {
   opacity: 0.5;
   pointer-events: none;

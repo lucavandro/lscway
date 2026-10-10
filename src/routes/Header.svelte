@@ -24,6 +24,7 @@
 
   async function checkSubstitutions() {
     if (!$userEmail || !$notificationsEnabled) return;
+    if (typeof document !== "undefined" && document.hidden) return;
 
     try {
       const response = await fetch(

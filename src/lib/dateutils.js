@@ -7,19 +7,19 @@ const timeToMinutes = (timeStr) => {
     return h * 60 + m;
 };
 
+const hourStartMinutes = hours.map(timeToMinutes);
+
 export function getHourNum() {
     const now = new Date();
     const currentMin = now.getHours() * 60 + now.getMinutes() + now.getSeconds() / 60;
     const defaultDuration = 60; // Durata di default dell'ultima lezione (in minuti)
 
     // Trova l'indice dell'ora di lezione in cui rientra l'orario attuale
-    const index = hours.findIndex((startTime, i) => {
-        const start = timeToMinutes(startTime);
-        
+    const index = hourStartMinutes.findIndex((start, i) => {
         // La lezione finisce all'inizio della successiva,
         // oppure dopo 'defaultDuration' minuti se è l'ultima nell'array
-        const end = (i < hours.length - 1) 
-            ? timeToMinutes(hours[i + 1]) 
+        const end = (i < hourStartMinutes.length - 1) 
+            ? hourStartMinutes[i + 1] 
             : start + defaultDuration;
 
         return currentMin >= start && currentMin < end;
@@ -53,25 +53,53 @@ export function getSchoolHour() {
 
 import { readable } from "svelte/store";
 
-export const clockStore = readable(
-    {
+function computeClockState() {
+    return {
         day: getDay(),
         hourNum: getHourNum(),
         schoolHour: getSchoolHour(),
         isChristmas: isChristmasPeriod()
-    },
+    };
+}
+
+export const clockStore = readable(
+    computeClockState(),
     (set) => {
+        let current = computeClockState();
+        set(current);
+
         if (typeof window === "undefined") return () => {};
+
         const update = () => {
-            set({
-                day: getDay(),
-                hourNum: getHourNum(),
-                schoolHour: getSchoolHour(),
-                isChristmas: isChristmasPeriod()
-            });
+            const next = computeClockState();
+            if (
+                next.day !== current.day ||
+                next.hourNum !== current.hourNum ||
+                next.schoolHour !== current.schoolHour ||
+                next.isChristmas !== current.isChristmas
+            ) {
+                current = next;
+                set(next);
+            }
         };
+
+        const handleVisibilityChange = () => {
+            if (typeof document !== "undefined" && document.visibilityState === "visible") {
+                update();
+            }
+        };
+
         const timer = setInterval(update, 15000);
-        return () => clearInterval(timer);
+        if (typeof document !== "undefined") {
+            document.addEventListener("visibilitychange", handleVisibilityChange);
+        }
+
+        return () => {
+            clearInterval(timer);
+            if (typeof document !== "undefined") {
+                document.removeEventListener("visibilitychange", handleVisibilityChange);
+            }
+        };
     }
 );
 

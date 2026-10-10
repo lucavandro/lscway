@@ -13,7 +13,7 @@
 </script>
 
 {#if showTabs}
-  <nav class="tabs-nav" aria-label="Sezioni orario">
+  <nav class="tabs-nav" aria-label="Sezioni orario" data-sveltekit-preload-code="viewport">
     <div class="tabs-tray" role="tablist">
       <a
         href="{base || '/'}"

@@ -27,7 +27,40 @@ const API_URL =
 const CACHE_KEY = "lscway_orario_cache_v1";
 
 let memoryCache = null;
+let lastSerializedJson = null;
 let inflightRevalidation = null;
+
+function buildTimetableIndexes(rows) {
+    const byClass = Object.create(null);
+    const byTeacher = Object.create(null);
+    const byAula = Object.create(null);
+
+    for (let i = 0; i < rows.length; i++) {
+        const row = rows[i];
+        if (row.classe && row.materia !== "INCL") {
+            (byClass[row.classe] ||= []).push(row);
+        }
+        if (row.docente) {
+            (byTeacher[row.docente] ||= []).push(row);
+        }
+        if (row.aula) {
+            (byAula[row.aula] ||= []).push(row);
+        }
+    }
+
+    return { byClass, byTeacher, byAula };
+}
+
+function attachIndexes(target, rows) {
+    if (!target || typeof target !== "object") return target;
+    Object.defineProperty(target, "_index", {
+        value: buildTimetableIndexes(rows),
+        enumerable: false,
+        configurable: true,
+        writable: true
+    });
+    return target;
+}
 
 function normalizeTimetableData(raw) {
     if (!raw || typeof raw !== "object") return null;
@@ -37,6 +70,9 @@ function normalizeTimetableData(raw) {
     }
 
     if (raw.__normalized) {
+        if (!raw._index && Array.isArray(raw.data)) {
+            attachIndexes(raw, raw.data);
+        }
         return raw;
     }
 
@@ -71,18 +107,27 @@ function normalizeTimetableData(raw) {
         __normalized: true
     };
 
-    return normalized;
+    return attachIndexes(normalized, rows);
 }
 
 function readCachedData() {
-    if (memoryCache) return memoryCache;
-    if (typeof localStorage === "undefined") return null;
+    if (typeof localStorage === "undefined") {
+        return memoryCache;
+    }
 
     try {
         const cachedStr = localStorage.getItem(CACHE_KEY);
-        if (!cachedStr) return null;
+        if (!cachedStr) {
+            memoryCache = null;
+            lastSerializedJson = null;
+            return null;
+        }
+        if (memoryCache && lastSerializedJson === cachedStr) {
+            return memoryCache;
+        }
         const parsed = JSON.parse(cachedStr);
         if (!parsed || !Array.isArray(parsed.data)) return null;
+        lastSerializedJson = cachedStr;
         memoryCache = normalizeTimetableData(parsed);
         return memoryCache;
     } catch (e) {
@@ -90,12 +135,12 @@ function readCachedData() {
     }
 }
 
-function persistCachedDataAsync(dataObj) {
-    if (typeof window === "undefined" || typeof localStorage === "undefined" || !dataObj) return;
+function persistCachedDataAsync(serializedJson) {
+    if (typeof window === "undefined" || typeof localStorage === "undefined" || !serializedJson) return;
 
     const save = () => {
         try {
-            localStorage.setItem(CACHE_KEY, JSON.stringify(dataObj));
+            localStorage.setItem(CACHE_KEY, serializedJson);
         } catch (e) {}
     };
 
@@ -133,11 +178,16 @@ async function fetchNetworkData(fetchFn, isBackground = false) {
 
     const normalized = normalizeTimetableData(rawData);
     if (normalized) {
-        memoryCache = normalized;
-        timetableData.set(normalized);
-        persistCachedDataAsync(normalized);
+        const nextJson = JSON.stringify(normalized);
+        const hasChanged = !memoryCache || lastSerializedJson !== nextJson;
+        if (hasChanged) {
+            memoryCache = normalized;
+            lastSerializedJson = nextJson;
+            timetableData.set(normalized);
+            persistCachedDataAsync(nextJson);
+        }
     }
-    return normalized;
+    return memoryCache || normalized;
 }
 
 export async function getData(fetch) {

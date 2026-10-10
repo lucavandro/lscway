@@ -671,6 +671,8 @@
     transition: background-color 0.1s ease, color 0.1s ease;
     box-sizing: border-box;
     line-height: 1.2;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 32px;
   }
 
   .option-item:hover,
@@ -869,6 +871,8 @@
     transition: background-color 0.12s ease, border-color 0.12s ease;
     box-sizing: border-box;
     line-height: 1.3;
+    content-visibility: auto;
+    contain-intrinsic-size: auto 48px;
   }
 
   .sheet-option-item:active {

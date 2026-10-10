@@ -1,6 +1,6 @@
 // This is the service worker with the combined offline experience (Offline page + Offline copy of pages)
 
-const CACHE_VERSION = "v2026-10-10-1";
+const CACHE_VERSION = "v2026-10-10-2";
 const CACHE = `lscway-cache-${CACHE_VERSION}`;
 let userEmail = null;
 let notificationsEnabled = true;
@@ -65,7 +65,10 @@ function stopPeriodicCheck() {
 }
 
 const PRECACHE_ASSETS = [
-  offlineFallbackPage
+  offlineFallbackPage,
+  "./app.css",
+  "./logo-blue.webp",
+  "./manifest.json"
 ];
 
 self.addEventListener('install', (event) => {
@@ -94,9 +97,34 @@ self.addEventListener('activate', (event) => {
         } catch (e) {}
       }
 
-      // Elimina tutte le cache delle versioni precedenti
       const cacheNames = await caches.keys();
       const oldCaches = cacheNames.filter((name) => name !== CACHE);
+
+      // Migra i bundle immutabili di SvelteKit (/_app/immutable/) già presenti nelle cache precedenti
+      // per evitare di riscaricare file con hash identico ad ogni aggiornamento di versione
+      if (oldCaches.length > 0) {
+        try {
+          const newCache = await caches.open(CACHE);
+          for (const oldName of oldCaches) {
+            const oldCache = await caches.open(oldName);
+            const requests = await oldCache.keys();
+            const immutableRequests = requests.filter((req) => req.url.includes('/_app/immutable/'));
+            await Promise.all(
+              immutableRequests.map(async (req) => {
+                const existing = await newCache.match(req);
+                if (!existing) {
+                  const res = await oldCache.match(req);
+                  if (res && res.ok) {
+                    await newCache.put(req, res);
+                  }
+                }
+              })
+            );
+          }
+        } catch (e) {}
+      }
+
+      // Elimina tutte le cache delle versioni precedenti
       await Promise.all(oldCaches.map((name) => caches.delete(name)));
 
       await self.clients.claim();

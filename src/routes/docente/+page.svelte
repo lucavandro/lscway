@@ -16,7 +16,10 @@
   $: currenDay = $clockStore.day;
   $: activeData = $timetableData || data;
   $: teachers = activeData?.docenti || [];
-  $: teacherWeekData = activeData?.data?.filter((e) => e.docente === selectedTeacher) || [];
+  $: teacherWeekData =
+    activeData?._index?.byTeacher?.[selectedTeacher] ??
+    activeData?.data?.filter((e) => e.docente === selectedTeacher) ??
+    [];
   $: teacherData = teacherWeekData.filter((e) => e.day === currenDay);
 
   onMount(() => {

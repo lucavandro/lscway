@@ -47,6 +47,13 @@ describe('data module', () => {
     expect(result.data[2].materia).toBe('RIC');
     expect(result.data[2].aula).toBe('');
 
+    // O(1) lookup indexes are attached and non-enumerable
+    expect(result._index).toBeDefined();
+    expect(result._index.byClass['1A']).toHaveLength(2);
+    expect(result._index.byTeacher['ROSSI MARIO']).toHaveLength(3);
+    expect(result._index.byAula['A101']).toHaveLength(1);
+    expect(Object.keys(result)).not.toContain('_index');
+
     // Store is updated
     expect(get(timetableData)).toEqual(result);
   });

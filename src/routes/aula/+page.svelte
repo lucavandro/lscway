@@ -16,7 +16,10 @@
   $: currenDay = $clockStore.day;
   $: activeData = $timetableData || data;
   $: classrooms = activeData?.aule ? activeData.aule.filter((e) => e != "") : [];
-  $: classroomWeekData = activeData?.data?.filter((e) => e.aula === selectedClassroom) || [];
+  $: classroomWeekData =
+    activeData?._index?.byAula?.[selectedClassroom] ??
+    activeData?.data?.filter((e) => e.aula === selectedClassroom) ??
+    [];
   $: classroomData = classroomWeekData.filter((e) => e.day === currenDay);
 
   function onSelectedItemChange() {
