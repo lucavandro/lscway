@@ -13,9 +13,12 @@ test.describe('Header Menu - Drawer, Temi e Font Scale', () => {
     await expect(hamburgerBtn).toBeVisible();
     await hamburgerBtn.click();
 
-    // Verify menu drawer panel is open
+    // Verify menu drawer panel is open and displays the SemVer version in footer
     const drawerPanel = page.locator('.drawer-panel');
     await expect(drawerPanel).toBeVisible();
+    const appVersionBadge = drawerPanel.locator('.drawer-footer .app-version');
+    await expect(appVersionBadge).toBeVisible();
+    await expect(appVersionBadge).toHaveText(/^v\d+\.\d+\.\d+$/);
 
     // Find and click theme toggle button
     const themeBtn = page.locator('.theme-toggle-btn');

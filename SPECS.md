@@ -128,6 +128,7 @@ lscway/
     │   ├── stores.js           # Svelte stores globali reattivi
     │   ├── theme.js            # Gestore tema chiaro/scuro e preferenze utente
     │   ├── utils.js            # Preferenze utente (localStorage), validazione email, ordinamento
+    │   ├── version.js          # Costante versione SemVer unificata dell'app (APP_VERSION)
     │   └── images/icons/       # Vettori SVG locali (es. offline-icon-dark/light)
     │
     └── routes/                 # Pagine e componenti visuali dell'app
@@ -313,6 +314,7 @@ Il liceo adotta la convenzione di Google Workspace:
     - Regolatore dimensione caratteri tabella (con pulsanti `-` / `+`, slider e tasto reset).
     - Pulsante "Aggiorna dati" (`reload()` che pulisce Cache Storage, Service Worker e ricarica i dati freschi).
     - Accesso / Logout utente.
+  - **Footer del Drawer (`.drawer-footer`):** visualizza il nome dell'istituto, l'anno scolastico (`A.S. 2026/27`) e in piccolo la versione SemVer corrente dell'applicazione (`v{APP_VERSION}`, importata da `src/lib/version.js`).
 - **Pagina `/prenotazioni` (`src/routes/prenotazioni/+page.svelte`):** bacheca a card (sullo stile di `social/+page.svelte`, con pulsanti *Apri*, *Condividi* e *Copia link*) contenente:
   - *Sportello Psicologico* (`https://forms.gle/UPLBbEKaK56fpDaL6`): accessibile a tutti gli utenti (studenti, famiglie e docenti).
   - *Portatili in comodato d'uso* (`https://forms.gle/NzWrea6g8ZDpwCQ8A`): card visibile esclusivamente ai docenti autenticati (`$isTeacher === true`).
@@ -337,8 +339,9 @@ Qualsiasi agente AI che opera su questa codebase **DEVE** rispettare rigorosamen
    - Non introdurre codice Node.js (come `fs`, `path`, server hooks con database) dentro `src/routes/` o `src/lib/`.
    - L'accesso a `window`, `document`, o `localStorage` deve essere sempre protetto da controlli `if (typeof window !== 'undefined')` o collocato all'interno di `onMount()`.
 
-3. **Integrità del Service Worker e Caching:**
-   - La gestione della cache deve rimanere allineata a `CACHE_VERSION` in `static/service-worker.js` e `APP_VERSION` in `src/app.html`.
+3. **Integrità del Service Worker, Caching e Versionamento SemVer Unificato:**
+   - L'applicazione adotta un sistema di **Semantic Versioning (`MAJOR.MINOR.PATCH`)** unificato e gestito autonomamente dagli agenti AI secondo le regole di [`AGENTS.md`](file:///c:/Users/Luca/git/lscway/AGENTS.md) (`feat:` $\rightarrow$ `MINOR`, `fix:`/`perf:`/`refactor:` $\rightarrow$ `PATCH`).
+   - La versione deve rimanere sempre identica e sincronizzata tra `package.json` (`"version": "X.Y.Z"`), `src/lib/version.js` (`APP_VERSION = 'X.Y.Z'`), `src/app.html` (`var APP_VERSION = 'X.Y.Z'`) e `static/service-worker.js` (`const CACHE_VERSION = "vX.Y.Z"`).
    - Non bloccare o rompere le strategie Workbox `CacheFirst` per i bundle immutabili (`/_app/immutable/`) e `StaleWhileRevalidate` per gli asset.
 
 4. **Prestazioni e Bundle Size:**
@@ -399,6 +402,7 @@ L'integrità del software e l'assenza di regressioni sono garantite da una doppi
   - `notifications.test.js`: permessi Web Notifications, notifiche per sostituzioni del giorno con deduplicazione, messaggistica con il Service Worker.
   - `quotes.test.js`: validazione integrità collezione citazioni scolastiche, estrazione casuale e prevenzione ripetizioni consecutive.
   - `theme.test.js`: transizione temi light/dark e persistenza DOM/`localStorage`.
+  - `version.test.js`: validazione formato SemVer (`MAJOR.MINOR.PATCH`) e sincronizzazione unificata tra `src/lib/version.js`, `package.json`, `src/app.html` e `static/service-worker.js`.
 
 ### 11.2. End-to-End Testing (Playwright)
 - **Configurazione:** `playwright.config.js` con avvio automatico del web server di preview (`npm run preview -- --port 4173`), browser Chromium headless, risoluzione del base path `/app/way/tmp`.
@@ -406,7 +410,7 @@ L'integrità del software e l'assenza di regressioni sono garantite da una doppi
 - **Scenari E2E coperti (`tests/e2e/`):**
   - `home-timetable.spec.js`: caricamento home, brand, tab navigation, selettore classe con ricerca, tabella giornaliera, toggle e matrice orario settimanale completo.
   - `navigation-tabs.spec.js`: transizione fluida tra schede Classe, Docente e Aula con aggiornamento reattivo dei dati.
-  - `header-menu.spec.js`: apertura/chiusura drawer menu, cambio tema chiaro/scuro in tempo reale, variazione dimensione font tabella con controlli dedicati, visibilità sezioni *Prenotazioni* (Sportello Psicologico per tutti, Portatili riservato docenti) e *Link Rapidi*.
+  - `header-menu.spec.js`: apertura/chiusura drawer menu, visibilità versione SemVer nel footer del drawer, cambio tema chiaro/scuro in tempo reale, variazione dimensione font tabella con controlli dedicati, visibilità sezioni *Prenotazioni* (Sportello Psicologico per tutti, Portatili riservato docenti) e *Link Rapidi*.
   - `hotspot.spec.js`: consultazione password Wi-Fi LIM aula e verifica operazione di copia.
   - `qr-social.spec.js`: rendering codice QR con link di condivisione e bacheca canali social ufficiali (Facebook, Instagram, TikTok, YouTube).
   - `sostituzioni.spec.js`: controllo accessi (avviso per utenti non autenticati) e visualizzazione schede sostituzione con badge orario e classe per docenti loggati.

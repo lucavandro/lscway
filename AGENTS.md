@@ -55,6 +55,23 @@
 
 ---
 
+### 1.4. Gestione Autonoma del Versionamento Semantico Unificato (SemVer)
+- L'applicazione adotta lo standard **Semantic Versioning (`MAJOR.MINOR.PATCH`)** gestito autonomamente dagli agenti AI ad ogni intervento sul codice.
+- **Regole di incremento automatico** (determinate dal tipo di commit Conventional Commits):
+  - `feat:` $\rightarrow$ incrementa `MINOR` e azzera `PATCH` (es. `1.0.0` $\rightarrow$ `1.1.0`).
+  - `fix:`, `perf:`, `refactor:` $\rightarrow$ incrementa `PATCH` (es. `1.1.0` $\rightarrow$ `1.1.1`).
+  - Breaking change architetturali $\rightarrow$ incrementa `MAJOR` e azzera `MINOR` e `PATCH` (es. `1.1.1` $\rightarrow$ `2.0.0`).
+  - `docs:`, `chore:` (modifiche esclusivamente documentali o di test senza impatto sul runtime dell'app) $\rightarrow$ nessun incremento richiesto.
+- **Sincronizzazione obbligatoria e unificata (4 file):**  
+  Quando la versione viene incrementata (es. a `X.Y.Z`), l'agente **DEVE** aggiornare contestualmente tutti e 4 i seguenti punti prima di eseguire build e test:
+  1. [`package.json`](file:///c:/Users/Luca/git/lscway/package.json): `"version": "X.Y.Z"`
+  2. [`src/lib/version.js`](file:///c:/Users/Luca/git/lscway/src/lib/version.js): `export const APP_VERSION = 'X.Y.Z';` (mostrata nel `.drawer-footer` di [`HeaderMenuPanel.svelte`](file:///c:/Users/Luca/git/lscway/src/routes/HeaderMenuPanel.svelte))
+  3. [`src/app.html`](file:///c:/Users/Luca/git/lscway/src/app.html): `var APP_VERSION = 'X.Y.Z';`
+  4. [`static/service-worker.js`](file:///c:/Users/Luca/git/lscway/static/service-worker.js): `const CACHE_VERSION = "vX.Y.Z";`
+- L'allineamento dei 4 file è validato automaticamente dal test unitario [`tests/unit/version.test.js`](file:///c:/Users/Luca/git/lscway/tests/unit/version.test.js).
+
+---
+
 ## 2. Invarianti Tecniche del Progetto
 
 Qualsiasi intervento sul codice deve preservare i seguenti pilastri architetturali:
@@ -71,7 +88,7 @@ Qualsiasi intervento sul codice deve preservare i seguenti pilastri architettura
 
 ### 2.3. Integrità PWA, Service Worker e Caching
 - Il Service Worker (`static/service-worker.js`) sfrutta Workbox per strategie `CacheFirst` sui file immutabili di SvelteKit (`/_app/immutable/`) e `StaleWhileRevalidate` per asset statici e shell di navigazione.
-- Se vengono aggiunti o rinominati asset statici critici, verificare l'impatto sul Service Worker e, se necessario, allineare la costante `CACHE_VERSION` in `static/service-worker.js` e `APP_VERSION` in `src/app.html`.
+- La versione della cache (`CACHE_VERSION = "vX.Y.Z"` in `static/service-worker.js`) e `APP_VERSION` (`'X.Y.Z'` in `src/app.html` e `src/lib/version.js`) sono unificate con `version` in `package.json` secondo la Regola 1.4.
 - Non rimuovere la logica di caching offline né la sincronizzazione delle sostituzioni in background.
 
 ### 2.4. Mobile First, Gestione Viewport e Scaler Font
@@ -97,7 +114,7 @@ flowchart TD
     B --> C{"Coerente con SPECS?"}
     C -- "No (Contrasto)" --> D["Chiedi chiarimento all'utente"]
     D --> E["Attendi decisione utente"]
-    E --> F["3. Esecuzione Modifiche"]
+    E --> F["3. Esecuzione Modifiche e Bump SemVer"]
     C -- "Sì / Nuova Spec" --> F
     F --> G["Aggiorna SPECS.md (se nuova feature)"]
     G --> H["4. Validazione Build (`npm run build`)"]
@@ -116,7 +133,7 @@ flowchart TD
 ### Dettaglio delle Fasi:
 1. **Analisi e Ispezione:** leggere i requisiti dell'utente ed esaminare il codice impattato insieme a [`SPECS.md`](file:///c:/Users/Luca/git/lscway/SPECS.md).
 2. **Risoluzione delle Discrepanze:** se c'è un conflitto con le specifiche, formulare la domanda all'utente prima di applicare modifiche distruttive o incoerenti.
-3. **Modifica Chirurgica:** scrivere codice pulito, modulare e leggibile, preservando i commenti esistenti. Se vengono aggiunte nuove funzionalità, aggiornare contestualmente `SPECS.md`.
+3. **Modifica Chirurgica e Bump Versione SemVer:** scrivere codice pulito, modulare e leggibile, preservando i commenti esistenti. Aggiornare in modo unificato la versione SemVer nei 4 file previsti dalla Regola 1.4 (`package.json`, `src/lib/version.js`, `src/app.html`, `static/service-worker.js`) e aggiornare contestualmente `SPECS.md` se vengono aggiunte nuove funzionalità.
 4. **Verifica della Build Locale:** eseguire sempre:
    ```bash
    npm run build

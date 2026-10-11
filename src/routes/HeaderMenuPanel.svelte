@@ -33,6 +33,7 @@
   } from "$lib/stores.js";
   import { theme, toggleTheme } from "$lib/theme.js";
   import { toggleNotifications } from "$lib/notifications.js";
+  import { APP_VERSION } from "$lib/version.js";
   import { onDestroy } from "svelte";
 
   let closing = false;
@@ -530,7 +531,10 @@
 
       <div class="drawer-footer">
         <small>Liceo Scientifico N. Cortese</small>
-        <small class="version">A.S. 2026/27</small>
+        <div class="drawer-footer-meta">
+          <small class="version">A.S. 2026/27</small>
+          <small class="app-version">v{APP_VERSION}</small>
+        </div>
       </div>
     </aside>
   </div>
@@ -1170,8 +1174,18 @@
     line-height: 1.35;
   }
 
-  .drawer-footer .version {
+  .drawer-footer-meta {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.5rem;
     margin-top: 0.15rem;
+  }
+
+  .drawer-footer .app-version {
+    font-size: 0.72rem;
+    font-variant-numeric: tabular-nums;
+    opacity: 0.85;
   }
 
   @keyframes fade-backdrop {
