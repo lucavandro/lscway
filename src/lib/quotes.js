@@ -448,6 +448,51 @@ export const quotes = [
     text: "Prima di dedicarsi interamente alla ricerca storica e all'insegnamento universitario tra Messina, Pavia e Napoli, il giovane Nino Cortese lavorò presso l'Archivio di Stato di Napoli, riordinando e salvando preziosi fondi documentari sui secoli XVII–XIX.",
     author: "Nino Cortese"
   },
+  {
+    type: "curiosity",
+    text: "Nino Cortese collaborò strettamente con Benedetto Croce anche nelle attività dell'Istituto Italiano per gli Studi Storici di Napoli (fondato nel 1946 a Palazzo Filomarino), formando generazioni di giovani studiosi al metodo critico e all'analisi rigorosa delle fonti.",
+    author: "Nino Cortese"
+  },
+  {
+    type: "curiosity",
+    text: "Tra i capolavori filologici di Nino Cortese spicca l'edizione critica e commentata della 'Storia del Reame di Napoli' di Pietro Colletta, arricchita da un vasto apparato di note e documenti inediti che rinnovò gli studi sul Settecento e primo Ottocento meridionale.",
+    author: "Nino Cortese"
+  },
+  {
+    type: "curiosity",
+    text: "Nino Cortese dedicò studi fondamentali a Vincenzo Cuoco e agli intellettuali della Repubblica Napoletana del 1799, curando l'edizione critica del 'Saggio storico sulla rivoluzione napoletana' e degli scritti politici e pedagogici di Cuoco.",
+    author: "Nino Cortese"
+  },
+  {
+    type: "curiosity",
+    text: "Uno dei temi più cari a Nino Cortese fu proprio la storia della scuola e dell'istruzione pubblica nel Mezzogiorno: studiò le riforme educative dall'Illuminismo di Antonio Genovesi fino all'Unità d'Italia, convinto che l'istruzione fosse il vero motore civile di un Paese.",
+    author: "Nino Cortese"
+  },
+  {
+    type: "curiosity",
+    text: "Con l'opera in più volumi 'Il Mezzogiorno ed il Risorgimento italiano', Nino Cortese dimostrò come la storia politica, costituzionale e culturale del Sud Italia fosse profondamente intrecciata alle grandi correnti intellettuali europee.",
+    author: "Nino Cortese"
+  },
+  {
+    type: "curiosity",
+    text: "Per l'altissimo valore scientifico delle sue ricerche, Nino Cortese fu socio dell'Accademia Nazionale dei Lincei, dell'Accademia Pontaniana e figura di primo piano della Società Napoletana di Storia Patria.",
+    author: "Nino Cortese"
+  },
+  {
+    type: "curiosity",
+    text: "Oltre alla cattedra presso l'Università Federico II, Nino Cortese insegnò anche all'Istituto Universitario Orientale e al Magistero 'Suor Orsola Benincasa' di Napoli, distinguendosi per lezioni appassionate che univano rigore documentario e chiarezza espositiva.",
+    author: "Nino Cortese"
+  },
+  {
+    type: "curiosity",
+    text: "Da bibliofilo e ricercatore instancabile, Nino Cortese raccolse nel corso della vita una vastissima biblioteca specialistica di migliaia di volumi, opuscoli rari e manoscritti sul Risorgimento e sulla storia moderna europea, divenuta patrimonio prezioso per gli studiosi.",
+    author: "Nino Cortese"
+  },
+  {
+    type: "curiosity",
+    text: "L'intitolazione del Liceo Scientifico di Maddaloni a Nino Cortese rende omaggio a uno studioso che ha dedicato l'intera esistenza alla ricerca della verità storica, alla tutela della memoria culturale campana e alla formazione critica dei giovani.",
+    author: "Nino Cortese"
+  },
 
   // --- Curiosità: Maddaloni e il Territorio ---
   {
@@ -473,6 +518,51 @@ export const quotes = [
   {
     type: "curiosity",
     text: "Il Castello e le torri medievali che dominano Maddaloni dall'alto della collina risalgono all'epoca longobarda e normanna e fecero da cornice per secoli alla storia del Ducato della famiglia Carafa.",
+    author: "Storia di Maddaloni"
+  },
+  {
+    type: "curiosity",
+    text: "Nel Quattrocento Maddaloni divenne feudo di Diomede Carafa, celebre umanista, consigliere della corte aragonese di Napoli e autore dei 'Memoriali' sull'arte del buon governo; nel 1558 i Carafa ottennero il titolo di Duchi di Maddaloni.",
+    author: "Storia di Maddaloni"
+  },
+  {
+    type: "curiosity",
+    text: "Nel cuore del centro storico di Maddaloni sorge l'imponente Palazzo Ducale dei Carafa, ampliato tra Cinquecento e Settecento e celebre per la sua loggia rinascimentale, i cortili monumentali e l'antico teatro di corte frequentato da letterati e musicisti.",
+    author: "Storia di Maddaloni"
+  },
+  {
+    type: "curiosity",
+    text: "La Basilica Minore del Corpus Domini di Maddaloni, edificata nel Cinquecento e impreziosita nel Settecento da artisti di scuola napoletana e vanvitelliana, custodisce pregevoli altari in marmi policromi, sculture lignee e un monumentale soffitto cassettonato.",
+    author: "Storia di Maddaloni"
+  },
+  {
+    type: "curiosity",
+    text: "Fondato nel Trecento come chiesa e ospedale per i pellegrini e i bisognosi, il complesso di Santa Maria de Commendatis a Maddaloni conserva ancora oggi preziosi portali gotici e testimonianze d'arte medievale e rinascimentale.",
+    author: "Storia di Maddaloni"
+  },
+  {
+    type: "curiosity",
+    text: "Sulle alture che incorniciano Maddaloni sorgono i santuari di San Michele Arcangelo e di Santa Maria del Monte, storici luoghi di spiritualità e punti panoramici da cui lo sguardo abbraccia l'intera pianura campana fino al Vesuvio e al golfo di Napoli.",
+    author: "Storia di Maddaloni"
+  },
+  {
+    type: "curiosity",
+    text: "Il 1° ottobre 1860 le colline di Maddaloni e l'area dei Ponti della Valle furono teatro di uno degli scontri decisivi della Battaglia del Volturno, guidata sul campo da Nino Bixio; l'Ossario monumentale ricorda i caduti di quella giornata storica.",
+    author: "Storia di Maddaloni"
+  },
+  {
+    type: "curiosity",
+    text: "Il celebre patriota e letterato risorgimentale Luigi Settembrini (1813–1876), autore delle 'Ricordanze della mia vita', era legato per radici familiari a Maddaloni, città da cui proveniva il padre Raffaele e che Settembrini ricordò con affetto nei suoi scritti.",
+    author: "Storia di Maddaloni"
+  },
+  {
+    type: "curiosity",
+    text: "Maddaloni è la città natale di Franco Imposimato (1936–1983), sindacalista e difensore della legalità e del territorio insignito della Medaglia d'oro al valor civile alla memoria, e del fratello Ferdinando Imposimato, magistrato e Presidente onorario aggiunto della Corte di Cassazione.",
+    author: "Storia di Maddaloni"
+  },
+  {
+    type: "curiosity",
+    text: "Alle pendici del colle del Castello di Maddaloni, l'antica chiesa di Santa Margherita custodisce un raro ciclo di affreschi tardo-trecenteschi firmati dal maestro Jacopo da Firenze, preziosa testimonianza della pittura medievale in Terra di Lavoro.",
     author: "Storia di Maddaloni"
   },
 

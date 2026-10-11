@@ -26,7 +26,13 @@ describe('quotes module', () => {
     }
 
     const curiosities = quotes.filter((q) => q.type === 'curiosity');
-    expect(curiosities.length).toBeGreaterThanOrEqual(40);
+    expect(curiosities.length).toBeGreaterThanOrEqual(55);
+
+    const corteseCuriosities = curiosities.filter((q) => q.author === 'Nino Cortese');
+    expect(corteseCuriosities.length).toBeGreaterThanOrEqual(12);
+
+    const maddaloniCuriosities = curiosities.filter((q) => q.author === 'Storia di Maddaloni');
+    expect(maddaloniCuriosities.length).toBeGreaterThanOrEqual(14);
 
     const mathCuriosities = curiosities.filter((q) => q.author === 'Storia della Matematica');
     expect(mathCuriosities.length).toBeGreaterThanOrEqual(14);
