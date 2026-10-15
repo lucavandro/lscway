@@ -8,7 +8,7 @@
 	<link rel="preconnect" href="https://www.liceoscientificocortese.edu.it" crossorigin />
 	<script>
 		(function() {
-			var APP_VERSION = '1.0.0';
+			var APP_VERSION = '1.1.0';
 			try {
 				var saved = localStorage.getItem('theme');
 				var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
@@ -31,7 +31,7 @@
 
 			try {
 				window.__lscwayInitialDataPromise = fetch(
-					'https://www.liceoscientificocortese.edu.it/app/orario/api/v0',
+					'https://www.liceoscientificocortese.edu.it/app/orario/api/v1/public/orario',
 					{
 						mode: 'cors',
 						cache: 'no-cache',

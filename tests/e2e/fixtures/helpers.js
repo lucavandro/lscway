@@ -1,8 +1,8 @@
 import { mockTimetableData, mockSubstitutionsData } from './mockData.js';
 
 export async function setupMockRoutes(page) {
-  // Intercept all API calls to /app/orario/api/v0/*
-  await page.route(/\/app\/orario\/api\/v0.*/, async (route) => {
+  // Intercept all API calls to /app/orario/api/*
+  await page.route(/\/app\/orario\/api\/.*/, async (route) => {
     const url = route.request().url();
     if (url.includes('/sostituzioni')) {
       await route.fulfill({

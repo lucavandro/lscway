@@ -179,33 +179,82 @@ lscway/
 ## 5. Modello Dati e Integrazioni API
 
 ### 5.1. API Orario Principale
-- **Endpoint:** `GET https://www.liceoscientificocortese.edu.it/app/orario/api/v0` (configurabile tramite `VITE_API_URL`)
-- **Risposta JSON attesa:**
+- **Endpoint:** `GET https://www.liceoscientificocortese.edu.it/app/orario/api/v1/public/orario` (configurabile tramite `VITE_API_URL`)
+- **Risposta JSON v1 attesa:**
   ```json
   {
-    "user": "nome.cognome@lscortese.com", // Facoltativo
-    "classi": ["1A", "1B", "2A", "3C", ...],
-    "docenti": ["ROSSI MARIO", "BIANCHI GIUSEPPE", ...],
-    "aule": ["A101", "A102", "B204", ...],
-    "data": [
+    "data": "2026-10-15",
+    "giorno": 4,
+    "timetable": {
+      "id": "tt_efdd39a4529440acfea67b3ea2f788aa",
+      "nome": "Orario Definitivo",
+      "dataInizioValidita": "2026-09-15",
+      "dataFineValidita": "2027-06-10",
+      "dataPubblicazione": "2026-09-14"
+    },
+    "dadaAreas": [
+      { "id": "dada_stem_in_action", "nome": "STEM IN ACTION", "colore": "#0284C7" }
+    ],
+    "rooms": [
       {
-        "day": "LUN",
-        "ora": "08:00",
-        "classe": "1A",
-        "docente": "ROSSI MARIO",
-        "materia": "MAT",
-        "aula": "A101"
+        "id": "A101",
+        "codice": "A101",
+        "nome": "A101",
+        "sede": "Sede Centrale",
+        "piano": 1,
+        "capienza": 21,
+        "colore": "#0284C7",
+        "dadaAreaId": "dada_stem_in_action"
+      }
+    ],
+    "teachers": [
+      {
+        "id": "ADINOLFIA",
+        "nome": "ANTONIO",
+        "cognome": "ADINOLFI",
+        "shortName": "ADINOLFI A.",
+        "email": "antonioadinolfi@lscortese.com"
+      }
+    ],
+    "classes": [
+      { "id": "1A", "nome": "1A", "anno": 1, "sezione": "A", "indirizzoId": null }
+    ],
+    "subjects": [
+      { "id": "SCIENZE", "codice": "SCIE", "nome": "SCIENZE", "shortName": null, "colore": "#DCE775" },
+      { "id": "MAT_FIS", "codice": "MAT_", "nome": "MAT_FIS", "shortName": "MATFIS", "colore": "#FF6F61" }
+    ],
+    "lessons": [
+      {
+        "id": "les_...",
+        "timetableId": "tt_...",
+        "giorno": 1,
+        "timeSlotId": "slot_1_1",
+        "classId": "3F",
+        "subjectId": "SCIENZE",
+        "teacherId": "ADINOLFIB",
+        "roomId": "B202",
+        "isSostegno": false,
+        "isPotenziamento": false,
+        "isRicevimento": false,
+        "isSubstitution": false
       }
     ]
   }
   ```
 
 #### Regole di Normalizzazione (`src/lib/data.js` -> `normalizeTimetableData`):
-1. **Filtro classi:** le classi contenenti caratteri speciali come `.` o `*` vengono ripulite o escluse.
-2. **Sostegno / Inclusione:** le materie `INC` o `MADISO` vengono poste in coda tramite la funzione di comparazione `inclusioneInFondo` (`src/lib/utils.js`).
-3. **Potenziamento & Ricevimento:**
-   - Materie `sub_potenziamento` o `POT` -> materia standardizzata in `POT`, aula vuota, classe vuota.
-   - Materie `sub_ricevimento` o `RIC` -> materia standardizzata in `RIC`, aula vuota.
+1. **Supporto duale v1 / v0 (Retrocompatibilità):** il parser supporta sia il payload relazionale completo v1 (`lessons`, `teachers`, `classes`, `rooms`, `subjects`) sia il payload legacy v0 (`classi`, `docenti`, `aule`, `data`).
+2. **Mappatura v1 verso formato interno:**
+   - `giorno` (1..5) convertito nei giorni testuali `["LUN", "MAR", "MER", "GIO", "VEN"]`.
+   - `timeSlotId` (`slot_{giorno}_{oraIndex}`) mappato nelle 8 fasce orarie standard da `08:00` a `14:25`.
+   - `docente`: `${cognome} ${nome}` e `docente_abbr`: `shortName` privo di punto finale.
+   - `aula`: nome/codice stanza (`roomId`).
+   - `materia`: prioritariamente `shortName`, in alternativa `codice` o `nome` della materia.
+3. **Filtro classi:** le classi contenenti caratteri speciali come `.` o `*` vengono ripulite o escluse.
+4. **Sostegno / Inclusione:** le materie `INC` o `MADISO` vengono poste in coda tramite la funzione di comparazione `inclusioneInFondo` (`src/lib/utils.js`).
+5. **Potenziamento & Ricevimento:**
+   - Materie `sub_potenziamento`, `POT` o flag `isPotenziamento: true` -> materia standardizzata in `POT`, aula vuota, classe vuota.
+   - Materie `sub_ricevimento`, `RIC` o flag `isRicevimento: true` -> materia standardizzata in `RIC`, aula vuota.
 
 ### 5.2. API Sostituzioni Docenti
 - **Endpoint Sostituzioni Dettagliate (UI):**  

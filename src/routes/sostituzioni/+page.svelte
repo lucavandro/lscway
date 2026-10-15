@@ -19,9 +19,14 @@
       s.presaVisione.stato !== "fallita",
   );
 
-  const API_URL = (
+  const rawApiUrl =
+    import.meta.env.VITE_SOSTITUZIONI_API_URL ||
     import.meta.env.VITE_API_URL ||
-    "https://www.liceoscientificocortese.edu.it/app/orario/api/v0"
+    "https://www.liceoscientificocortese.edu.it/app/orario/api/v0";
+  const API_URL = (
+    rawApiUrl.includes("/v1/")
+      ? "https://www.liceoscientificocortese.edu.it/app/orario/api/v0"
+      : rawApiUrl
   ).replace(/\/+$/, "");
 
   async function fetchSostituzioni() {

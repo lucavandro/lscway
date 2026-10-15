@@ -58,6 +58,107 @@ describe('data module', () => {
     expect(get(timetableData)).toEqual(result);
   });
 
+  it('normalizes timetable data in v1 relational format and caches it', async () => {
+    const mockV1Response = {
+      data: '2026-10-15',
+      giorno: 4,
+      timetable: { id: 'tt_1', nome: 'Orario Definitivo' },
+      classes: [
+        { id: '1A', nome: '1A' },
+        { id: '1B.', nome: '1B.' }
+      ],
+      teachers: [
+        { id: 'T_ROSSI', nome: 'MARIO', cognome: 'ROSSI', shortName: 'ROSSI M.' }
+      ],
+      rooms: [
+        { id: 'A101', codice: 'A101', nome: 'A101' }
+      ],
+      subjects: [
+        { id: 'MATEMATICA', codice: 'MATE', nome: 'MATEMATICA', shortName: 'MAT' },
+        { id: 'FISICA', codice: 'FISI', nome: 'FISICA', shortName: null }
+      ],
+      lessons: [
+        {
+          id: 'les_1',
+          giorno: 1,
+          timeSlotId: 'slot_1_1',
+          classId: '1A',
+          teacherId: 'T_ROSSI',
+          roomId: 'A101',
+          subjectId: 'MATEMATICA',
+          isPotenziamento: false,
+          isRicevimento: false
+        },
+        {
+          id: 'les_2',
+          giorno: 1,
+          timeSlotId: 'slot_1_2',
+          classId: '1A',
+          teacherId: 'T_ROSSI',
+          roomId: 'A101',
+          subjectId: 'sub_potenziamento',
+          isPotenziamento: true,
+          isRicevimento: false
+        },
+        {
+          id: 'les_3',
+          giorno: 1,
+          timeSlotId: 'slot_1_3',
+          classId: '1A',
+          teacherId: 'T_ROSSI',
+          roomId: 'A101',
+          subjectId: 'sub_ricevimento',
+          isPotenziamento: false,
+          isRicevimento: true
+        }
+      ]
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockV1Response
+    });
+
+    const result = await getData(mockFetch);
+    expect(result).toBeDefined();
+    expect(result.__normalized).toBe(true);
+
+    // Classes cleaned
+    expect(result.classi).toEqual(['1A']);
+    expect(result.docenti).toEqual(['ROSSI MARIO']);
+    expect(result.aule).toEqual(['A101']);
+
+    // Lesson 0: regular lesson
+    expect(result.data[0].day).toBe('LUN');
+    expect(result.data[0].ora).toBe('08:00');
+    expect(result.data[0].classe).toBe('1A');
+    expect(result.data[0].docente).toBe('ROSSI MARIO');
+    expect(result.data[0].docente_abbr).toBe('ROSSI M');
+    expect(result.data[0].materia).toBe('MAT');
+    expect(result.data[0].aula).toBe('A101');
+
+    // Lesson 1: potenziamento -> materia POT, empty aula and classe
+    expect(result.data[1].day).toBe('LUN');
+    expect(result.data[1].ora).toBe('08:55');
+    expect(result.data[1].materia).toBe('POT');
+    expect(result.data[1].aula).toBe('');
+    expect(result.data[1].classe).toBe('');
+
+    // Lesson 2: ricevimento -> materia RIC, empty aula
+    expect(result.data[2].day).toBe('LUN');
+    expect(result.data[2].ora).toBe('09:50');
+    expect(result.data[2].materia).toBe('RIC');
+    expect(result.data[2].aula).toBe('');
+
+    // Index lookup attached
+    expect(result._index.byClass['1A']).toBeDefined();
+    expect(result._index.byTeacher['ROSSI MARIO']).toHaveLength(3);
+    expect(result._index.byAula['A101']).toHaveLength(1);
+
+    // Store is updated
+    expect(get(timetableData)).toEqual(result);
+  });
+
   it('rejects Google OAuth credential with non-school domain', async () => {
     // Generate a mock JWT for an unauthorized domain (e.g. gmail.com)
     const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));

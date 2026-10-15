@@ -1,4 +1,5 @@
 import { userEmail, timetableData } from "./stores";
+import { weekdays, hours } from "./dateutils.js";
 
 
 function decodeGoogleJwt(token) {
@@ -19,7 +20,7 @@ function decodeGoogleJwt(token) {
     return JSON.parse(normalized);
 }
 
-const DEFAULT_API_URL = "https://www.liceoscientificocortese.edu.it/app/orario/api/v0";
+const DEFAULT_API_URL = "https://www.liceoscientificocortese.edu.it/app/orario/api/v1/public/orario";
 const API_URL =
     import.meta.env.VITE_API_URL ||
     import.meta.env.VITE_ORARIO_API_URL ||
@@ -76,33 +77,119 @@ function normalizeTimetableData(raw) {
         return raw;
     }
 
-    const classi = Array.isArray(raw.classi)
-        ? raw.classi.filter((e) => !e.includes(".") && !e.includes("*"))
-        : [];
+    const isV1 = Array.isArray(raw.lessons);
 
-    const rows = Array.isArray(raw.data)
-        ? raw.data.map((e) => {
-            if (e.classe && e.classe.includes(".")) {
-                e.classe = e.classe.replace(".", "");
-            } else if (e.classe && e.classe.includes("*")) {
-                e.classe = e.classe.replace("*", "");
-                if (!e.aula) e.aula = "-";
+    let classi = [];
+    let docenti = [];
+    let aule = [];
+    let rows = [];
+
+    if (isV1) {
+        const teacherMap = new Map((raw.teachers || []).map((t) => [t.id, t]));
+        const subjectMap = new Map((raw.subjects || []).map((s) => [s.id, s]));
+        const classMap = new Map((raw.classes || []).map((c) => [c.id, c]));
+        const roomMap = new Map((raw.rooms || []).map((r) => [r.id, r]));
+
+        classi = (raw.classes || [])
+            .map((c) => c.nome || c.id)
+            .filter((e) => e && !e.includes(".") && !e.includes("*"));
+
+        docenti = (raw.teachers || [])
+            .map((t) => (t.cognome + " " + t.nome).trim())
+            .filter(Boolean);
+
+        aule = (raw.rooms || [])
+            .map((r) => r.nome || r.codice || r.id)
+            .filter(Boolean);
+
+        rows = (raw.lessons || []).map((l) => {
+            let day = l.day;
+            if (!day && typeof l.giorno === "number" && l.giorno >= 1 && l.giorno <= weekdays.length) {
+                day = weekdays[l.giorno - 1];
             }
-            if (e.materia == "sub_potenziamento" || e.materia == "POT") {
-                e.materia = "POT";
-                e.aula = "";
-                e.classe = "";
-            } else if (e.materia == "sub_ricevimento" || e.materia == "RIC") {
-                e.materia = "RIC";
-                e.aula = "";
+
+            let ora = l.ora;
+            if (!ora && l.timeSlotId) {
+                const parts = l.timeSlotId.split("_");
+                const slotIdx = parseInt(parts[2], 10);
+                if (!isNaN(slotIdx) && slotIdx >= 1 && slotIdx <= hours.length) {
+                    ora = hours[slotIdx - 1];
+                }
             }
-            return e;
-        })
-        : [];
+
+            const c = classMap.get(l.classId);
+            let classe = c ? (c.nome || c.id) : (l.classId || l.classe || "");
+            if (classe.includes(".")) classe = classe.replace(".", "");
+            else if (classe.includes("*")) {
+                classe = classe.replace("*", "");
+                if (!l.roomId && !l.aula) l.aula = "-";
+            }
+
+            const t = teacherMap.get(l.teacherId);
+            const docente = t ? (t.cognome + " " + t.nome).trim() : (l.docente || "");
+            const docente_abbr = t
+                ? (t.shortName ? t.shortName.replace(/\.$/, "") : "")
+                : (l.docente_abbr || "");
+
+            const r = roomMap.get(l.roomId);
+            let aula = r ? (r.nome || r.codice || r.id) : (l.roomId || l.aula || "");
+
+            const s = subjectMap.get(l.subjectId);
+            let materia = s ? (s.shortName || s.codice || s.nome || l.subjectId) : (l.materia || l.subjectId || "");
+
+            if (l.isPotenziamento || materia === "sub_potenziamento" || materia === "POT") {
+                materia = "POT";
+                aula = "";
+                classe = "";
+            } else if (l.isRicevimento || materia === "sub_ricevimento" || materia === "RIC") {
+                materia = "RIC";
+                aula = "";
+            }
+
+            return {
+                day,
+                ora,
+                classe,
+                materia,
+                docente,
+                aula,
+                docente_abbr
+            };
+        });
+    } else {
+        classi = Array.isArray(raw.classi)
+            ? raw.classi.filter((e) => !e.includes(".") && !e.includes("*"))
+            : [];
+
+        docenti = Array.isArray(raw.docenti) ? raw.docenti : [];
+        aule = Array.isArray(raw.aule) ? raw.aule : [];
+
+        rows = Array.isArray(raw.data)
+            ? raw.data.map((e) => {
+                if (e.classe && e.classe.includes(".")) {
+                    e.classe = e.classe.replace(".", "");
+                } else if (e.classe && e.classe.includes("*")) {
+                    e.classe = e.classe.replace("*", "");
+                    if (!e.aula) e.aula = "-";
+                }
+                if (e.materia == "sub_potenziamento" || e.materia == "POT") {
+                    e.materia = "POT";
+                    e.aula = "";
+                    e.classe = "";
+                } else if (e.materia == "sub_ricevimento" || e.materia == "RIC") {
+                    e.materia = "RIC";
+                    e.aula = "";
+                }
+                return e;
+            })
+            : [];
+    }
 
     const normalized = {
         ...raw,
         classi,
+        docenti,
+        aule,
         data: rows,
         __normalized: true
     };
@@ -126,7 +213,7 @@ function readCachedData() {
             return memoryCache;
         }
         const parsed = JSON.parse(cachedStr);
-        if (!parsed || !Array.isArray(parsed.data)) return null;
+        if (!parsed || (!Array.isArray(parsed.data) && !Array.isArray(parsed.lessons))) return null;
         lastSerializedJson = cachedStr;
         memoryCache = normalizeTimetableData(parsed);
         return memoryCache;
