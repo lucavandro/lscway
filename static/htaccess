@@ -1,5 +1,7 @@
 <IfModule mod_headers.c>
     Header set Content-Security-Policy "upgrade-insecure-requests"
+    # Se qualsiasi redirect interno o di mod_dir genera un header Location con http:// dietro reverse proxy, forzalo a https://
+    Header edit Location "^http://" "https://"
 <FilesMatch "\.(html|json)$|service-worker\.js$">
     Header set Cache-Control "no-cache, max-age=0, must-revalidate"
 </FilesMatch>
@@ -9,11 +11,31 @@
 </IfModule>
 
 <IfModule mod_dir.c>
+    # Disabilita il redirect automatico di mod_dir che causerebbe un 301 verso http:// dietro reverse proxy SSL
     DirectorySlash Off
+    DirectoryIndex index.html
 </IfModule>
 
 <IfModule mod_rewrite.c>
     RewriteEngine On
+    # Permette a mod_rewrite di elaborare le directory fisiche anche senza slash finale (necessario con DirectorySlash Off)
+    RewriteOptions AllowNoSlash
+
+    # Rilevamento dello schema (HTTPS se dietro reverse proxy SSL, se HTTPS è attivo o sul dominio di produzione)
+    RewriteCond %{HTTP:X-Forwarded-Proto} =https [OR]
+    RewriteCond %{HTTPS} on [OR]
+    RewriteCond %{HTTP_HOST} ^(?:www\.)?liceoscientificocortese\.edu\.it [NC]
+    RewriteRule ^ - [E=PROTO:https]
+    RewriteCond %{ENV:PROTO} ^$
+    RewriteRule ^ - [E=PROTO:http]
+
+    # Se la directory base dell'app (/app/way/tmp) o una directory fisica viene richiesta senza slash finale,
+    # reindirizza esplicitamente con slash finale preservando HTTPS.
+    # Risolve il bug del 403 Forbidden (mod_autoindex con DirectorySlash Off) e previene redirect insicuri su http://
+    RewriteCond %{REQUEST_URI} !/$
+    RewriteCond %{REQUEST_FILENAME} -d [OR]
+    RewriteCond %{REQUEST_URI} ^/app/way/tmp$
+    RewriteRule ^ %{ENV:PROTO}://%{HTTP_HOST}%{REQUEST_URI}/ [R=301,L,QSA]
 
     # Se il file fisico richiesto esiste, servilo direttamente
     RewriteCond %{REQUEST_FILENAME} -f

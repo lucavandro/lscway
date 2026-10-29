@@ -56,7 +56,7 @@ L'applicazione viene compilata come una SPA statica (senza SSR a runtime Node.js
       base: '/app/way/tmp'
   }
   ```
-- **Invariante per Agenti AI:** qualsiasi route interna, link, o fetch ad asset interni **deve** utilizzare o tenere conto del prefisso `base` importato da `$app/paths` (es. `<a href="{base}/docente">`). Per i link e i redirect alla home page usare sempre `${base}/` con slash finale (e mai `base || "/"` senza slash finale), così da evitare redirect `301` di Apache verso `http://` dietro reverse proxy.
+- **Invariante per Agenti AI:** qualsiasi route interna, link, o fetch ad asset interni **deve** utilizzare o tenere conto del prefisso `base` importato da `$app/paths` (es. `<a href="{base}/docente">`). Per i link e i redirect alla home page usare sempre `${base}/` con slash finale (e mai `base || "/"` senza slash finale), così da evitare redirect `301` di Apache verso `http://` dietro reverse proxy. In `static/.htaccess`, `DirectorySlash Off` è combinato con `RewriteOptions AllowNoSlash` e con una regola di riscrittura esplicita che reindirizza `/app/way/tmp` alla versione con slash finale forzando il protocollo `https://`, eliminando sia il rischio di `403 Forbidden` (da `mod_autoindex`) sia il declassamento a `http://` da parte di `mod_dir`. Inoltre, `Header edit Location "^http://" "https://"` funge da ulteriore barriera di sicurezza.
 
 ### 3.2. Caching, Indicizzazione O(1) e Avvio Istantaneo (Stale-While-Revalidate)
 1. **Preload anticipato in `app.html`:** prima ancora che il bundle JS di Svelte si carichi, un piccolo script inline in `app.html` avvia la fetch dei dati orario salvando la Promise in `window.__lscwayInitialDataPromise`.
@@ -86,7 +86,8 @@ lscway/
 ├── README.md                   # Breve introduzione per sviluppatori umani
 │
 ├── static/                     # Risorse statiche servite direttamente
-│   ├── .htaccess               # Direttive Apache per routing SPA e cache control
+│   ├── .htaccess               # Direttive Apache per routing SPA, trailing slash sicuro e cache control
+│   ├── htaccess                # Mirror sincronizzato di .htaccess per ambienti di deploy alternativi
 │   ├── app.css                 # Design System, reset moderno, variabili CSS e stili globali
 │   ├── favicon.png             # Favicon applicazione
 │   ├── icon-192.png            # Icona PWA 192x192
@@ -452,6 +453,7 @@ L'integrità del software e l'assenza di regressioni sono garantite da una doppi
   - `quotes.test.js`: validazione integrità collezione citazioni scolastiche, estrazione casuale e prevenzione ripetizioni consecutive.
   - `theme.test.js`: transizione temi light/dark e persistenza DOM/`localStorage`.
   - `version.test.js`: validazione formato SemVer (`MAJOR.MINOR.PATCH`) e sincronizzazione unificata tra `src/lib/version.js`, `package.json`, `src/app.html` e `static/service-worker.js`.
+  - `htaccess.test.js`: verifica direttive `.htaccess` (trailing slash sicuro, `DirectorySlash Off`, `RewriteOptions AllowNoSlash`, override HTTPS `Location` e fallback SPA `index.html`).
 
 ### 11.2. End-to-End Testing (Playwright)
 - **Configurazione:** `playwright.config.js` con avvio automatico del web server di preview (`npm run preview -- --port 4173`), browser Chromium headless, risoluzione del base path `/app/way/tmp`.
