@@ -261,7 +261,7 @@ lscway/
    - Viene risolto il nome del docente sostituito (`docenteOriginale` e `docenteOriginaleAbbr`) mappando `originalTeacherId` nell'anagrafica docenti.
    - **Indicizzazione duale O(1):** `buildTimetableIndexes` associa la lezione sia al docente supplente (`byTeacher[row.docente]`) sia al docente titolare assente (`byTeacher[row.docenteOriginale]`), permettendo a entrambi di consultare l'orario correttamente aggiornato.
    - **Visualizzazione UI:**
-     - *Vista giornaliera (`TimeTableRow.svelte`):* bordo di evidenziazione riga ambrato, chip docente con `SwapIcon`, badge semantico `Supplenza`/`Sorveglianza` e sottotitolo `sost. Prof. ...`.
+     - *Vista giornaliera (`TimeTableRow.svelte`):* bordo di evidenziazione riga ambrato, chip docente con `SwapIcon` e sottotitolo `sost. Prof. ...`.
      - *Vista settimanale (`FullTimeTableRow.svelte`):* micro-badge `SOST`/`SORV` nella cella e accento cromatico sul giorno.
 
 ### 5.2. API Sostituzioni Docenti

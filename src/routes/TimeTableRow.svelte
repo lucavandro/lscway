@@ -120,9 +120,11 @@
                     </a>
 
                     {#if rd.isSubstitution}
-                      <span class="sub-badge" class:is-sorveglianza={rd.tipologia === "sorveglianza"}>
-                        {rd.tipologia === "sorveglianza" ? "Sorveglianza" : "Supplenza"}
-                      </span>
+                      {#if rd.tipologia === "sorveglianza"}
+                        <span class="sub-badge is-sorveglianza">
+                          Sorveglianza
+                        </span>
+                      {/if}
                       {#if rd.docenteOriginale}
                         <span class="sub-orig-label" title="Docente sostituito: {rd.docenteOriginale}">
                           sost. {rd.docenteOriginaleAbbr || rd.docenteOriginale}

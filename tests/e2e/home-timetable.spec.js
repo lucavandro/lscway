@@ -106,9 +106,10 @@ test.describe('Home Page - Orario Classe', () => {
     await page.goto('/app/way/tmp/?q=1A');
 
     if (currentDay !== 'SAB' && currentDay !== 'DOM') {
-      // Check table row has substitution badge and original teacher note
-      await expect(page.locator('.sub-badge')).toHaveText('Supplenza');
+      // Check table row has substitute chip with SwapIcon and original teacher note, without redundant Supplenza badge
+      await expect(page.locator('.teacher-chip.is-substitute')).toBeVisible();
       await expect(page.locator('.sub-orig-label')).toContainText('sost. ROSSI M');
+      await expect(page.locator('.sub-badge')).toHaveCount(0);
     }
   });
 });
