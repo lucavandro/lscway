@@ -110,6 +110,72 @@ test.describe('Home Page - Orario Classe', () => {
       await expect(page.locator('.teacher-chip.is-substitute')).toBeVisible();
       await expect(page.locator('.sub-orig-label')).toContainText('sost. ROSSI M');
       await expect(page.locator('.sub-badge')).toHaveCount(0);
+      await expect(page.locator('.subject-tag.is-substitution')).toContainText('Sostituzione');
+    }
+  });
+
+  test('displays single row for teacher substitution superseding POT, showing Sostituzione as materia without SUPPLENZA tag', async ({ page }) => {
+    const weekdays = ['DOM', 'LUN', 'MAR', 'MER', 'GIO', 'VEN', 'SAB'];
+    const currentDay = weekdays[new Date().getDay()];
+
+    await page.route('**/app/orario/api/**', async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          classi: ['4E'],
+          docenti: ['VIGLIOTTI G', 'SANZARI E'],
+          aule: ['A101'],
+          data: [
+            {
+              day: currentDay === 'SAB' || currentDay === 'DOM' ? 'LUN' : currentDay,
+              ora: '08:00',
+              classe: '',
+              docente: 'VIGLIOTTI G',
+              docente_abbr: 'VIGLIOTTI G',
+              materia: 'POT',
+              aula: '',
+              isSubstitution: false
+            },
+            {
+              day: currentDay === 'SAB' || currentDay === 'DOM' ? 'LUN' : currentDay,
+              ora: '08:00',
+              classe: '4E',
+              docente: 'VIGLIOTTI G',
+              docente_abbr: 'VIGLIOTTI G',
+              materia: 'SCIE',
+              aula: 'A101',
+              isSubstitution: true,
+              tipologia: 'sostituto',
+              docenteOriginale: 'SANZARI E',
+              docenteOriginaleAbbr: 'SANZARI E'
+            }
+          ]
+        })
+      });
+    });
+
+    await page.goto('/app/way/tmp/docente?q=VIGLIOTTI+G');
+
+    if (currentDay !== 'SAB' && currentDay !== 'DOM') {
+      // Row must only show the single substitution entry (POT is superseded)
+      const row = page.locator('.timetable-row.has-substitution').first();
+      await expect(row).toBeVisible();
+
+      // No entry divider in row
+      await expect(row.locator('.entry-divider')).toHaveCount(0);
+
+      // Class chip shows 4E and original teacher
+      await expect(row.locator('.class-chip')).toContainText('4E');
+      await expect(row.locator('.sub-orig-label')).toContainText('sost. SANZARI E');
+
+      // Tag SUPPLENZA is eliminated
+      await expect(row.locator('.sub-badge')).toHaveCount(0);
+
+      // Materia displays "Sostituzione"
+      const materiaTag = row.locator('.subject-tag.is-substitution');
+      await expect(materiaTag).toBeVisible();
+      await expect(materiaTag).toContainText('Sostituzione');
     }
   });
 });

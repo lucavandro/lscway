@@ -261,8 +261,10 @@ lscway/
    - Viene risolto il nome del docente sostituito (`docenteOriginale` e `docenteOriginaleAbbr`) mappando `originalTeacherId` nell'anagrafica docenti.
    - **Indicizzazione duale O(1):** `buildTimetableIndexes` associa la lezione sia al docente supplente (`byTeacher[row.docente]`) sia al docente titolare assente (`byTeacher[row.docenteOriginale]`), permettendo a entrambi di consultare l'orario correttamente aggiornato.
    - **Visualizzazione UI:**
-     - *Vista giornaliera (`TimeTableRow.svelte`):* bordo di evidenziazione riga ambrato, chip docente con `SwapIcon` e sottotitolo `sost. Prof. ...`.
-     - *Vista settimanale (`FullTimeTableRow.svelte`):* micro-badge `SOST`/`SORV` nella cella e accento cromatico sul giorno.
+     - *Risoluzione a singola voce e sovrascrittura POT:* se nell'ora è presente una supplenza, la voce di supplenza prevale sull'ora di potenziamento (POT) o sulla lezione originaria del supplente, eliminando duplicazioni, trattini vuoti e divisori orari (`.entry-divider`).
+     - *Materia:* il campo materia mostra l'etichetta `"Sostituzione"` (o `"Sorveglianza"` se `tipologia === 'sorveglianza'`) con badge ambrato dedicato (`.is-substitution`).
+     - *Pulizia badge:* il tag ridondante `"SUPPLENZA"` sotto la classe o il docente è rimosso; nella vista docente la classe mostra la classe (es. `4E`) e il riferimento al titolare (`sost. Prof. ...`), mentre nella vista classe il docente mostra il supplente con icona di scambio `SwapIcon` e indicazione del titolare.
+     - *Vista settimanale (`FullTimeTableRow.svelte`):* micro-badge `SOST`/`SORV` nella cella, materia "Sostituzione" e accento cromatico ambrato sul giorno.
 
 ### 5.2. API Sostituzioni Docenti
 - **Endpoint Sostituzioni Dettagliate (UI):**  

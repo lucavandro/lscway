@@ -7,11 +7,6 @@
   import { base } from "$app/paths";
   import SwapIcon from "$icons/SwapIcon.svelte";
 
-  $: currentHour = $clockStore.hourNum;
-  $: hour = hours[hourIndex];
-  $: rowData = data.filter((e) => e.ora == hour).sort(inclusioneInFondo);
-  $: isActive = hourIndex === currentHour - 1;
-
   function isPotEntry(r) {
     return r?.materia === "POT" || r?.materia === "sub_potenziamento";
   }
@@ -21,6 +16,23 @@
   }
 
   $: isTeacherTable = Array.isArray(fields) && fields.includes("classe") && !fields.includes("docente");
+  $: currentHour = $clockStore.hourNum;
+  $: hour = hours[hourIndex];
+
+  $: rawRowData = data.filter((e) => e.ora == hour).sort(inclusioneInFondo);
+  $: rowData = (() => {
+    if (!rawRowData || rawRowData.length <= 1) return rawRowData;
+    const hasSub = rawRowData.some((r) => r.isSubstitution);
+    if (!hasSub) return rawRowData;
+    if (isTeacherTable) {
+      return rawRowData.filter((r) => r.isSubstitution);
+    }
+    const nonPot = rawRowData.filter((r) => !isPotEntry(r) && !isRicEntry(r));
+    return nonPot.length > 0 ? nonPot : rawRowData;
+  })();
+
+  $: isActive = hourIndex === currentHour - 1;
+
   $: isSpannedSpecialRow =
     isTeacherTable &&
     rowData.length > 0 &&
@@ -153,15 +165,10 @@
                     <a href="{base}/?q={queryValue(rd['classe'])}" class="link-chip class-chip" title="Classe {rd['classe']}">
                       <span>{rd["classe"]}</span>
                     </a>
-                    {#if rd.isSubstitution}
-                      <span class="sub-badge" class:is-sorveglianza={rd.tipologia === "sorveglianza"}>
-                        {rd.tipologia === "sorveglianza" ? "Sorveglianza" : "Supplenza"}
+                    {#if rd.isSubstitution && isTeacherTable && rd.docenteOriginale}
+                      <span class="sub-orig-label" title="Docente sostituito: {rd.docenteOriginale}">
+                        sost. {rd.docenteOriginaleAbbr || rd.docenteOriginale}
                       </span>
-                      {#if isTeacherTable && rd.docenteOriginale}
-                        <span class="sub-orig-label" title="Docente sostituito: {rd.docenteOriginale}">
-                          sost. {rd.docenteOriginaleAbbr || rd.docenteOriginale}
-                        </span>
-                      {/if}
                     {/if}
                   </div>
                 {:else if rd["materia"] === "RIC" || rd["materia"] === "sub_ricevimento"}
@@ -174,12 +181,17 @@
               {:else if field === "materia"}
                 <span
                   class="subject-tag"
-                  class:is-pot={rd[field] === "POT" || rd[field] === "sub_potenziamento"}
-                  class:is-ric={rd[field] === "RIC" || rd[field] === "sub_ricevimento"}
-                  class:is-sostegno={rd[field] === "MADISO" || rd[field] === "INC"}
-                  title={rd[field]}
+                  class:is-pot={!rd.isSubstitution && (rd[field] === "POT" || rd[field] === "sub_potenziamento")}
+                  class:is-ric={!rd.isSubstitution && (rd[field] === "RIC" || rd[field] === "sub_ricevimento")}
+                  class:is-sostegno={!rd.isSubstitution && (rd[field] === "MADISO" || rd[field] === "INC")}
+                  class:is-substitution={rd.isSubstitution}
+                  title={rd.isSubstitution
+                    ? (rd.tipologia === "sorveglianza" ? "Sorveglianza" : "Sostituzione")
+                    : rd[field]}
                 >
-                  {rd[field]}
+                  {rd.isSubstitution
+                    ? (rd.tipologia === "sorveglianza" ? "Sorveglianza" : "Sostituzione")
+                    : rd[field]}
                 </span>
               {:else}
                 <span class="cell-text">{rd[field]}</span>
@@ -520,6 +532,20 @@
     color: #818cf8;
     background: rgba(99, 102, 241, 0.22);
     border-color: rgba(99, 102, 241, 0.45);
+  }
+
+  .subject-tag.is-substitution {
+    background: rgba(245, 158, 11, 0.16);
+    color: #b45309;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    font-weight: 700;
+  }
+
+  :global([data-theme="dark"]) .subject-tag.is-substitution,
+  :global(.dark) .subject-tag.is-substitution {
+    color: #fbbf24;
+    background: rgba(245, 158, 11, 0.22);
+    border-color: rgba(245, 158, 11, 0.5);
   }
 
   .badge-chip {

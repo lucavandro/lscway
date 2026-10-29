@@ -8,13 +8,32 @@
   $: currentDay = $clockStore.day;
   $: currentHour = $clockStore.hourNum;
   $: hour = hours[hourIndex];
+  $: isTeacherTable = Array.isArray(fields) && fields.includes("classe") && !fields.includes("docente");
+
+  function processDayEntries(entries, isTeacher) {
+    if (!entries || entries.length <= 1) return entries;
+    const sorted = entries.sort(inclusioneInFondo);
+    const hasSub = sorted.some((e) => e.isSubstitution);
+    if (!hasSub) return sorted;
+    if (isTeacher) {
+      return sorted.filter((e) => e.isSubstitution);
+    }
+    const nonPot = sorted.filter(
+      (e) =>
+        e.materia !== "POT" &&
+        e.materia !== "sub_potenziamento" &&
+        e.materia !== "RIC" &&
+        e.materia !== "sub_ricevimento"
+    );
+    return nonPot.length > 0 ? nonPot : sorted;
+  }
 
   $: filteredRowData = {
-    LUN: rowData.filter((e) => e.day === "LUN").sort(inclusioneInFondo),
-    MAR: rowData.filter((e) => e.day === "MAR").sort(inclusioneInFondo),
-    MER: rowData.filter((e) => e.day === "MER").sort(inclusioneInFondo),
-    GIO: rowData.filter((e) => e.day === "GIO").sort(inclusioneInFondo),
-    VEN: rowData.filter((e) => e.day === "VEN").sort(inclusioneInFondo),
+    LUN: processDayEntries(rowData.filter((e) => e.day === "LUN"), isTeacherTable),
+    MAR: processDayEntries(rowData.filter((e) => e.day === "MAR"), isTeacherTable),
+    MER: processDayEntries(rowData.filter((e) => e.day === "MER"), isTeacherTable),
+    GIO: processDayEntries(rowData.filter((e) => e.day === "GIO"), isTeacherTable),
+    VEN: processDayEntries(rowData.filter((e) => e.day === "VEN"), isTeacherTable),
   };
 </script>
 
@@ -75,37 +94,43 @@
                   </span>
                 {/if}
 
-                {#if !hasPrimary && entry["materia"]}
+                {#if !hasPrimary && (entry["materia"] || entry.isSubstitution)}
                   <span
                     class="subj-tag fallback-subj"
-                    class:is-pot={isPot}
-                    class:is-ric={isRic}
-                    class:is-sostegno={isSostegno}
+                    class:is-pot={!entry.isSubstitution && isPot}
+                    class:is-ric={!entry.isSubstitution && isRic}
+                    class:is-sostegno={!entry.isSubstitution && isSostegno}
+                    class:is-substitution={entry.isSubstitution}
                   >
-                    {entry["materia"]}
+                    {entry.isSubstitution
+                      ? (entry.tipologia === "sorveglianza" ? "Sorveglianza" : "Sostituzione")
+                      : entry["materia"]}
                   </span>
                 {/if}
               </div>
 
               <!-- Line 2: Secondary info (Materia + Aula/Classe tags, stacked on mobile, side-by-side on tablet/desktop) -->
-              {#if (hasPrimary && entry["materia"]) || showClassTag || showAula}
+              {#if (hasPrimary && (entry["materia"] || entry.isSubstitution)) || showClassTag || showAula}
                 <div class="line-secondary">
                   {#if showClassTag}
                     <span class="class-tag">{entry["classe"]}</span>
                   {/if}
 
-                  {#if showClassTag && ((hasPrimary && entry["materia"]) || showAula)}
+                  {#if showClassTag && ((hasPrimary && (entry["materia"] || entry.isSubstitution)) || showAula)}
                     <span class="sec-sep" aria-hidden="true">•</span>
                   {/if}
 
-                  {#if hasPrimary && entry["materia"]}
+                  {#if hasPrimary && (entry["materia"] || entry.isSubstitution)}
                     <span
                       class="subj-tag"
-                      class:is-pot={isPot}
-                      class:is-ric={isRic}
-                      class:is-sostegno={isSostegno}
+                      class:is-pot={!entry.isSubstitution && isPot}
+                      class:is-ric={!entry.isSubstitution && isRic}
+                      class:is-sostegno={!entry.isSubstitution && isSostegno}
+                      class:is-substitution={entry.isSubstitution}
                     >
-                      {entry["materia"]}
+                      {entry.isSubstitution
+                        ? (entry.tipologia === "sorveglianza" ? "Sorveglianza" : "Sostituzione")
+                        : entry["materia"]}
                     </span>
                   {/if}
 
@@ -367,6 +392,20 @@
     color: #818cf8;
     background: rgba(99, 102, 241, 0.2);
     border-color: rgba(99, 102, 241, 0.45);
+  }
+
+  .subj-tag.is-substitution {
+    background: rgba(245, 158, 11, 0.16);
+    color: #b45309;
+    border-color: rgba(245, 158, 11, 0.4);
+    font-weight: 700;
+  }
+
+  :global([data-theme="dark"]) .subj-tag.is-substitution,
+  :global(.dark) .subj-tag.is-substitution {
+    color: #fbbf24;
+    background: rgba(245, 158, 11, 0.22);
+    border-color: rgba(245, 158, 11, 0.5);
   }
 
   .room-sub {
