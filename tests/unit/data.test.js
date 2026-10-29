@@ -159,6 +159,57 @@ describe('data module', () => {
     expect(get(timetableData)).toEqual(result);
   });
 
+  it('normalizes substitutions and indexes for both substitute and substituted teacher', async () => {
+    const mockV1WithSubs = {
+      data: '2026-10-29',
+      giorno: 4,
+      timetable: { id: 'tt_1', nome: 'Orario Definitivo' },
+      classes: [{ id: '4E', nome: '4E' }],
+      teachers: [
+        { id: 'VIGLIOTTIG', shortName: 'VIGLIOTTI G.' },
+        { id: 'SANZARIE', shortName: 'SANZARI E.' }
+      ],
+      rooms: [{ id: 'A101', codice: 'A101' }],
+      subjects: [{ id: 'SCIENZE', shortName: 'SCIE' }],
+      lessons: [
+        {
+          id: 'les_sub_1',
+          giorno: 4,
+          timeSlotId: 'slot_4_1',
+          classId: '4E',
+          teacherId: 'VIGLIOTTIG',
+          roomId: 'A101',
+          subjectId: 'SCIENZE',
+          isSubstitution: true,
+          tipologia: 'sostituto',
+          originalTeacherId: 'SANZARIE'
+        }
+      ]
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockV1WithSubs
+    });
+
+    const result = await getData(mockFetch);
+    expect(result).toBeDefined();
+    expect(result.data).toHaveLength(1);
+
+    const subLesson = result.data[0];
+    expect(subLesson.isSubstitution).toBe(true);
+    expect(subLesson.tipologia).toBe('sostituto');
+    expect(subLesson.originalTeacherId).toBe('SANZARIE');
+    expect(subLesson.docente).toBe('VIGLIOTTI G');
+    expect(subLesson.docente_abbr).toBe('VIGLIOTTI G');
+    expect(subLesson.docenteOriginale).toBe('SANZARI E');
+    expect(subLesson.docenteOriginaleAbbr).toBe('SANZARI E');
+
+    // Dual indexing: both substitute and original teacher can see the lesson
+    expect(result._index.byTeacher['VIGLIOTTI G']).toContainEqual(subLesson);
+    expect(result._index.byTeacher['SANZARI E']).toContainEqual(subLesson);
+  });
+
   it('rejects Google OAuth credential with non-school domain', async () => {
     // Generate a mock JWT for an unauthorized domain (e.g. gmail.com)
     const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));

@@ -5,6 +5,7 @@
   import { hours, clockStore } from "$lib/dateutils.js";
   import { inclusioneInFondo } from "$lib/utils.js";
   import { base } from "$app/paths";
+  import SwapIcon from "$icons/SwapIcon.svelte";
 
   $: currentHour = $clockStore.hourNum;
   $: hour = hours[hourIndex];
@@ -45,7 +46,11 @@
   const queryValue = (value) => encodeURIComponent(value ?? "");
 </script>
 
-<tr class="timetable-row" class:is-active={isActive}>
+<tr
+  class="timetable-row"
+  class:is-active={isActive}
+  class:has-substitution={rowData.some((r) => r.isSubstitution)}
+>
   <!-- Sticky Hour Header -->
   <th class="hour-cell" scope="row">
     <div class="hour-number-wrap">
@@ -101,17 +106,62 @@
                 {/if}
               {:else if field === "docente"}
                 {#if rd["docente"]}
-                  <a href="{base}/docente?q={queryValue(rd['docente'])}" class="link-chip teacher-chip" title={rd["docente"]}>
-                    <span>{rd["docente_abbr"] || rd["docente"]}</span>
-                  </a>
+                  <div class="teacher-slot">
+                    <a
+                      href="{base}/docente?q={queryValue(rd['docente'])}"
+                      class="link-chip teacher-chip"
+                      class:is-substitute={rd.isSubstitution}
+                      title={rd["docente"]}
+                    >
+                      {#if rd.isSubstitution}
+                        <span class="sub-chip-icon" aria-hidden="true"><SwapIcon /></span>
+                      {/if}
+                      <span>{rd["docente_abbr"] || rd["docente"]}</span>
+                    </a>
+
+                    {#if rd.isSubstitution}
+                      <span class="sub-badge" class:is-sorveglianza={rd.tipologia === "sorveglianza"}>
+                        {rd.tipologia === "sorveglianza" ? "Sorveglianza" : "Supplenza"}
+                      </span>
+                      {#if rd.docenteOriginale}
+                        <span class="sub-orig-label" title="Docente sostituito: {rd.docenteOriginale}">
+                          sost. {rd.docenteOriginaleAbbr || rd.docenteOriginale}
+                        </span>
+                      {/if}
+                    {/if}
+                  </div>
+                {:else if rd.isSubstitution && rd.tipologia === "sorveglianza"}
+                  <div class="teacher-slot">
+                    <span class="sub-badge is-sorveglianza">
+                      <span class="sub-chip-icon" aria-hidden="true"><SwapIcon /></span>
+                      Sorveglianza
+                    </span>
+                    {#if rd.docenteOriginale}
+                      <span class="sub-orig-label" title="Docente sostituito: {rd.docenteOriginale}">
+                        sost. {rd.docenteOriginaleAbbr || rd.docenteOriginale}
+                      </span>
+                    {/if}
+                  </div>
                 {:else}
                   <span class="dash">—</span>
                 {/if}
               {:else if field === "classe"}
                 {#if rd["classe"] && rd["materia"] !== "POT" && rd["materia"] !== "sub_potenziamento"}
-                  <a href="{base}/?q={queryValue(rd['classe'])}" class="link-chip class-chip" title="Classe {rd['classe']}">
-                    <span>{rd["classe"]}</span>
-                  </a>
+                  <div class="class-slot">
+                    <a href="{base}/?q={queryValue(rd['classe'])}" class="link-chip class-chip" title="Classe {rd['classe']}">
+                      <span>{rd["classe"]}</span>
+                    </a>
+                    {#if rd.isSubstitution}
+                      <span class="sub-badge" class:is-sorveglianza={rd.tipologia === "sorveglianza"}>
+                        {rd.tipologia === "sorveglianza" ? "Sorveglianza" : "Supplenza"}
+                      </span>
+                      {#if isTeacherTable && rd.docenteOriginale}
+                        <span class="sub-orig-label" title="Docente sostituito: {rd.docenteOriginale}">
+                          sost. {rd.docenteOriginaleAbbr || rd.docenteOriginale}
+                        </span>
+                      {/if}
+                    {/if}
+                  </div>
                 {:else if rd["materia"] === "RIC" || rd["materia"] === "sub_ricevimento"}
                   <span class="badge-chip badge-ric">Ricevimento</span>
                 {:else if rd["materia"] === "INC" || rd["materia"] === "MADISO"}
@@ -170,6 +220,15 @@
 
   .timetable-row.is-active .hour-number {
     color: var(--brand-primary);
+  }
+
+  /* Substitution highlight */
+  .timetable-row.has-substitution:not(.is-active) {
+    background-color: color-mix(in srgb, #f59e0b 6%, var(--brand-surface-card));
+  }
+
+  .timetable-row.has-substitution .hour-cell {
+    border-left: 3px solid #f59e0b;
   }
 
   .hour-cell {
@@ -267,9 +326,21 @@
     margin: 0.1rem auto;
   }
 
+  /* Teacher & Class slot wrappers for substitutions */
+  .teacher-slot,
+  .class-slot {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.18rem;
+    max-width: 100%;
+  }
+
   /* Compact Chips */
   .link-chip {
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
     max-width: 100%;
     padding: 0.25rem 0.5rem;
     border-radius: 6px;
@@ -295,6 +366,28 @@
     border: 1px solid color-mix(in srgb, var(--brand-primary) 20%, transparent);
   }
 
+  .teacher-chip.is-substitute {
+    border-color: color-mix(in srgb, #f59e0b 40%, transparent);
+  }
+
+  .sub-chip-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 0.25rem;
+    color: #b45309;
+  }
+
+  :global([data-theme="dark"]) .sub-chip-icon,
+  :global(.dark) .sub-chip-icon {
+    color: #fbbf24;
+  }
+
+  .sub-chip-icon :global(svg) {
+    width: 13px;
+    height: 13px;
+  }
+
   .room-chip {
     background: rgba(16, 185, 129, 0.1);
     color: #10b981;
@@ -305,6 +398,55 @@
     background: color-mix(in srgb, var(--brand-text) 6%, transparent);
     color: var(--brand-text);
     border: 1px solid var(--brand-border);
+  }
+
+  /* Substitution badges & labels */
+  .sub-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+    font-size: calc(0.675rem * var(--table-font-scale, 1));
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    padding: 0.08rem 0.32rem;
+    border-radius: 4px;
+    background: rgba(245, 158, 11, 0.15);
+    color: #b45309;
+    border: 1px solid rgba(245, 158, 11, 0.35);
+    line-height: 1.1;
+    white-space: nowrap;
+  }
+
+  :global([data-theme="dark"]) .sub-badge,
+  :global(.dark) .sub-badge {
+    color: #fbbf24;
+    background: rgba(245, 158, 11, 0.22);
+    border-color: rgba(245, 158, 11, 0.45);
+  }
+
+  .sub-badge.is-sorveglianza {
+    background: rgba(99, 102, 241, 0.12);
+    color: #4f46e5;
+    border-color: rgba(99, 102, 241, 0.3);
+  }
+
+  :global([data-theme="dark"]) .sub-badge.is-sorveglianza,
+  :global(.dark) .sub-badge.is-sorveglianza {
+    color: #818cf8;
+    background: rgba(99, 102, 241, 0.2);
+    border-color: rgba(99, 102, 241, 0.45);
+  }
+
+  .sub-orig-label {
+    font-size: calc(0.725rem * var(--table-font-scale, 1));
+    color: var(--brand-text-muted);
+    font-style: italic;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 140px;
+    line-height: 1.15;
   }
 
   .subject-tag {
@@ -451,6 +593,9 @@
     .subject-tag {
       padding: 0.18rem 0.35rem;
       font-size: calc(0.825rem * var(--table-font-scale, 1));
+    }
+    .sub-orig-label {
+      max-width: 95px;
     }
   }
 </style>

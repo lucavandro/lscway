@@ -36,6 +36,7 @@
       class="day-slot"
       class:is-today={isToday}
       class:is-active-slot={isActiveSlot}
+      class:has-substitution={dayEntries.some((e) => e.isSubstitution)}
     >
       {#if dayEntries.length > 0}
         <div class="slot-stack">
@@ -61,6 +62,16 @@
                 {#if showPrimaryTeacher}
                   <span class="primary-label teacher-label" title={entry["docente"]}>
                     {entry["docente_abbr"] || entry["docente"]}
+                  </span>
+                {/if}
+
+                {#if entry.isSubstitution}
+                  <span
+                    class="micro-sub-badge"
+                    class:is-sorveglianza={entry.tipologia === "sorveglianza"}
+                    title="Sostituzione: {entry.tipologia || 'supplenza'}{entry.docenteOriginale ? ` per ${entry.docenteOriginale}` : ''}"
+                  >
+                    {entry.tipologia === "sorveglianza" ? "SORV" : "SOST"}
                   </span>
                 {/if}
 
@@ -182,6 +193,49 @@
   .day-slot.is-active-slot {
     background: color-mix(in srgb, var(--brand-primary) 12%, var(--brand-surface-card));
     box-shadow: inset 0 0 0 2px var(--brand-primary);
+  }
+
+  /* Substitution highlight in weekly matrix */
+  .day-slot.has-substitution {
+    background-color: color-mix(in srgb, #f59e0b 6%, transparent);
+  }
+
+  .micro-sub-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: calc(0.55rem * var(--table-font-scale, 1));
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    padding: 0.04rem 0.2rem;
+    border-radius: 3px;
+    background: rgba(245, 158, 11, 0.18);
+    color: #b45309;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+    line-height: 1;
+    margin-left: 0.15rem;
+    vertical-align: middle;
+    flex-shrink: 0;
+  }
+
+  :global([data-theme="dark"]) .micro-sub-badge,
+  :global(.dark) .micro-sub-badge {
+    color: #fbbf24;
+    background: rgba(245, 158, 11, 0.25);
+    border-color: rgba(245, 158, 11, 0.5);
+  }
+
+  .micro-sub-badge.is-sorveglianza {
+    background: rgba(99, 102, 241, 0.14);
+    color: #4f46e5;
+    border-color: rgba(99, 102, 241, 0.35);
+  }
+
+  :global([data-theme="dark"]) .micro-sub-badge.is-sorveglianza,
+  :global(.dark) .micro-sub-badge.is-sorveglianza {
+    color: #818cf8;
+    background: rgba(99, 102, 241, 0.22);
+    border-color: rgba(99, 102, 241, 0.45);
   }
 
   .slot-stack {

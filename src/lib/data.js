@@ -44,6 +44,9 @@ function buildTimetableIndexes(rows) {
         if (row.docente) {
             (byTeacher[row.docente] ||= []).push(row);
         }
+        if (row.isSubstitution && row.docenteOriginale && row.docenteOriginale !== row.docente) {
+            (byTeacher[row.docenteOriginale] ||= []).push(row);
+        }
         if (row.aula) {
             (byAula[row.aula] ||= []).push(row);
         }
@@ -90,12 +93,27 @@ function normalizeTimetableData(raw) {
         const classMap = new Map((raw.classes || []).map((c) => [c.id, c]));
         const roomMap = new Map((raw.rooms || []).map((r) => [r.id, r]));
 
+        const getTeacherName = (t) => {
+            if (!t) return "";
+            if (t.cognome && t.nome) return `${t.cognome} ${t.nome}`.trim();
+            if (t.cognome) return t.cognome.trim();
+            if (t.shortName) return t.shortName.replace(/\.$/, "").trim();
+            return t.id || "";
+        };
+
+        const getTeacherAbbr = (t) => {
+            if (!t) return "";
+            if (t.shortName) return t.shortName.replace(/\.$/, "").trim();
+            if (t.cognome) return t.cognome.trim();
+            return t.id || "";
+        };
+
         classi = (raw.classes || [])
             .map((c) => c.nome || c.id)
             .filter((e) => e && !e.includes(".") && !e.includes("*"));
 
         docenti = (raw.teachers || [])
-            .map((t) => (t.cognome + " " + t.nome).trim())
+            .map((t) => getTeacherName(t))
             .filter(Boolean);
 
         aule = (raw.rooms || [])
@@ -126,9 +144,9 @@ function normalizeTimetableData(raw) {
             }
 
             const t = teacherMap.get(l.teacherId);
-            const docente = t ? (t.cognome + " " + t.nome).trim() : (l.docente || "");
+            const docente = t ? getTeacherName(t) : (l.docente || "");
             const docente_abbr = t
-                ? (t.shortName ? t.shortName.replace(/\.$/, "") : "")
+                ? getTeacherAbbr(t)
                 : (l.docente_abbr || "");
 
             const r = roomMap.get(l.roomId);
@@ -146,6 +164,13 @@ function normalizeTimetableData(raw) {
                 aula = "";
             }
 
+            const isSubstitution = Boolean(l.isSubstitution);
+            const tipologia = l.tipologia || (isSubstitution ? "sostituto" : null);
+            const originalTeacherId = l.originalTeacherId || null;
+            const origT = originalTeacherId ? teacherMap.get(originalTeacherId) : null;
+            const docenteOriginale = origT ? getTeacherName(origT) : (originalTeacherId || null);
+            const docenteOriginaleAbbr = origT ? getTeacherAbbr(origT) : (originalTeacherId || null);
+
             return {
                 day,
                 ora,
@@ -153,7 +178,12 @@ function normalizeTimetableData(raw) {
                 materia,
                 docente,
                 aula,
-                docente_abbr
+                docente_abbr,
+                isSubstitution,
+                tipologia,
+                originalTeacherId,
+                docenteOriginale,
+                docenteOriginaleAbbr
             };
         });
     } else {
@@ -180,7 +210,14 @@ function normalizeTimetableData(raw) {
                     e.materia = "RIC";
                     e.aula = "";
                 }
-                return e;
+                return {
+                    ...e,
+                    isSubstitution: Boolean(e.isSubstitution),
+                    tipologia: e.tipologia || (e.isSubstitution ? "sostituto" : null),
+                    originalTeacherId: e.originalTeacherId || null,
+                    docenteOriginale: e.docenteOriginale || e.docente_originale || null,
+                    docenteOriginaleAbbr: e.docenteOriginaleAbbr || e.docente_originale_abbr || null
+                };
             })
             : [];
     }
@@ -241,7 +278,7 @@ function persistCachedDataAsync(serializedJson) {
 async function fetchNetworkData(fetchFn, isBackground = false) {
     let rawData = null;
 
-    if (typeof window !== "undefined" && window.__lscwayInitialDataPromise && API_URL === DEFAULT_API_URL) {
+    if (typeof window !== "undefined" && window.__lscwayInitialDataPromise && (API_URL === DEFAULT_API_URL || API_URL.includes("/v1/public/orario"))) {
         const preloadPromise = window.__lscwayInitialDataPromise;
         delete window.__lscwayInitialDataPromise;
         try {

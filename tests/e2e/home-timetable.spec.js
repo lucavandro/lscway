@@ -71,4 +71,48 @@ test.describe('Home Page - Orario Classe', () => {
     expect(metrics.whiteSpace).toBe('nowrap');
     expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1);
   });
+
+  test('displays substitution badge and banner when substitutions exist', async ({ page }) => {
+    const todayWeekdays = ['DOM', 'LUN', 'MAR', 'MER', 'GIO', 'VEN', 'SAB'];
+    const currentDay = todayWeekdays[new Date().getDay()];
+
+    await page.route(/\/app\/orario\/api\/.*/, async (route) => {
+      await route.fulfill({
+        status: 200,
+        contentType: 'application/json',
+        body: JSON.stringify({
+          classi: ['1A'],
+          docenti: ['ROSSI MARIO', 'VERDI GIUSEPPE'],
+          aule: ['A101'],
+          data: [
+            {
+              day: currentDay === 'SAB' || currentDay === 'DOM' ? 'LUN' : currentDay,
+              ora: '08:00',
+              classe: '1A',
+              docente: 'VERDI GIUSEPPE',
+              docente_abbr: 'VERDI G',
+              materia: 'MAT',
+              aula: 'A101',
+              isSubstitution: true,
+              tipologia: 'sostituto',
+              docenteOriginale: 'ROSSI MARIO',
+              docenteOriginaleAbbr: 'ROSSI M'
+            }
+          ]
+        })
+      });
+    });
+
+    await page.goto('/app/way/tmp/?q=1A');
+
+    if (currentDay !== 'SAB' && currentDay !== 'DOM') {
+      // Check SubstitutionsBanner is visible
+      await expect(page.locator('.sub-alert')).toBeVisible();
+      await expect(page.locator('.sub-alert')).toContainText('1 ora di sostituzione oggi');
+
+      // Check table row has substitution badge and original teacher note
+      await expect(page.locator('.sub-badge')).toHaveText('Supplenza');
+      await expect(page.locator('.sub-orig-label')).toContainText('sost. ROSSI M');
+    }
+  });
 });

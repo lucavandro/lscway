@@ -5,4 +5,4 @@
  * - `APP_VERSION` in `src/app.html`
  * - `CACHE_VERSION` (con prefisso `v`) in `static/service-worker.js`
  */
-export const APP_VERSION = '1.1.1';
+export const APP_VERSION = '1.2.0';
