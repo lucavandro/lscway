@@ -10,30 +10,41 @@
   $: hour = hours[hourIndex];
   $: isTeacherTable = Array.isArray(fields) && fields.includes("classe") && !fields.includes("docente");
 
-  function processDayEntries(entries, isTeacher) {
-    if (!entries || entries.length <= 1) return entries;
-    const sorted = entries.sort(inclusioneInFondo);
-    const hasSub = sorted.some((e) => e.isSubstitution);
-    if (!hasSub) return sorted;
-    if (isTeacher) {
-      return sorted.filter((e) => e.isSubstitution);
+  function resolveWeeklyEntries(entries, isTeacher) {
+    if (!entries || entries.length === 0) return [];
+
+    const resolved = [];
+    for (const e of entries) {
+      if (!e.isSubstitution) {
+        resolved.push(e);
+      } else {
+        // In weekly view, substitutions are not shown
+        if (isTeacher && e.docenteOriginale && e.docenteOriginale !== e.docente) {
+          // For substitute teacher, omit substitution so their base POT/lesson is visible
+          continue;
+        }
+        if (!e.docenteOriginale && !e.docente) {
+          continue;
+        }
+        resolved.push({
+          ...e,
+          isSubstitution: false,
+          tipologia: null,
+          docente: e.docenteOriginale || e.docente,
+          docente_abbr: e.docenteOriginaleAbbr || e.docente_abbr
+        });
+      }
     }
-    const nonPot = sorted.filter(
-      (e) =>
-        e.materia !== "POT" &&
-        e.materia !== "sub_potenziamento" &&
-        e.materia !== "RIC" &&
-        e.materia !== "sub_ricevimento"
-    );
-    return nonPot.length > 0 ? nonPot : sorted;
+
+    return resolved.sort(inclusioneInFondo);
   }
 
   $: filteredRowData = {
-    LUN: processDayEntries(rowData.filter((e) => e.day === "LUN"), isTeacherTable),
-    MAR: processDayEntries(rowData.filter((e) => e.day === "MAR"), isTeacherTable),
-    MER: processDayEntries(rowData.filter((e) => e.day === "MER"), isTeacherTable),
-    GIO: processDayEntries(rowData.filter((e) => e.day === "GIO"), isTeacherTable),
-    VEN: processDayEntries(rowData.filter((e) => e.day === "VEN"), isTeacherTable),
+    LUN: resolveWeeklyEntries(rowData.filter((e) => e.day === "LUN"), isTeacherTable),
+    MAR: resolveWeeklyEntries(rowData.filter((e) => e.day === "MAR"), isTeacherTable),
+    MER: resolveWeeklyEntries(rowData.filter((e) => e.day === "MER"), isTeacherTable),
+    GIO: resolveWeeklyEntries(rowData.filter((e) => e.day === "GIO"), isTeacherTable),
+    VEN: resolveWeeklyEntries(rowData.filter((e) => e.day === "VEN"), isTeacherTable),
   };
 </script>
 
@@ -55,7 +66,6 @@
       class="day-slot"
       class:is-today={isToday}
       class:is-active-slot={isActiveSlot}
-      class:has-substitution={dayEntries.some((e) => e.isSubstitution)}
     >
       {#if dayEntries.length > 0}
         <div class="slot-stack">
@@ -84,53 +94,37 @@
                   </span>
                 {/if}
 
-                {#if entry.isSubstitution}
-                  <span
-                    class="micro-sub-badge"
-                    class:is-sorveglianza={entry.tipologia === "sorveglianza"}
-                    title="Sostituzione: {entry.tipologia || 'supplenza'}{entry.docenteOriginale ? ` per ${entry.docenteOriginale}` : ''}"
-                  >
-                    {entry.tipologia === "sorveglianza" ? "SORV" : "SOST"}
-                  </span>
-                {/if}
-
-                {#if !hasPrimary && (entry["materia"] || entry.isSubstitution)}
+                {#if !hasPrimary && entry["materia"]}
                   <span
                     class="subj-tag fallback-subj"
-                    class:is-pot={!entry.isSubstitution && isPot}
-                    class:is-ric={!entry.isSubstitution && isRic}
-                    class:is-sostegno={!entry.isSubstitution && isSostegno}
-                    class:is-substitution={entry.isSubstitution}
+                    class:is-pot={isPot}
+                    class:is-ric={isRic}
+                    class:is-sostegno={isSostegno}
                   >
-                    {entry.isSubstitution
-                      ? (entry.tipologia === "sorveglianza" ? "Sorveglianza" : "Sostituzione")
-                      : entry["materia"]}
+                    {entry["materia"]}
                   </span>
                 {/if}
               </div>
 
               <!-- Line 2: Secondary info (Materia + Aula/Classe tags, stacked on mobile, side-by-side on tablet/desktop) -->
-              {#if (hasPrimary && (entry["materia"] || entry.isSubstitution)) || showClassTag || showAula}
+              {#if (hasPrimary && entry["materia"]) || showClassTag || showAula}
                 <div class="line-secondary">
                   {#if showClassTag}
                     <span class="class-tag">{entry["classe"]}</span>
                   {/if}
 
-                  {#if showClassTag && ((hasPrimary && (entry["materia"] || entry.isSubstitution)) || showAula)}
+                  {#if showClassTag && ((hasPrimary && entry["materia"]) || showAula)}
                     <span class="sec-sep" aria-hidden="true">•</span>
                   {/if}
 
-                  {#if hasPrimary && (entry["materia"] || entry.isSubstitution)}
+                  {#if hasPrimary && entry["materia"]}
                     <span
                       class="subj-tag"
-                      class:is-pot={!entry.isSubstitution && isPot}
-                      class:is-ric={!entry.isSubstitution && isRic}
-                      class:is-sostegno={!entry.isSubstitution && isSostegno}
-                      class:is-substitution={entry.isSubstitution}
+                      class:is-pot={isPot}
+                      class:is-ric={isRic}
+                      class:is-sostegno={isSostegno}
                     >
-                      {entry.isSubstitution
-                        ? (entry.tipologia === "sorveglianza" ? "Sorveglianza" : "Sostituzione")
-                        : entry["materia"]}
+                      {entry["materia"]}
                     </span>
                   {/if}
 
@@ -218,49 +212,6 @@
   .day-slot.is-active-slot {
     background: color-mix(in srgb, var(--brand-primary) 12%, var(--brand-surface-card));
     box-shadow: inset 0 0 0 2px var(--brand-primary);
-  }
-
-  /* Substitution highlight in weekly matrix */
-  .day-slot.has-substitution {
-    background-color: color-mix(in srgb, #f59e0b 6%, transparent);
-  }
-
-  .micro-sub-badge {
-    display: inline-flex;
-    align-items: center;
-    font-size: calc(0.55rem * var(--table-font-scale, 1));
-    font-weight: 800;
-    text-transform: uppercase;
-    letter-spacing: 0.02em;
-    padding: 0.04rem 0.2rem;
-    border-radius: 3px;
-    background: rgba(245, 158, 11, 0.18);
-    color: #b45309;
-    border: 1px solid rgba(245, 158, 11, 0.4);
-    line-height: 1;
-    margin-left: 0.15rem;
-    vertical-align: middle;
-    flex-shrink: 0;
-  }
-
-  :global([data-theme="dark"]) .micro-sub-badge,
-  :global(.dark) .micro-sub-badge {
-    color: #fbbf24;
-    background: rgba(245, 158, 11, 0.25);
-    border-color: rgba(245, 158, 11, 0.5);
-  }
-
-  .micro-sub-badge.is-sorveglianza {
-    background: rgba(99, 102, 241, 0.14);
-    color: #4f46e5;
-    border-color: rgba(99, 102, 241, 0.35);
-  }
-
-  :global([data-theme="dark"]) .micro-sub-badge.is-sorveglianza,
-  :global(.dark) .micro-sub-badge.is-sorveglianza {
-    color: #818cf8;
-    background: rgba(99, 102, 241, 0.22);
-    border-color: rgba(99, 102, 241, 0.45);
   }
 
   .slot-stack {
@@ -392,20 +343,6 @@
     color: #818cf8;
     background: rgba(99, 102, 241, 0.2);
     border-color: rgba(99, 102, 241, 0.45);
-  }
-
-  .subj-tag.is-substitution {
-    background: rgba(245, 158, 11, 0.16);
-    color: #b45309;
-    border-color: rgba(245, 158, 11, 0.4);
-    font-weight: 700;
-  }
-
-  :global([data-theme="dark"]) .subj-tag.is-substitution,
-  :global(.dark) .subj-tag.is-substitution {
-    color: #fbbf24;
-    background: rgba(245, 158, 11, 0.22);
-    border-color: rgba(245, 158, 11, 0.5);
   }
 
   .room-sub {

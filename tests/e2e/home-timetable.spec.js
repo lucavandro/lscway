@@ -165,17 +165,26 @@ test.describe('Home Page - Orario Classe', () => {
       // No entry divider in row
       await expect(row.locator('.entry-divider')).toHaveCount(0);
 
-      // Class chip shows 4E and original teacher
-      await expect(row.locator('.class-chip')).toContainText('4E');
-      await expect(row.locator('.sub-orig-label')).toContainText('sost. SANZARI E');
+      // Class chip shows 4E without sub-orig-label in class slot
+      await expect(row.locator('.class-slot .class-chip')).toContainText('4E');
+      await expect(row.locator('.class-slot .sub-orig-label')).toHaveCount(0);
 
       // Tag SUPPLENZA is eliminated
       await expect(row.locator('.sub-badge')).toHaveCount(0);
 
-      // Materia displays "Sostituzione"
-      const materiaTag = row.locator('.subject-tag.is-substitution');
-      await expect(materiaTag).toBeVisible();
-      await expect(materiaTag).toContainText('Sostituzione');
+      // Materia column displays "Sostituzione" tag with replaced teacher below it
+      const materiaSlot = row.locator('.materia-slot');
+      await expect(materiaSlot).toBeVisible();
+      await expect(materiaSlot.locator('.subject-tag.is-substitution')).toContainText('Sostituzione');
+      await expect(materiaSlot.locator('.sub-orig-label')).toContainText('sost. SANZARI E');
+
+      // Weekly view must NOT show substitutions
+      const switchEl = page.locator('.segment-btn', { hasText: 'Settimana' });
+      await switchEl.click();
+      await expect(page.locator('.compact-timetable')).toBeVisible();
+      await expect(page.locator('.compact-timetable .micro-sub-badge')).toHaveCount(0);
+      await expect(page.locator('.compact-timetable .has-substitution')).toHaveCount(0);
+      await expect(page.locator('.compact-timetable .subj-tag.is-substitution')).toHaveCount(0);
     }
   });
 });

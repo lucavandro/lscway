@@ -261,10 +261,10 @@ lscway/
    - Viene risolto il nome del docente sostituito (`docenteOriginale` e `docenteOriginaleAbbr`) mappando `originalTeacherId` nell'anagrafica docenti.
    - **Indicizzazione duale O(1):** `buildTimetableIndexes` associa la lezione sia al docente supplente (`byTeacher[row.docente]`) sia al docente titolare assente (`byTeacher[row.docenteOriginale]`), permettendo a entrambi di consultare l'orario correttamente aggiornato.
    - **Visualizzazione UI:**
-     - *Risoluzione a singola voce e sovrascrittura POT:* se nell'ora è presente una supplenza, la voce di supplenza prevale sull'ora di potenziamento (POT) o sulla lezione originaria del supplente, eliminando duplicazioni, trattini vuoti e divisori orari (`.entry-divider`).
-     - *Materia:* il campo materia mostra l'etichetta `"Sostituzione"` (o `"Sorveglianza"` se `tipologia === 'sorveglianza'`) con badge ambrato dedicato (`.is-substitution`).
-     - *Pulizia badge:* il tag ridondante `"SUPPLENZA"` sotto la classe o il docente è rimosso; nella vista docente la classe mostra la classe (es. `4E`) e il riferimento al titolare (`sost. Prof. ...`), mentre nella vista classe il docente mostra il supplente con icona di scambio `SwapIcon` e indicazione del titolare.
-     - *Vista settimanale (`FullTimeTableRow.svelte`):* micro-badge `SOST`/`SORV` nella cella, materia "Sostituzione" e accento cromatico ambrato sul giorno.
+     - *Solo nella vista giornaliera:* le sostituzioni vengono mostrate unicamente nella vista giornaliera (`TimeTableRow.svelte`). Nella vista settimanale (`FullTimeTableRow.svelte`) non vengono mostrate le sostituzioni per preservare la leggibilità dell'orario settimanale base.
+     - *Risoluzione a singola voce e sovrascrittura POT:* nella vista giornaliera, se nell'ora è presente una supplenza, la voce di supplenza prevale sull'ora di potenziamento (POT) o sulla lezione originaria del supplente, eliminando duplicazioni, trattini vuoti e divisori orari (`.entry-divider`).
+     - *Colonna Materia nella pagina docente:* il campo materia mostra l'etichetta `"Sostituzione"` (o `"Sorveglianza"`) con badge ambrato (`.is-substitution`) e, direttamente sotto di essa, il nome del docente sostituito (`sost. Prof. ...`). La colonna Classe mostra unicamente il chip della classe.
+     - *Pulizia badge:* il tag ridondante `"SUPPLENZA"` è rimosso da tutte le viste; nella vista classe il docente mostra il supplente con icona di scambio `SwapIcon` e indicazione del titolare.
 
 ### 5.2. API Sostituzioni Docenti
 - **Endpoint Sostituzioni Dettagliate (UI):**  

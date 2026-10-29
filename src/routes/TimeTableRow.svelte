@@ -165,11 +165,6 @@
                     <a href="{base}/?q={queryValue(rd['classe'])}" class="link-chip class-chip" title="Classe {rd['classe']}">
                       <span>{rd["classe"]}</span>
                     </a>
-                    {#if rd.isSubstitution && isTeacherTable && rd.docenteOriginale}
-                      <span class="sub-orig-label" title="Docente sostituito: {rd.docenteOriginale}">
-                        sost. {rd.docenteOriginaleAbbr || rd.docenteOriginale}
-                      </span>
-                    {/if}
                   </div>
                 {:else if rd["materia"] === "RIC" || rd["materia"] === "sub_ricevimento"}
                   <span class="badge-chip badge-ric">Ricevimento</span>
@@ -179,20 +174,36 @@
                   <span class="dash">—</span>
                 {/if}
               {:else if field === "materia"}
-                <span
-                  class="subject-tag"
-                  class:is-pot={!rd.isSubstitution && (rd[field] === "POT" || rd[field] === "sub_potenziamento")}
-                  class:is-ric={!rd.isSubstitution && (rd[field] === "RIC" || rd[field] === "sub_ricevimento")}
-                  class:is-sostegno={!rd.isSubstitution && (rd[field] === "MADISO" || rd[field] === "INC")}
-                  class:is-substitution={rd.isSubstitution}
-                  title={rd.isSubstitution
-                    ? (rd.tipologia === "sorveglianza" ? "Sorveglianza" : "Sostituzione")
-                    : rd[field]}
-                >
-                  {rd.isSubstitution
-                    ? (rd.tipologia === "sorveglianza" ? "Sorveglianza" : "Sostituzione")
-                    : rd[field]}
-                </span>
+                {#if rd.isSubstitution && isTeacherTable}
+                  <div class="materia-slot">
+                    <span
+                      class="subject-tag is-substitution"
+                      title={rd.tipologia === "sorveglianza" ? "Sorveglianza" : "Sostituzione"}
+                    >
+                      {rd.tipologia === "sorveglianza" ? "Sorveglianza" : "Sostituzione"}
+                    </span>
+                    {#if rd.docenteOriginale}
+                      <span class="sub-orig-label" title="Docente sostituito: {rd.docenteOriginale}">
+                        sost. {rd.docenteOriginaleAbbr || rd.docenteOriginale}
+                      </span>
+                    {/if}
+                  </div>
+                {:else}
+                  <span
+                    class="subject-tag"
+                    class:is-pot={!rd.isSubstitution && (rd[field] === "POT" || rd[field] === "sub_potenziamento")}
+                    class:is-ric={!rd.isSubstitution && (rd[field] === "RIC" || rd[field] === "sub_ricevimento")}
+                    class:is-sostegno={!rd.isSubstitution && (rd[field] === "MADISO" || rd[field] === "INC")}
+                    class:is-substitution={rd.isSubstitution}
+                    title={rd.isSubstitution
+                      ? (rd.tipologia === "sorveglianza" ? "Sorveglianza" : "Sostituzione")
+                      : rd[field]}
+                  >
+                    {rd.isSubstitution
+                      ? (rd.tipologia === "sorveglianza" ? "Sorveglianza" : "Sostituzione")
+                      : rd[field]}
+                  </span>
+                {/if}
               {:else}
                 <span class="cell-text">{rd[field]}</span>
               {/if}
@@ -340,9 +351,10 @@
     margin: 0.1rem auto;
   }
 
-  /* Teacher & Class slot wrappers for substitutions */
+  /* Teacher, Class & Materia slot wrappers for substitutions */
   .teacher-slot,
-  .class-slot {
+  .class-slot,
+  .materia-slot {
     display: flex;
     flex-direction: column;
     align-items: center;
