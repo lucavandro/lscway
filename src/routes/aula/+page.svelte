@@ -8,7 +8,6 @@
   import TimeTable from "./../TimeTable.svelte";
   import FullTimeTable from "./../FullTimeTable.svelte";
   import FullTimeTableSwitch from "./../FullTimeTableSwitch.svelte";
-  import SubstitutionsBanner from "./../SubstitutionsBanner.svelte";
 
   export let data;
   let selectedClassroom = "";
@@ -22,7 +21,6 @@
     activeData?.data?.filter((e) => e.aula === selectedClassroom) ??
     [];
   $: classroomData = classroomWeekData.filter((e) => e.day === currenDay);
-  $: substitutionsToday = classroomData.filter((e) => e.isSubstitution);
 
   function onSelectedItemChange() {
     let queryClass = $page.url.searchParams.get("q");
@@ -72,12 +70,6 @@
       <FullTimeTableSwitch bind:control={showFullTimeTable} />
     </div>
   </div>
-
-  <SubstitutionsBanner
-    substitutions={substitutionsToday}
-    type="aula"
-    triggerKey={selectedClassroom}
-  />
 
   <div class="table-section">
     {#if showFullTimeTable}

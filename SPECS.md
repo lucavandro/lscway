@@ -150,7 +150,6 @@ lscway/
         ├── FullTimeTable.svelte       # Matrice orario settimanale (LUN - VEN)
         ├── FullTimeTableRow.svelte   # Riga della matrice orario settimanale
         ├── FullTimeTableSwitch.svelte # Toggle switch Giornaliero / Settimanale
-        ├── SubstitutionsBanner.svelte # Banner contestuale riepilogativo sostituzioni del giorno (classe, docente, aula)
         │
         ├── aula/               # Pagina consultazione orario per AULA
         │   └── +page.svelte
@@ -264,7 +263,6 @@ lscway/
    - **Visualizzazione UI:**
      - *Vista giornaliera (`TimeTableRow.svelte`):* bordo di evidenziazione riga ambrato, chip docente con `SwapIcon`, badge semantico `Supplenza`/`Sorveglianza` e sottotitolo `sost. Prof. ...`.
      - *Vista settimanale (`FullTimeTableRow.svelte`):* micro-badge `SOST`/`SORV` nella cella e accento cromatico sul giorno.
-     - *Banner contestuale (`SubstitutionsBanner.svelte`):* alert dismissibile in testata (`+page.svelte`, `docente/+page.svelte`, `aula/+page.svelte`) che elenca le ore di sostituzione attive oggi per la selezione corrente.
 
 ### 5.2. API Sostituzioni Docenti
 - **Endpoint Sostituzioni Dettagliate (UI):**  

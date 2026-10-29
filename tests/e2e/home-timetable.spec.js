@@ -72,7 +72,7 @@ test.describe('Home Page - Orario Classe', () => {
     expect(metrics.scrollWidth).toBeLessThanOrEqual(metrics.clientWidth + 1);
   });
 
-  test('displays substitution badge and banner when substitutions exist', async ({ page }) => {
+  test('displays substitution badge in timetable when substitutions exist', async ({ page }) => {
     const todayWeekdays = ['DOM', 'LUN', 'MAR', 'MER', 'GIO', 'VEN', 'SAB'];
     const currentDay = todayWeekdays[new Date().getDay()];
 
@@ -106,10 +106,6 @@ test.describe('Home Page - Orario Classe', () => {
     await page.goto('/app/way/tmp/?q=1A');
 
     if (currentDay !== 'SAB' && currentDay !== 'DOM') {
-      // Check SubstitutionsBanner is visible
-      await expect(page.locator('.sub-alert')).toBeVisible();
-      await expect(page.locator('.sub-alert')).toContainText('1 ora di sostituzione oggi');
-
       // Check table row has substitution badge and original teacher note
       await expect(page.locator('.sub-badge')).toHaveText('Supplenza');
       await expect(page.locator('.sub-orig-label')).toContainText('sost. ROSSI M');
