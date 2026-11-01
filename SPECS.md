@@ -110,6 +110,7 @@ lscway/
     ├── icons/                  # Componenti Svelte icone SVG scalabili
     │   ├── BellIcon.svelte / BellOffIcon.svelte
     │   ├── BookingIcon.svelte
+    │   ├── CalendarEditIcon.svelte # Icona matita/modifica per Orario Interno
     │   ├── HomeIcon.svelte
     │   ├── LinkIcon.svelte
     │   ├── LoginIcon.svelte / LogoutIcon.svelte
@@ -124,6 +125,7 @@ lscway/
     │   ├── data.js             # Fetch orario, cache localStorage, JWT Google auth
     │   ├── dateutils.js        # Ore lezioni, calcolo ora corrente, giorni, store orologio
     │   ├── hotspot.js          # Tabella statica SSID / password hotspot LIM per aula
+    │   ├── internalTimetable.js # Client API orario interno, sessione e sottomaterie
     │   ├── notifications.js    # Richiesta permessi, trigger notifiche, sync con SW
     │   ├── quotes.js           # Collezione citazioni/aforismi scolastici e selettore random
     │   ├── stores.js           # Svelte stores globali reattivi
@@ -154,6 +156,8 @@ lscway/
         ├── aula/               # Pagina consultazione orario per AULA
         │   └── +page.svelte
         ├── docente/            # Pagina consultazione orario per DOCENTE
+        │   └── +page.svelte
+        ├── orario-interno/     # Pagina consultazione e MODIFICA SOTTOMATERIE ORARIO INTERNO (docenti abilitati)
         │   └── +page.svelte
         ├── sostituzioni/       # Pagina bacheca ore di SOSTITUZIONE (riservata docenti)
         │   └── +page.svelte
@@ -286,6 +290,25 @@ lscway/
 - Gestisce aule singole (es. `"A101": "89287577"`) e aule con più punti d'accesso (es. `"B105_1"`, `"B105_2"`, `"B105_3"`).
 - Include l'hotspot generale docenti: `"NINOCORTESE": "N1n0$d0cent1"`.
 
+### 5.4. API Orario Interno e Sottomaterie (`src/lib/internalTimetable.js`)
+L'orario interno permette ai docenti abilitati di specificare per ciascuna ora di lezione la specifica **sottomateria** svolta (`subsubjectId`), lasciando invariata la disciplina principale dell'orario d'istituto (`subjectId`).
+- **Condivisione Sessione e Cookie:**
+  - Prefisso API: `/app/orario/api/v1` (Same-Domain con credenziali `same-origin` o `include`).
+  - Cookie HTTP: `orariolsc_session` (SameSite=Lax, Path=/).
+  - Inizializzazione sessione Google: `POST /app/orario/api/v1/auth/google` con `{ credential: "<GOOGLE_ID_TOKEN>" }`.
+  - Verifica sessione: `GET /app/orario/api/v1/auth/session` (restituisce 401 se assente o scaduta).
+- **Lettura Orario Interno Docente:**
+  - `GET /app/orario/api/v1/me/internal-timetable`: restituisce le lezioni personali della versione pubblicata (`lessons`), l'elenco materie con `admitsSubsubjects` e `subsubjectIds` (`subjects`), le classi (`classes`) e le fasce orarie (`timeSlots`).
+- **Assegnazione o Rimozione Sottomateria:**
+  - `PUT /app/orario/api/v1/me/internal-timetable/{lessonId}` con body:
+    ```json
+    { "subsubjectId": "FIS", "revision": 3 }
+    ```
+    *(Per rimuovere la sottomateria e ripristinare la materia principale, inviare `"subsubjectId": null`).*
+  - Risposta `200 OK`: `{ item: { id, revision, subsubjectId } }`.
+- **Concorrenza Ottimistica (HTTP 409):**
+  - Se la `revision` locale è disallineata rispetto al server, risponde con `409 Conflict` e payload contenente `current: { id, revision, subsubjectId }`. Il client sincronizza automaticamente la lezione locale aggiornando la revisione senza perdita di coerenza.
+
 ---
 
 ## 6. Svelte Stores e Gestione dello Stato Globale
@@ -305,6 +328,7 @@ Gli store globali sono definiti in `src/lib/stores.js`, `src/lib/dateutils.js` e
 | `clockStore` | `readable(object)` | In-memory (timer ogni 15s) | Fornisce `{ day, hourNum, schoolHour, isChristmas }` |
 | `theme` | `writable('light'\|'dark')` | DOM `data-theme` | Tema effettivo visualizzato |
 | `themePreference` | `writable('system'\|'light'\|'dark')`| `localStorage('theme')` | Preferenza tema scelta dall'utente |
+| `canEditInternalTimetable` | `writable(boolean)` | `localStorage('lscway_can_edit_internal_timetable')` | Abilitazione visualizzazione e accesso a Orario Interno (docenti con materie che ammettono sottomaterie) |
 
 ---
 
@@ -381,6 +405,26 @@ Il liceo adotta la convenzione di Google Workspace:
   - *Indirizzi gruppi mail scolastici* (`https://docs.google.com/spreadsheets/d/1CHoQed5cFo5ryTkfugP5-4K2jlOuV_RiNbSYj_wD6G4/edit?usp=sharing`)
   - *Moduli Web 2.0* (`https://forms.gle/UPLBbEKaK56fpDaL6`)
   - *ELS Cortese* (`https://www.liceoscientificocortese.edu.it/els/`)
+
+### 8.5. Orario Interno e Modale Sottomaterie (`src/routes/orario-interno/+page.svelte`)
+- **Regole di Visibilità e Accesso:**
+  - Riservata esclusivamente ai docenti autenticati (`$isTeacher && $userEmail`) che possiedono almeno una materia con sottomaterie ammesse (`hasAdmitsSubsubjects(subjects) === true`).
+  - La voce nel drawer appare dinamicamente se e solo se tali requisiti sono soddisfatti (pilotata dallo store `canEditInternalTimetable`).
+  - Se un utente non loggato accede all'URL, visualizza una card di blocco con pulsante per il login Google.
+  - Se la sessione di dominio (`orariolsc_session`) è scaduta (`401 Unauthorized`), mostra un banner esplicativo con link rapido per riconnettersi con Google.
+- **Visualizzazione Orario Settimanale:**
+  - Matrice completa Lunedì - Venerdì (8 ore) con layout compatto, colonna ore fissa, responsive e conforme a `--table-font-scale`.
+  - Gli slot delle lezioni che ammettono sottomaterie sono evidenziati con bordo e badge interattivo `.editable-card` con indicatore di modifica.
+  - Se la sottomateria è valorizzata, viene visualizzato il nome della sottomateria (in verde smeraldo) e tra parentesi la materia genitore; se non impostata, viene mostrata la materia principale con badge `"Non impostata"`.
+- **Modale Accessibile di Assegnazione:**
+  - Dialog modale con focus trap, tasto `Escape`, touch targets ≥ 48px e blocco scroll del body.
+  - Elenco opzioni a schede radio:
+    - *Materia principale:* reimposta `"subsubjectId": null` lasciando la disciplina aggregata dell'orario d'istituto.
+    - *Sottomaterie:* per ciascuna sottomateria ammessa (`subsubjectIds`), permette la selezione specifica.
+  - **Gestione Conflitti e Feedback:**
+    - Feedback visivo con spinner durante il salvataggio per evitare doppi click.
+    - Gestione automatica del codice `409 Conflict`: riallinea lo slot locale e la `revision` con i dati correnti del server, avvisando l'utente.
+    - Notifica toast nativa di avvenuto salvataggio al completamento.
 
 ---
 

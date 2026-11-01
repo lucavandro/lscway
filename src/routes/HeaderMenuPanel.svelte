@@ -16,6 +16,8 @@
   import SocialIcon from "$icons/SocialIcon.svelte";
   import BookingIcon from "$icons/BookingIcon.svelte";
   import LinkIcon from "$icons/LinkIcon.svelte";
+  import CalendarEditIcon from "$icons/CalendarEditIcon.svelte";
+  import { canEditInternalTimetable, checkTeacherHasSubsubjects } from "$lib/internalTimetable.js";
   import {
     isLoading,
     userEmail,
@@ -83,6 +85,7 @@
 
   function logout() {
     userEmail.set(null);
+    canEditInternalTimetable.set(false);
     closeMenu();
   }
 
@@ -185,6 +188,10 @@
   }
 
   // Safely close only when genuine page navigation occurs
+  $: if ($isMenuOpen && $isTeacher && $userEmail) {
+    checkTeacherHasSubsubjects().catch(() => {});
+  }
+
   afterNavigate(() => {
     if ($isMenuOpen) {
       closeMenu();
@@ -294,6 +301,19 @@
           </li>
 
           {#if $isTeacher}
+            {#if $canEditInternalTimetable}
+              <li>
+                <a
+                  href="{base}/orario-interno"
+                  class="nav-link"
+                  class:active={$page.url.pathname === base + "/orario-interno"}
+                  on:click={closeMenu}
+                >
+                  <span class="nav-icon"><CalendarEditIcon /></span>
+                  <span class="nav-text">Orario interno</span>
+                </a>
+              </li>
+            {/if}
             <li>
               <a
                 href="{base}/hotspot"

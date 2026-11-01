@@ -1,5 +1,6 @@
 import { userEmail, timetableData } from "./stores";
 import { weekdays, hours } from "./dateutils.js";
+import { internalTimetableApi, checkTeacherHasSubsubjects } from "./internalTimetable.js";
 
 
 function decodeGoogleJwt(token) {
@@ -360,6 +361,13 @@ export async function googleAuth(credential) {
         }
 
         userEmail.set(payload.email);
+
+        if (typeof window !== "undefined") {
+            try {
+                await internalTimetableApi.loginWithGoogle(credential);
+                await checkTeacherHasSubsubjects();
+            } catch (e) {}
+        }
 
         return {
             success: true,
