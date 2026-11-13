@@ -19,9 +19,11 @@
   import CalendarEditIcon from "$icons/CalendarEditIcon.svelte";
   import { canEditInternalTimetable, checkTeacherHasSubsubjects } from "$lib/internalTimetable.js";
   import { unreadSubstitutionsCount, cleanupPersonalSubstitutions } from "$lib/personalSubstitutions.js";
+  import { logout as authLogout } from "$lib/auth.js";
   import {
     isLoading,
     userEmail,
+    currentUser,
     isTeacher,
     isMenuOpen,
     notificationsEnabled,
@@ -84,11 +86,21 @@
     setTimeout(() => location.reload(), 300);
   }
 
-  function logout() {
-    userEmail.set(null);
-    canEditInternalTimetable.set(false);
-    cleanupPersonalSubstitutions();
-    closeMenu();
+  let isLoggingOut = false;
+  let logoutError = null;
+
+  async function logout() {
+    if (isLoggingOut) return;
+    isLoggingOut = true;
+    logoutError = null;
+    try {
+      await authLogout();
+      closeMenu();
+    } catch (err) {
+      logoutError = err.message || "Errore durante la disconnessione.";
+    } finally {
+      isLoggingOut = false;
+    }
   }
 
   let touchStartX = 0;
@@ -278,10 +290,13 @@
       {#if $isTeacher && $userEmail}
         <div class="user-card">
           <div class="user-avatar">
-            {$userEmail.charAt(0).toUpperCase()}
+            {($currentUser?.displayName ? $currentUser.displayName.charAt(0) : $userEmail.charAt(0)).toUpperCase()}
           </div>
           <div class="user-info">
             <span class="user-tag">Docente</span>
+            {#if $currentUser?.displayName}
+              <span class="user-name" title={$currentUser.displayName}>{$currentUser.displayName}</span>
+            {/if}
             <span class="user-email" title={$userEmail}>{$userEmail}</span>
           </div>
         </div>
@@ -361,7 +376,7 @@
                 on:click={closeMenu}
               >
                 <span class="nav-icon"><LoginIcon /></span>
-                <span class="nav-text">Login Docenti</span>
+                <span class="nav-text">Accedi con Google</span>
               </a>
             </li>
           {/if}
@@ -545,10 +560,16 @@
           </li>
           {#if $isTeacher}
             <li>
-              <button type="button" class="nav-action-btn logout-btn" on:click={logout}>
+              <button type="button" class="nav-action-btn logout-btn" on:click={logout} disabled={isLoggingOut}>
                 <span class="nav-icon"><LogoutIcon /></span>
-                <span class="nav-text">Esci dall'account</span>
+                <span class="nav-text">{isLoggingOut ? "Disconnessione..." : "Esci dall'account"}</span>
               </button>
+              {#if logoutError}
+                <div class="logout-error-banner" role="alert">
+                  <span class="logout-error-msg">{logoutError}</span>
+                  <button type="button" class="retry-logout-btn" on:click={logout}>Riprova</button>
+                </div>
+              {/if}
             </li>
           {/if}
         </ul>
@@ -717,6 +738,16 @@
     letter-spacing: 0.04em;
   }
 
+  .user-name {
+    font-size: 0.92rem;
+    font-weight: 600;
+    color: var(--brand-text);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    line-height: 1.2;
+  }
+
   .user-email {
     font-size: 0.9rem;
     color: var(--brand-text);
@@ -849,6 +880,41 @@
   .nav-action-btn.logout-btn:hover {
     background: rgba(239, 68, 68, 0.1);
     color: #dc2626;
+  }
+
+  .logout-error-banner {
+    margin-top: 0.4rem;
+    padding: 0.45rem 0.65rem;
+    background: rgba(239, 68, 68, 0.1);
+    border: 1px solid rgba(239, 68, 68, 0.3);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+    font-size: 0.8rem;
+    color: #ef4444;
+  }
+
+  .logout-error-msg {
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
+  .retry-logout-btn {
+    background: #ef4444;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 0.2rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    cursor: pointer;
+    flex-shrink: 0;
+  }
+
+  .retry-logout-btn:hover {
+    background: #dc2626;
   }
 
   /* Theme Switch in Drawer */

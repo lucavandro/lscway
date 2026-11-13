@@ -4,6 +4,7 @@ import {
   checkSubstitutionsForNotifications,
   clearNotifiedSubstitutions,
 } from "./notifications.js";
+import { handleAuth401 } from "./auth.js";
 
 /**
  * Risolve l'URL di base per le API delle sostituzioni personali del docente.
@@ -17,19 +18,6 @@ export function getPersonalSubstitutionsApiBase() {
     }
     if (import.meta.env.VITE_INTERNAL_TIMETABLE_API_BASE) {
       return import.meta.env.VITE_INTERNAL_TIMETABLE_API_BASE.replace(/\/+$/, "");
-    }
-    const apiUrl = import.meta.env.VITE_API_URL || "";
-    if (apiUrl.includes("/app/orario/api/v1")) {
-      if (typeof window !== "undefined") {
-        try {
-          const parsed = new URL(apiUrl, window.location.href);
-          if (parsed.origin === window.location.origin) {
-            return "/app/orario/api/v1";
-          }
-          return `${parsed.origin}/app/orario/api/v1`;
-        } catch (e) {}
-      }
-      return apiUrl.split("/public/orario")[0];
     }
   }
   return "/app/orario/api/v1";
@@ -78,6 +66,12 @@ export async function personalSubstitutionsRequest(endpoint, options = {}, custo
   });
 
   if (!response.ok) {
+    if (response.status === 401) {
+      try {
+        handleAuth401();
+      } catch (e) {}
+    }
+
     let errorData = {};
     try {
       errorData = await response.json();

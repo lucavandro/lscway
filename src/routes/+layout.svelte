@@ -7,6 +7,7 @@
 	import { onNavigate } from "$app/navigation";
 	import { initTheme } from "$lib/theme.js";
 	import { isLoading, isMenuOpen } from "$lib/stores.js";
+	import { checkSession } from "$lib/auth.js";
 
 	let HeaderMenuPanelComponent = null;
 	let menuPanelPromise = null;
@@ -42,6 +43,9 @@
 	// Lifecycle events
 	onMount(() => {
 		initTheme();
+		if (typeof window !== 'undefined') {
+			checkSession().catch(() => {});
+		}
 
 		const splash = document.getElementById("app-splash");
 		if (splash) {

@@ -1,9 +1,9 @@
 <script>
-  import { googleAuth } from "$lib/data.js";
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
   import { userEmail } from "$lib/stores.js";
   import { base } from "$app/paths";
+  import { loginWithGoogle, checkSession } from "$lib/auth.js";
 
   let errorMessage = "";
   let googleButtonContainer;
@@ -15,11 +15,11 @@
 
   async function handleGoogleCredential(response) {
     resetMessages();
-    const result = await googleAuth(response.credential);
-    if (result.success) {
+    try {
+      await loginWithGoogle(response.credential);
       goto(`${base}/`);
-    } else {
-      errorMessage = result.message;
+    } catch (err) {
+      errorMessage = err.message || "Impossibile completare l'accesso con Google.";
     }
   }
 
@@ -68,6 +68,14 @@
   }
 
   onMount(async () => {
+    try {
+      const res = await checkSession();
+      if (res && res.authenticated) {
+        goto(`${base}/`);
+        return;
+      }
+    } catch (e) {}
+
     if ($userEmail) {
       goto(`${base}/`);
       return;

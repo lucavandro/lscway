@@ -270,7 +270,38 @@ lscway/
      - *Colonna Materia nella pagina docente:* il campo materia mostra l'etichetta `"Sostituzione"` (o `"Sorveglianza"`) con badge ambrato (`.is-substitution`) e, direttamente sotto di essa, il nome del docente sostituito (`sost. Prof. ...`). La colonna Classe mostra unicamente il chip della classe.
      - *Pulizia badge:* il tag ridondante `"SUPPLENZA"` è rimosso da tutte le viste; nella vista classe il docente mostra il supplente con icona di scambio `SwapIcon` e indicazione del titolare.
 
-### 5.2. API Sostituzioni Personali Docenti (`src/lib/personalSubstitutions.js`)
+### 5.2. Autenticazione e Sessione Condivisa con OrarioLSC (`src/lib/auth.js`)
+L'applicazione condivide la medesima origine (protocollo, dominio e porta) con l'applicativo principale OrarioLSC e ne integra l'autenticazione tramite cookie di sessione HttpOnly (`orariolsc_session`).
+- **Invarianti di Sicurezza e Sessione:**
+  - Base API: `/app/orario/api/v1`.
+  - La sessione è gestita interamente lato server tramite cookie HttpOnly inviato in automatico dal browser (`credentials: 'same-origin'`).
+  - È tassativamente vietato leggere il cookie, salvarlo in `localStorage` o passare parametri identificativi (email o teacherId) nel corpo o nella query delle richieste autenticate.
+- **1. Verifica dello stato di sessione all'avvio (`checkSession`):**
+  - All'avvio dell'applicazione (in `+layout.svelte` e in `signin/+page.svelte`), viene invocato `GET /app/orario/api/v1/auth/session` con `credentials: 'same-origin'` e `cache: 'no-store'`.
+  - **HTTP 200:** utente autenticato. Il JSON restituisce `{ user: { displayName, email, role, ... } }`. Aggiorna gli store reattivi `currentUser`, `userEmail` e `authStatus = 'authenticated'`. Se la sessione è già attiva, non viene ripresentato il login Google.
+  - **HTTP 401:** utente non autenticato. L'interfaccia imposta `authStatus = 'unauthenticated'`, ripulisce i dati personali e presenta il pulsante "Accedi con Google".
+  - **HTTP 403:** account non autorizzato (`authStatus = 'forbidden'`, messaggio d'errore dedicato).
+  - **Errori di rete o HTTP 5xx:** l'applicazione imposta `authStatus = 'error'` mostrando un messaggio di errore temporaneo, **senza interpretare l'anomalia come un logout**.
+- **2. Login con Google (`loginWithGoogle`):**
+  - Utilizza Google Identity Services (GIS) configurato con il Client ID condiviso.
+  - Al termine dell'autenticazione Google, invia l'ID token (`credential`) al backend:
+    ```javascript
+    POST /app/orario/api/v1/auth/google
+    body: JSON.stringify({ credential })
+    ```
+  - Non vengono mai inviati access token al posto dell'ID token e la credenziale Google non viene mantenuta dopo lo scambio.
+  - **HTTP 200:** il backend imposta il cookie di sessione e restituisce `{ user: ... }`. Aggiorna la UI con nome visualizzato ed email.
+  - **HTTP 401 / 403:** segnala credenziale Google non valida o account non autorizzato.
+- **3. Utilizzo della Sessione e Gestione 401 (`handleAuth401`):**
+  - Tutte le richieste successive (`/me/substitutions`, `/me/notifications`, `/me/internal-timetable`) utilizzano sempre `credentials: 'same-origin'`.
+  - Se un qualsiasi endpoint autenticato restituisce `HTTP 401`, l'applicazione invoca `handleAuth401()`, elimina immediatamente dalla memoria locale tutti i dati personali e riporta l'interfaccia allo stato non autenticato ("Accedi con Google").
+- **4. Logout (`logout`):**
+  - Richiesta: `DELETE /app/orario/api/v1/auth/session` con `credentials: 'same-origin'`.
+  - **HTTP 204:** conferma di avvenuta revoca della sessione e cancellazione del cookie.
+  - A seguito del successo: rimozione di profilo e dati personali dalla memoria (`currentUser`, `userEmail`, `canEditInternalTimetable`), stop del polling notifiche, ripristino di "Accedi con Google" e invocazione di `google.accounts.id.disableAutoSelect()` per evitare auto-login immediati.
+  - Se la richiesta di logout fallisce (errore rete o HTTP 5xx): il logout **NON** viene considerato riuscito; l'errore viene mostrato nel drawer e l'utente può riprovare.
+
+### 5.3. API Sostituzioni Personali Docenti (`src/lib/personalSubstitutions.js`)
 L'interfaccia personale del docente consente la consultazione esclusiva delle proprie sostituzioni pubblicate, il monitoraggio delle notifiche senza presa visione e la registrazione esplicita della presa visione.
 - **Autenticazione e Isolamento:**
   - Base path: `/app/orario/api/v1` (Same-Domain con credenziali `same-origin` o `include`).
@@ -292,12 +323,12 @@ L'interfaccia personale del docente consente la consultazione esclusiva delle pr
   - Badge accessibile con contatore notifiche non lette visibile nella pagina delle sostituzioni, sulla tab di navigazione `Tabs.svelte` e nel drawer `HeaderMenuPanel.svelte`.
   - **Dismissione Completa Legacy API:** rimossa qualsiasi invocazione e polling verso la vecchia API `docenti_sostituzioni_api.php`. Le notifiche desktop e la sincronizzazione di background del Service Worker operano esclusivamente tramite la nuova API `/app/orario/api/v1/me/notifications` con cookie di sessione.
 
-### 5.3. Hotspot LIM Aule (`src/lib/hotspot.js`)
+### 5.4. Hotspot LIM Aule (`src/lib/hotspot.js`)
 - Mappa statica `chiave_aula: password`.
 - Gestisce aule singole (es. `"A101": "89287577"`) e aule con più punti d'accesso (es. `"B105_1"`, `"B105_2"`, `"B105_3"`).
 - Include l'hotspot generale docenti: `"NINOCORTESE": "N1n0$d0cent1"`.
 
-### 5.4. API Orario Interno e Sottomaterie (`src/lib/internalTimetable.js`)
+### 5.5. API Orario Interno e Sottomaterie (`src/lib/internalTimetable.js`)
 L'orario interno permette ai docenti abilitati di specificare per ciascuna ora di lezione la specifica **sottomateria** svolta (`subsubjectId`), lasciando invariata la disciplina principale dell'orario d'istituto (`subjectId`).
 - **Condivisione Sessione e Cookie:**
   - Prefisso API: `/app/orario/api/v1` (Same-Domain con credenziali `same-origin` o `include`).
@@ -325,6 +356,9 @@ Gli store globali sono definiti in `src/lib/stores.js`, `src/lib/dateutils.js` e
 | Store | Tipo | Persistenza | Descrizione |
 |---|---|---|---|
 | `timetableData` | `writable(null)` | Cache memory + `localStorage` | Dati completi dell'orario scolastico normalizzato |
+| `currentUser` | `writable(object\|null)` | In-memory (da `/auth/session`) | Profilo utente autenticato (`displayName`, `email`, `role`) |
+| `authStatus` | `writable('loading'\|'authenticated'\|'unauthenticated'\|'forbidden'\|'error')` | In-memory | Stato di autenticazione sessione backend |
+| `authError` | `writable(string\|null)` | In-memory | Eventuale messaggio d'errore di autenticazione o autorizzazione |
 | `userEmail` | `writable(string\|null)` | `localStorage('userEmail')` | Email Google dell'utente loggato (`@lscortese.com`) |
 | `isTeacher` | `writable(boolean)` | Derivato da `userEmail` | `true` se il prefisso dell'email non contiene `.` (es. `cognome@...`), `false` se studente (`nome.cognome@...`) |
 | `isLoading` | `writable(boolean)` | In-memory | Mostra lo splash screen o spinner di ricaricamento |

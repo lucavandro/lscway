@@ -14,6 +14,9 @@ export const isTeacher = writable(false);
 export const isLoading = writable(false);
 export const isMenuOpen = writable(false);
 export const timetableData = writable(null);
+export const currentUser = writable(null);
+export const authStatus = writable('loading');
+export const authError = writable(null);
 
 
 userEmail.subscribe((value) => {
@@ -45,13 +48,13 @@ const getInitialNotificationsEnabled = () => {
 
 export const notificationsEnabled = writable(getInitialNotificationsEnabled());
 
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && window.localStorage) {
     notificationsEnabled.subscribe((value) => {
         window.localStorage.setItem('notifications_enabled', value ? 'true' : 'false');
     });
 }
 
-if (typeof window !== 'undefined') {
+if (typeof window !== 'undefined' && window.localStorage) {
     userEmail.subscribe((value) => {
         if (value) {
             window.localStorage.setItem('userEmail', value);

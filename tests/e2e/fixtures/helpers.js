@@ -1,6 +1,34 @@
 import { mockTimetableData, mockSubstitutionsData } from './mockData.js';
 
 export async function setupMockRoutes(page) {
+  // Sync localStorage userEmail with session cookie for same-origin auth requests
+  await page.addInitScript(() => {
+    const syncCookie = () => {
+      const email = window.localStorage.getItem('userEmail');
+      if (email) {
+        document.cookie = 'orariolsc_session=' + encodeURIComponent(email) + '; path=/';
+      } else {
+        document.cookie = 'orariolsc_session=; path=/; max-age=0; expires=Thu, 01 Jan 1970 00:00:00 GMT';
+      }
+    };
+    syncCookie();
+    const origSet = window.localStorage.setItem.bind(window.localStorage);
+    const origRemove = window.localStorage.removeItem.bind(window.localStorage);
+    const origClear = window.localStorage.clear.bind(window.localStorage);
+    window.localStorage.setItem = function(k, v) {
+      origSet(k, v);
+      if (k === 'userEmail') syncCookie();
+    };
+    window.localStorage.removeItem = function(k) {
+      origRemove(k);
+      if (k === 'userEmail') syncCookie();
+    };
+    window.localStorage.clear = function() {
+      origClear();
+      syncCookie();
+    };
+  });
+
   // Intercept all API calls to /app/orario/api/*
   await page.route(/\/app\/orario\/api\/.*/, async (route) => {
     const request = route.request();
@@ -17,6 +45,71 @@ export async function setupMockRoutes(page) {
       await route.fulfill({
         status: 204,
         headers: corsHeaders,
+      });
+      return;
+    }
+
+    if (url.includes('/auth/session')) {
+      if (request.method() === 'DELETE') {
+        await route.fulfill({
+          status: 204,
+          headers: corsHeaders,
+        });
+        return;
+      }
+
+      const cookieHeader = request.headers()['cookie'] || '';
+      const hasSession = cookieHeader.includes('orariolsc_session=');
+      if (hasSession) {
+        let email = 'rossi@lscortese.com';
+        const match = cookieHeader.match(/orariolsc_session=([^;]+)/);
+        if (match && match[1] && match[1] !== 'test-mock-session') {
+          email = decodeURIComponent(match[1]);
+        }
+        await route.fulfill({
+          status: 200,
+          headers: {
+            ...corsHeaders,
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            user: {
+              displayName: 'Mario Rossi',
+              email: email,
+              role: 'teacher',
+            },
+          }),
+        });
+        return;
+      }
+
+      await route.fulfill({
+        status: 401,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          message: 'Sessione assente o scaduta.',
+        }),
+      });
+      return;
+    }
+
+    if (url.includes('/auth/google')) {
+      await route.fulfill({
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          user: {
+            displayName: 'Mario Rossi',
+            email: 'rossi@lscortese.com',
+            role: 'teacher',
+          },
+        }),
       });
       return;
     }
