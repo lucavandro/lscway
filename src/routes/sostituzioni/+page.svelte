@@ -271,7 +271,7 @@
             {#if errorCode === 401}
               <p>La sessione di accesso con Google non è attiva o è scaduta.</p>
             {:else if errorCode === 403}
-              <p>L'account non è associato ad un profilo docente attivo autorizzato.</p>
+              <p>L'account Google <strong>{$userEmail}</strong> non è associato ad un profilo docente attivo autorizzato.</p>
             {/if}
           </div>
         </div>
