@@ -1,5 +1,9 @@
 import { writable } from "svelte/store";
 import { userEmail } from "./stores.js";
+import {
+  checkSubstitutionsForNotifications,
+  clearNotifiedSubstitutions,
+} from "./notifications.js";
 
 /**
  * Risolve l'URL di base per le API delle sostituzioni personali del docente.
@@ -185,6 +189,7 @@ export async function pollPersonalNotifications(customFetch) {
         loaded: true,
         error: null,
       }));
+      checkSubstitutionsForNotifications(data.items);
     }
     return data;
   } catch (err) {
@@ -234,6 +239,7 @@ export function cleanupPersonalSubstitutions() {
     loaded: false,
     error: null,
   });
+  clearNotifiedSubstitutions();
 }
 
 /**

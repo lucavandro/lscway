@@ -115,6 +115,34 @@ describe('notifications module', () => {
     );
   });
 
+  it('triggers notifications with new v1 API substitution schema', () => {
+    const today = new Date().toISOString().split('T')[0];
+    const subs = [
+      {
+        id: 'sub_new_1',
+        data: today,
+        ora: '1^ Ora (08:00 - 08:50)',
+        classe: { id: 'c_1', nome: '4C' },
+        presaVisione: { stato: 'inviata', data: null }
+      },
+      {
+        id: 'sub_new_2',
+        data: today,
+        ora: '2^ Ora (08:50 - 09:40)',
+        classe: { id: 'c_2', nome: '5D' },
+        presaVisione: { stato: 'presa_visione', data: '2026-11-13 09:00:00' }
+      }
+    ];
+
+    checkSubstitutionsForNotifications(subs);
+    expect(globalThis.Notification).toHaveBeenCalledWith(
+      'Sostituzione non confermata',
+      expect.objectContaining({
+        body: expect.stringContaining('4C')
+      })
+    );
+  });
+
   it('syncs user and notification state with service worker', () => {
     const postMessageSpy = navigator.serviceWorker.controller.postMessage;
 

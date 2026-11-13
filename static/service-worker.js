@@ -1,6 +1,6 @@
 // This is the service worker with the combined offline experience (Offline page + Offline copy of pages)
 
-const CACHE_VERSION = "v1.4.1";
+const CACHE_VERSION = "v1.4.2";
 const CACHE = `lscway-cache-${CACHE_VERSION}`;
 let userEmail = null;
 let notificationsEnabled = true;
@@ -289,18 +289,34 @@ async function checkSubstitutionsInBackground() {
   }
 
   try {
-    const response = await fetch(`https://www.liceoscientificocortese.edu.it/app/way/docenti_sostituzioni_api.php?email=${encodeURIComponent(userEmail)}`);
+    const response = await fetch('/app/orario/api/v1/me/notifications', {
+      credentials: 'same-origin',
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
+    if (!response.ok) return;
+
     const data = await response.json();
-    
-    if (data.success) {
+    const items = Array.isArray(data.items) ? data.items : [];
+
+    if (items.length > 0) {
       const today = new Date().toISOString().split('T')[0];
-      const todaySubstitutions = data.data.filter(s => 
-        s.data === today && !s.accettato && !notifiedSubstitutions.has(s.id)
-      );
+      const todaySubstitutions = items.filter(s => {
+        const isAcknowledged = Boolean(
+          s.accettato ||
+          (s.presaVisione && s.presaVisione.data !== null && s.presaVisione.stato === 'presa_visione')
+        );
+        return s.data === today && !isAcknowledged && !notifiedSubstitutions.has(s.id);
+      });
 
       for (const substitution of todaySubstitutions) {
+        const className = typeof substitution.classe === 'object' && substitution.classe !== null
+          ? (substitution.classe.nome || '')
+          : (substitution.classe || '');
+
         await self.registration.showNotification('Sostituzione non confermata', {
-          body: `Hai una sostituzione alle ${substitution.ora} per la classe ${substitution.classe} che necessita conferma.`,
+          body: `Hai una sostituzione alle ${substitution.ora} per la classe ${className} che necessita conferma.`,
           icon: 'https://www.liceoscientificocortese.edu.it/app/way/tmp/favicon.png',
           badge: 'https://www.liceoscientificocortese.edu.it/app/way/tmp/favicon.png',
           tag: `substitution-${substitution.id}`,
@@ -310,11 +326,11 @@ async function checkSubstitutionsInBackground() {
             url: 'https://www.liceoscientificocortese.edu.it/app/way/tmp/sostituzioni'
           }
         });
-        
+
         notifiedSubstitutions.add(substitution.id);
       }
-      
-      console.log(`Service Worker: Controllate ${data.data.length} sostituzioni, inviate ${todaySubstitutions.length} notifiche`);
+
+      console.log(`Service Worker: Controllate ${items.length} sostituzioni, inviate ${todaySubstitutions.length} notifiche`);
     }
   } catch (error) {
     console.error('Service Worker: Errore nel controllo sostituzioni in background:', error);

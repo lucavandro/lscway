@@ -141,26 +141,4 @@ export async function setupMockRoutes(page) {
       });
     }
   });
-
-  // Intercept polling API calls to docenti_sostituzioni_api.php
-  await page.route(/.*docenti_sostituzioni_api\.php.*/, async (route) => {
-    await route.fulfill({
-      status: 200,
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        success: true,
-        data: [
-          {
-            id: 991,
-            data: new Date().toISOString().split('T')[0],
-            ora: '08:55',
-            classe: '2B',
-            accettato: false,
-          },
-        ],
-      }),
-    });
-  });
 }

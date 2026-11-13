@@ -83,8 +83,12 @@ export function showSubstitutionNotification(substitution) {
 		return;
 	}
 
+	const className = typeof substitution.classe === 'object' && substitution.classe !== null
+		? (substitution.classe.nome || '')
+		: (substitution.classe || '');
+
 	const notification = new Notification('Sostituzione non confermata', {
-		body: `Hai una sostituzione alle ${substitution.ora} per la classe ${substitution.classe} che necessita conferma.`,
+		body: `Hai una sostituzione alle ${substitution.ora} per la classe ${className} che necessita conferma.`,
 		icon: 'https://www.liceoscientificocortese.edu.it/app/way/tmp/favicon.png',
 		badge: 'https://www.liceoscientificocortese.edu.it/app/way/tmp/favicon.png',
 		tag: `substitution-${substitution.id}`,
@@ -106,12 +110,16 @@ export function showSubstitutionNotification(substitution) {
 }
 
 export function checkSubstitutionsForNotifications(substitutions) {
-	if (!get(notificationsEnabled) || typeof window === 'undefined' || !('Notification' in window) || Notification.permission !== 'granted') return;
+	if (!get(notificationsEnabled) || typeof window === 'undefined' || !('Notification' in window) || Notification.permission !== 'granted' || !Array.isArray(substitutions)) return;
 
 	const today = new Date().toISOString().split('T')[0];
-	const todaySubstitutions = substitutions.filter(s => 
-		s.data === today && !s.accettato
-	);
+	const todaySubstitutions = substitutions.filter(s => {
+		const isAcknowledged = Boolean(
+			s.accettato ||
+			(s.presaVisione && s.presaVisione.data !== null && s.presaVisione.stato === 'presa_visione')
+		);
+		return s.data === today && !isAcknowledged;
+	});
 
 	todaySubstitutions.forEach(substitution => {
 		showSubstitutionNotification(substitution);

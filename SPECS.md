@@ -290,6 +290,7 @@ L'interfaccia personale del docente consente la consultazione esclusiva delle pr
   - Nessuna registrazione automatica all'apertura della pagina: richiesta azione esplicita con pulsante "Conferma presa visione".
   - Protezione anti-doppio invio con disabilitazione contestuale e stato "Registrazione in corso...".
   - Badge accessibile con contatore notifiche non lette visibile nella pagina delle sostituzioni, sulla tab di navigazione `Tabs.svelte` e nel drawer `HeaderMenuPanel.svelte`.
+  - **Dismissione Completa Legacy API:** rimossa qualsiasi invocazione e polling verso la vecchia API `docenti_sostituzioni_api.php`. Le notifiche desktop e la sincronizzazione di background del Service Worker operano esclusivamente tramite la nuova API `/app/orario/api/v1/me/notifications` con cookie di sessione.
 
 ### 5.3. Hotspot LIM Aule (`src/lib/hotspot.js`)
 - Mappa statica `chiave_aula: password`.

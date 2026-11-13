@@ -23,27 +23,7 @@
 
   $: day = $clockStore.day;
   $: schoolHour = $clockStore.schoolHour;
-  let substitutionInterval;
   let mounted = false;
-
-  async function checkSubstitutions() {
-    if (!$userEmail || !$notificationsEnabled) return;
-    if (typeof document !== "undefined" && document.hidden) return;
-
-    try {
-      const response = await fetch(
-        `https://www.liceoscientificocortese.edu.it/app/way/docenti_sostituzioni_api.php?email=${encodeURIComponent($userEmail)}`,
-        { priority: "low" },
-      );
-      const data = await response.json();
-
-      if (data.success && $notificationsEnabled) {
-        checkSubstitutionsForNotifications(data.data);
-      }
-    } catch (err) {
-      console.error("Errore nel controllo sostituzioni per notifiche:", err);
-    }
-  }
 
   onMount(() => {
     mounted = true;
@@ -56,7 +36,6 @@
   });
 
   onDestroy(() => {
-    if (substitutionInterval) clearInterval(substitutionInterval);
     stopPersonalSubstitutionsPolling();
   });
 
@@ -72,15 +51,7 @@
     if ($userEmail && $notificationsEnabled) {
       syncUserEmailWithServiceWorker();
       syncNotificationsWithServiceWorker(true);
-      checkSubstitutions();
-      if (!substitutionInterval) {
-        substitutionInterval = setInterval(checkSubstitutions, 10000);
-      }
     } else {
-      if (substitutionInterval) {
-        clearInterval(substitutionInterval);
-        substitutionInterval = null;
-      }
       if (!$userEmail) {
         clearNotifiedSubstitutions();
         clearUserFromServiceWorker();
