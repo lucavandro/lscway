@@ -7,12 +7,25 @@
   import { base } from "$app/paths";
   import SwapIcon from "$icons/SwapIcon.svelte";
 
+  function resolveEntryMateria(r) {
+    if (!r) return "";
+    if (r.subsubjectId !== null && r.subsubjectId !== undefined) {
+      if (r.materia && r.materia !== r.displaySubjectId) {
+        return r.materia;
+      }
+      return r.subsubjectId;
+    }
+    return r.materia || r.displaySubjectId || "";
+  }
+
   function isPotEntry(r) {
-    return r?.materia === "POT" || r?.materia === "sub_potenziamento";
+    const mat = resolveEntryMateria(r);
+    return mat === "POT" || mat === "sub_potenziamento";
   }
 
   function isRicEntry(r) {
-    return r?.materia === "RIC" || r?.materia === "sub_ricevimento";
+    const mat = resolveEntryMateria(r);
+    return mat === "RIC" || mat === "sub_ricevimento";
   }
 
   $: isTeacherTable = Array.isArray(fields) && fields.includes("classe") && !fields.includes("docente");
@@ -43,7 +56,10 @@
 
   function getFieldEntries(field, rows) {
     if (!rows || rows.length <= 1) return rows;
-    const hasSostegno = rows.some((r) => r.materia === "MADISO" || r.materia === "INC");
+    const hasSostegno = rows.some((r) => {
+      const mat = resolveEntryMateria(r);
+      return mat === "MADISO" || mat === "INC";
+    });
     if (hasSostegno) {
       if (field === "aula") {
         return [rows[0]];
@@ -107,9 +123,10 @@
       <td class="data-cell">
         <div class="cell-entries">
           {#each entries as rd, index}
+            {@const entryMateria = resolveEntryMateria(rd)}
             <div class="entry-item">
               {#if field === "aula"}
-                {#if rd[field] && rd[field] !== "-" && rd["materia"] !== "POT" && rd["materia"] !== "sub_potenziamento" && rd["materia"] !== "RIC" && rd["materia"] !== "sub_ricevimento"}
+                {#if rd[field] && rd[field] !== "-" && entryMateria !== "POT" && entryMateria !== "sub_potenziamento" && entryMateria !== "RIC" && entryMateria !== "sub_ricevimento"}
                   <a href="{base}/aula?q={queryValue(rd[field])}" class="link-chip room-chip" title="Aula {rd[field]}">
                     <span>{rd[field]}</span>
                   </a>
@@ -160,15 +177,15 @@
                   <span class="dash">—</span>
                 {/if}
               {:else if field === "classe"}
-                {#if rd["classe"] && rd["materia"] !== "POT" && rd["materia"] !== "sub_potenziamento"}
+                {#if rd["classe"] && entryMateria !== "POT" && entryMateria !== "sub_potenziamento"}
                   <div class="class-slot">
                     <a href="{base}/?q={queryValue(rd['classe'])}" class="link-chip class-chip" title="Classe {rd['classe']}">
                       <span>{rd["classe"]}</span>
                     </a>
                   </div>
-                {:else if rd["materia"] === "RIC" || rd["materia"] === "sub_ricevimento"}
+                {:else if entryMateria === "RIC" || entryMateria === "sub_ricevimento"}
                   <span class="badge-chip badge-ric">Ricevimento</span>
-                {:else if rd["materia"] === "INC" || rd["materia"] === "MADISO"}
+                {:else if entryMateria === "INC" || entryMateria === "MADISO"}
                   <span class="badge-chip badge-sostegno">Sostegno</span>
                 {:else}
                   <span class="dash">—</span>
@@ -191,17 +208,17 @@
                 {:else}
                   <span
                     class="subject-tag"
-                    class:is-pot={!rd.isSubstitution && (rd[field] === "POT" || rd[field] === "sub_potenziamento")}
-                    class:is-ric={!rd.isSubstitution && (rd[field] === "RIC" || rd[field] === "sub_ricevimento")}
-                    class:is-sostegno={!rd.isSubstitution && (rd[field] === "MADISO" || rd[field] === "INC")}
+                    class:is-pot={!rd.isSubstitution && (entryMateria === "POT" || entryMateria === "sub_potenziamento")}
+                    class:is-ric={!rd.isSubstitution && (entryMateria === "RIC" || entryMateria === "sub_ricevimento")}
+                    class:is-sostegno={!rd.isSubstitution && (entryMateria === "MADISO" || entryMateria === "INC")}
                     class:is-substitution={rd.isSubstitution}
                     title={rd.isSubstitution
                       ? (rd.tipologia === "sorveglianza" ? "Sorveglianza" : "Sostituzione")
-                      : rd[field]}
+                      : entryMateria}
                   >
                     {rd.isSubstitution
                       ? (rd.tipologia === "sorveglianza" ? "Sorveglianza" : "Sostituzione")
-                      : rd[field]}
+                      : entryMateria}
                   </span>
                 {/if}
               {:else}

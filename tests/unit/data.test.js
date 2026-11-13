@@ -210,6 +210,82 @@ describe('data module', () => {
     expect(result._index.byTeacher['SANZARI E']).toContainEqual(subLesson);
   });
 
+  it('shows subsubjectId instead of displaySubjectId when subsubjectId is not null, and falls back to displaySubjectId/subjectId when null', async () => {
+    const mockV1WithSubsubjects = {
+      data: '2026-11-14',
+      giorno: 2,
+      timetable: { id: 'tt_1', nome: 'Orario Definitivo' },
+      classes: [{ id: '1DSA', nome: '1DSA' }],
+      teachers: [{ id: 'VANDROL', nome: 'LUCA', cognome: 'VANDRO', shortName: 'VANDRO L.' }],
+      rooms: [{ id: 'C001', codice: 'C001' }],
+      subjects: [
+        { id: 'INF_IA', codice: 'INF_IA', nome: 'Informatica & IA', admitsSubsubjects: true, subsubjectIds: ['IA', 'INFORMATICA'] },
+        { id: 'INFORMATICA', codice: 'INFO', nome: 'INFORMATICA', admitsSubsubjects: false },
+        { id: 'IA', codice: 'IA', nome: 'Intelligenza Artificiale', admitsSubsubjects: false },
+        { id: 'MAT_FIS', codice: 'MAT_', nome: 'MAT_FIS', admitsSubsubjects: true, subsubjectIds: ['MATEMATICA', 'FISICA'] }
+      ],
+      lessons: [
+        {
+          id: 'les_sub_active',
+          giorno: 2,
+          timeSlotId: 'slot_2_5',
+          classId: '1DSA',
+          teacherId: 'VANDROL',
+          roomId: 'C001',
+          subjectId: 'INF_IA',
+          displaySubjectId: 'INF_IA',
+          subsubjectId: 'INFORMATICA'
+        },
+        {
+          id: 'les_sub_null',
+          giorno: 2,
+          timeSlotId: 'slot_2_6',
+          classId: '1DSA',
+          teacherId: 'VANDROL',
+          roomId: 'C001',
+          subjectId: 'MAT_FIS',
+          displaySubjectId: 'MAT_FIS',
+          subsubjectId: null
+        },
+        {
+          id: 'les_sub_custom_fallback',
+          giorno: 2,
+          timeSlotId: 'slot_2_7',
+          classId: '1DSA',
+          teacherId: 'VANDROL',
+          roomId: 'C001',
+          subjectId: 'INF_IA',
+          displaySubjectId: 'INF_IA',
+          subsubjectId: 'CUSTOM_SUB'
+        }
+      ]
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockV1WithSubsubjects
+    });
+
+    const result = await getData(mockFetch);
+    expect(result).toBeDefined();
+    expect(result.data).toHaveLength(3);
+
+    // Lesson 1: subsubjectId !== null -> displays INFORMATICA (resolved to codice 'INFO') instead of displaySubjectId 'INF_IA'
+    expect(result.data[0].subsubjectId).toBe('INFORMATICA');
+    expect(result.data[0].displaySubjectId).toBe('INF_IA');
+    expect(result.data[0].materia).toBe('INFO');
+
+    // Lesson 2: subsubjectId === null -> displays displaySubjectId 'MAT_FIS' (resolved to codice 'MAT_')
+    expect(result.data[1].subsubjectId).toBeNull();
+    expect(result.data[1].displaySubjectId).toBe('MAT_FIS');
+    expect(result.data[1].materia).toBe('MAT_');
+
+    // Lesson 3: subsubjectId !== null with custom code -> displays custom subsubjectId string directly
+    expect(result.data[2].subsubjectId).toBe('CUSTOM_SUB');
+    expect(result.data[2].displaySubjectId).toBe('INF_IA');
+    expect(result.data[2].materia).toBe('CUSTOM_SUB');
+  });
+
   it('rejects Google OAuth credential with non-school domain', async () => {
     // Generate a mock JWT for an unauthorized domain (e.g. gmail.com)
     const header = btoa(JSON.stringify({ alg: 'HS256', typ: 'JWT' }));

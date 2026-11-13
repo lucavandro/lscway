@@ -154,14 +154,17 @@ function normalizeTimetableData(raw) {
             const r = roomMap.get(l.roomId);
             let aula = r ? (r.nome || r.codice || r.id) : (l.roomId || l.aula || "");
 
-            const s = subjectMap.get(l.subjectId);
-            let materia = s ? (s.shortName || s.codice || s.nome || l.subjectId) : (l.materia || l.subjectId || "");
+            const targetSubjectId = (l.subsubjectId !== null && l.subsubjectId !== undefined)
+                ? l.subsubjectId
+                : (l.displaySubjectId || l.subjectId);
+            const s = subjectMap.get(targetSubjectId);
+            let materia = s ? (s.shortName || s.codice || s.nome || targetSubjectId) : (l.materia || targetSubjectId || "");
 
-            if (l.isPotenziamento || materia === "sub_potenziamento" || materia === "POT") {
+            if (l.isPotenziamento || materia === "sub_potenziamento" || materia === "POT" || targetSubjectId === "sub_potenziamento" || targetSubjectId === "POT") {
                 materia = "POT";
                 aula = "";
                 classe = "";
-            } else if (l.isRicevimento || materia === "sub_ricevimento" || materia === "RIC") {
+            } else if (l.isRicevimento || materia === "sub_ricevimento" || materia === "RIC" || targetSubjectId === "sub_ricevimento" || targetSubjectId === "RIC") {
                 materia = "RIC";
                 aula = "";
             }
@@ -185,7 +188,10 @@ function normalizeTimetableData(raw) {
                 tipologia,
                 originalTeacherId,
                 docenteOriginale,
-                docenteOriginaleAbbr
+                docenteOriginaleAbbr,
+                subjectId: l.subjectId,
+                subsubjectId: l.subsubjectId !== undefined ? l.subsubjectId : null,
+                displaySubjectId: l.displaySubjectId !== undefined ? l.displaySubjectId : null
             };
         });
     } else {
@@ -204,21 +210,27 @@ function normalizeTimetableData(raw) {
                     e.classe = e.classe.replace("*", "");
                     if (!e.aula) e.aula = "-";
                 }
-                if (e.materia == "sub_potenziamento" || e.materia == "POT") {
-                    e.materia = "POT";
+                let materia = (e.subsubjectId !== null && e.subsubjectId !== undefined)
+                    ? e.subsubjectId
+                    : (e.displaySubjectId || e.materia);
+                if (materia == "sub_potenziamento" || materia == "POT") {
+                    materia = "POT";
                     e.aula = "";
                     e.classe = "";
-                } else if (e.materia == "sub_ricevimento" || e.materia == "RIC") {
-                    e.materia = "RIC";
+                } else if (materia == "sub_ricevimento" || materia == "RIC") {
+                    materia = "RIC";
                     e.aula = "";
                 }
                 return {
                     ...e,
+                    materia,
                     isSubstitution: Boolean(e.isSubstitution),
                     tipologia: e.tipologia || (e.isSubstitution ? "sostituto" : null),
                     originalTeacherId: e.originalTeacherId || null,
                     docenteOriginale: e.docenteOriginale || e.docente_originale || null,
-                    docenteOriginaleAbbr: e.docenteOriginaleAbbr || e.docente_originale_abbr || null
+                    docenteOriginaleAbbr: e.docenteOriginaleAbbr || e.docente_originale_abbr || null,
+                    subsubjectId: e.subsubjectId !== undefined ? e.subsubjectId : null,
+                    displaySubjectId: e.displaySubjectId !== undefined ? e.displaySubjectId : null
                 };
             })
             : [];

@@ -187,4 +187,73 @@ test.describe('Home Page - Orario Classe', () => {
       await expect(page.locator('.compact-timetable .subj-tag.is-substitution')).toHaveCount(0);
     }
   });
+
+  test('displays subsubjectId in daily and weekly timetable when subsubjectId is not null instead of displaySubjectId', async ({ page }) => {
+    const todayWeekdays = ['DOM', 'LUN', 'MAR', 'MER', 'GIO', 'VEN', 'SAB'];
+    const currentDay = todayWeekdays[new Date().getDay()];
+    const schoolDay = currentDay === 'SAB' || currentDay === 'DOM' ? 'LUN' : currentDay;
+
+    await page.route(/\/app\/orario\/api\/.*/, async (route) => {
+      const url = route.request().url();
+      if (url.includes('/auth/session')) {
+        await route.fulfill({
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'Unauthenticated' })
+        });
+        return;
+      }
+
+      await route.fulfill({
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: '2026-11-16',
+          giorno: 1,
+          timetable: { id: 'tt_1', nome: 'Orario Definitivo' },
+          classes: [{ id: '1DSA', nome: '1DSA' }],
+          teachers: [{ id: 'VANDROL', nome: 'LUCA', cognome: 'VANDRO', shortName: 'VANDRO L.' }],
+          rooms: [{ id: 'C001', codice: 'C001', nome: 'C001' }],
+          subjects: [
+            { id: 'INF_IA', codice: 'INF_IA', nome: 'Informatica & IA' },
+            { id: 'INFORMATICA', codice: 'INFO', nome: 'INFORMATICA' }
+          ],
+          lessons: [
+            {
+              id: 'les_sub_1',
+              day: schoolDay,
+              giorno: 1,
+              ora: '08:00',
+              timeSlotId: 'slot_1_1',
+              classId: '1DSA',
+              teacherId: 'VANDROL',
+              roomId: 'C001',
+              subjectId: 'INF_IA',
+              displaySubjectId: 'INF_IA',
+              subsubjectId: 'INFORMATICA'
+            }
+          ]
+        })
+      });
+    });
+
+    await page.goto('/app/way/tmp/?q=1DSA');
+
+    if (currentDay !== 'SAB' && currentDay !== 'DOM') {
+      // Daily timetable: check subject-tag displays INFO (subsubject) instead of INF_IA (displaySubjectId)
+      const dailyTag = page.locator('.daily-timetable .subject-tag').first();
+      await expect(dailyTag).toBeVisible();
+      await expect(dailyTag).toHaveText('INFO');
+    }
+
+    // Weekly timetable: switch to Settimana view
+    const switchEl = page.locator('.segment-btn', { hasText: 'Settimana' });
+    await switchEl.click();
+    await expect(page.locator('.compact-timetable')).toBeVisible();
+
+    // Verify weekly cell displays INFO as subj-tag
+    const weeklyTag = page.locator('.compact-timetable .subj-tag').first();
+    await expect(weeklyTag).toBeVisible();
+    await expect(weeklyTag).toHaveText('INFO');
+  });
 });

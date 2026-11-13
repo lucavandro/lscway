@@ -10,6 +10,17 @@
   $: hour = hours[hourIndex];
   $: isTeacherTable = Array.isArray(fields) && fields.includes("classe") && !fields.includes("docente");
 
+  function resolveEntryMateria(r) {
+    if (!r) return "";
+    if (r.subsubjectId !== null && r.subsubjectId !== undefined) {
+      if (r.materia && r.materia !== r.displaySubjectId) {
+        return r.materia;
+      }
+      return r.subsubjectId;
+    }
+    return r.materia || r.displaySubjectId || "";
+  }
+
   function resolveWeeklyEntries(entries, isTeacher) {
     if (!entries || entries.length === 0) return [];
 
@@ -70,9 +81,10 @@
       {#if dayEntries.length > 0}
         <div class="slot-stack">
           {#each dayEntries as entry, idx}
-            {@const isSostegno = entry["materia"] === "MADISO" || entry["materia"] === "INC"}
-            {@const isPot = entry["materia"] === "POT" || entry["materia"] === "sub_potenziamento"}
-            {@const isRic = entry["materia"] === "RIC" || entry["materia"] === "sub_ricevimento"}
+            {@const displayedSubject = resolveEntryMateria(entry)}
+            {@const isSostegno = displayedSubject === "MADISO" || displayedSubject === "INC"}
+            {@const isPot = displayedSubject === "POT" || displayedSubject === "sub_potenziamento"}
+            {@const isRic = displayedSubject === "RIC" || displayedSubject === "sub_ricevimento"}
             {@const isSecondarySostegno = idx > 0 && isSostegno}
             {@const isRoomView = fields.includes("classe") && fields.includes("docente")}
             {@const showPrimaryClass = fields.includes("classe") && !isRoomView && entry["classe"] && !isSecondarySostegno && !isPot}
@@ -94,41 +106,41 @@
                   </span>
                 {/if}
 
-                {#if !hasPrimary && entry["materia"]}
+                {#if !hasPrimary && displayedSubject}
                   <span
                     class="subj-tag fallback-subj"
                     class:is-pot={isPot}
                     class:is-ric={isRic}
                     class:is-sostegno={isSostegno}
                   >
-                    {entry["materia"]}
+                    {displayedSubject}
                   </span>
                 {/if}
               </div>
 
               <!-- Line 2: Secondary info (Materia + Aula/Classe tags, stacked on mobile, side-by-side on tablet/desktop) -->
-              {#if (hasPrimary && entry["materia"]) || showClassTag || showAula}
+              {#if (hasPrimary && displayedSubject) || showClassTag || showAula}
                 <div class="line-secondary">
                   {#if showClassTag}
                     <span class="class-tag">{entry["classe"]}</span>
                   {/if}
 
-                  {#if showClassTag && ((hasPrimary && entry["materia"]) || showAula)}
+                  {#if showClassTag && ((hasPrimary && displayedSubject) || showAula)}
                     <span class="sec-sep" aria-hidden="true">•</span>
                   {/if}
 
-                  {#if hasPrimary && entry["materia"]}
+                  {#if hasPrimary && displayedSubject}
                     <span
                       class="subj-tag"
                       class:is-pot={isPot}
                       class:is-ric={isRic}
                       class:is-sostegno={isSostegno}
                     >
-                      {entry["materia"]}
+                      {displayedSubject}
                     </span>
                   {/if}
 
-                  {#if hasPrimary && entry["materia"] && showAula}
+                  {#if hasPrimary && displayedSubject && showAula}
                     <span class="sec-sep" aria-hidden="true">•</span>
                   {/if}
 

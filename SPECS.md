@@ -254,7 +254,7 @@ lscway/
    - `timeSlotId` (`slot_{giorno}_{oraIndex}`) mappato nelle 8 fasce orarie standard da `08:00` a `14:25`.
    - `docente`: `${cognome} ${nome}` e `docente_abbr`: `shortName` privo di punto finale.
    - `aula`: nome/codice stanza (`roomId`).
-   - `materia`: prioritariamente `shortName`, in alternativa `codice` o `nome` della materia.
+   - `materia`: prioritariamente determinata da `subsubjectId` se valorizzato (`subsubjectId !== null`), altrimenti da `displaySubjectId` (o `subjectId` come fallback); risolta prioritariamente tramite `shortName`, in alternativa `codice` o `nome` della materia.
 3. **Filtro classi:** le classi contenenti caratteri speciali come `.` o `*` vengono ripulite o escluse.
 4. **Sostegno / Inclusione:** le materie `INC` o `MADISO` vengono poste in coda tramite la funzione di comparazione `inclusioneInFondo` (`src/lib/utils.js`).
 5. **Potenziamento & Ricevimento:**
@@ -354,6 +354,9 @@ L'orario interno permette ai docenti abilitati di specificare per ciascuna ora d
   - Risposta `200 OK`: `{ item: { id, revision, subsubjectId } }`.
 - **Concorrenza Ottimistica (HTTP 409):**
   - Se la `revision` locale è disallineata rispetto al server, risponde con `409 Conflict` e payload contenente `current: { id, revision, subsubjectId }`. Il client sincronizza automaticamente la lezione locale aggiornando la revisione senza perdita di coerenza.
+- **Visualizzazione nelle Tabelle Orario Giornaliero e Settimanale (`TimeTableRow.svelte` e `FullTimeTableRow.svelte`):**
+  - Per ciascuna ora di lezione, se il campo `subsubjectId` è valorizzato (diverso da `null`), le tabelle orario giornaliero e settimanale mostrano la sottomateria al posto di `displaySubjectId` (o `subjectId`).
+  - Se `subsubjectId` è `null`, viene mantenuto `displaySubjectId` (o `subjectId` come fallback naturale).
 
 ---
 
