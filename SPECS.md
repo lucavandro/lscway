@@ -327,6 +327,8 @@ L'interfaccia personale del docente consente la consultazione esclusiva delle pr
       2. **Confermate (`confirmedSubstitutions`):** elenca le ore già visionate, con badge "Confermata", stato "Presa visione registrata" e timestamp di registrazione.
     - Se una delle due sezioni è vuota, presenta un messaggio dedicato (es. "Nessuna sostituzione da confermare"). Se non vi è alcuna sostituzione in assoluto, mostra lo stato vuoto globale.
   - **Dettagli Card e Posizione della Classe:** la classe è posizionata all'interno della sezione centrale dei dettagli (`.sub-details`) insieme a Materia, Aula, Docente sostituito, Tipologia e Note, mentre l'intestazione della card evidenzia orario (`slot-hour`), badge data e badge di stato.
+  - **Ordinamento Cronologico Decrescente (dalla più recente alla più vecchia):**
+    Tutte le sostituzioni personali pubblicate (sia nella sezione *Da confermare* sia nella sezione *Confermate*, oltre che negli store di polling e nei payload restituiti da `fetchPersonalSubstitutions`) vengono presentate in ordine cronologico decrescente dalla più recente alla più vecchia. L'algoritmo di ordinamento confronta in via primaria la data dell'evento (`data`), in via secondaria l'orario o la fascia oraria del giorno (`ora` / `timeSlotId`), e in caso di parità la data di pubblicazione (`pubblicataIl`) e l'identificativo (`id`).
   - **Dismissione Completa Legacy API:** rimossa qualsiasi invocazione e polling verso la vecchia API `docenti_sostituzioni_api.php`. Le notifiche desktop e la sincronizzazione di background del Service Worker operano esclusivamente tramite la nuova API `/app/orario/api/v1/me/notifications` con cookie di sessione.
 
 ### 5.4. Hotspot LIM Aule (`src/lib/hotspot.js`)
@@ -550,6 +552,7 @@ L'integrità del software e l'assenza di regressioni sono garantite da una doppi
   - `utils.test.js`: persistenza preferenze in `localStorage` (docente, classe, aula), validatore booleano email scolastica, data odierna YYYY-MM-DD, ordinamento materie sostegno/inclusione in fondo.
   - `hotspot.test.js`: consistenza database credenziali Wi-Fi LIM per tutte le aule dei tre plessi A, B e C e hotspot docenti.
   - `notifications.test.js`: permessi Web Notifications, notifiche per sostituzioni del giorno con deduplicazione, messaggistica con il Service Worker.
+  - `personalSubstitutions.test.js`: client API sostituzioni personali, ordinamento cronologico decrescente (più recente $\rightarrow$ più vecchia), gestione store e presa visione.
   - `quotes.test.js`: validazione integrità collezione citazioni scolastiche, estrazione casuale e prevenzione ripetizioni consecutive.
   - `theme.test.js`: transizione temi light/dark e persistenza DOM/`localStorage`.
   - `version.test.js`: validazione formato SemVer (`MAJOR.MINOR.PATCH`) e sincronizzazione unificata tra `src/lib/version.js`, `package.json`, `src/app.html` e `static/service-worker.js`.

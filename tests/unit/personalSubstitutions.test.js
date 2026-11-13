@@ -9,6 +9,8 @@ import {
   markSubstitutionAcknowledgedLocally,
   cleanupPersonalSubstitutions,
   pollPersonalNotifications,
+  getSubstitutionTimestamp,
+  sortSubstitutionsRecentFirst,
 } from "../../src/lib/personalSubstitutions.js";
 import { get } from "svelte/store";
 
@@ -218,5 +220,80 @@ describe("personalSubstitutions client library", () => {
     });
 
     await call1;
+  });
+
+  describe("sortSubstitutionsRecentFirst", () => {
+    it("sorts substitutions by date descending (most recent first)", () => {
+      const input = [
+        { id: "1", data: "2026-11-10", ora: "08:55" },
+        { id: "2", data: "2026-11-20", ora: "08:55" },
+        { id: "3", data: "2026-11-13", ora: "08:55" },
+      ];
+
+      const sorted = sortSubstitutionsRecentFirst(input);
+      expect(sorted.map((s) => s.id)).toEqual(["2", "3", "1"]);
+      // Does not mutate the original array
+      expect(input.map((s) => s.id)).toEqual(["1", "2", "3"]);
+    });
+
+    it("sorts same day substitutions by hour or time slot descending", () => {
+      const input = [
+        { id: "morning", data: "2026-11-13", ora: "08:55" },
+        { id: "noon", data: "2026-11-13", ora: "11:40" },
+        { id: "early", data: "2026-11-13", ora: "08:00" },
+      ];
+
+      const sorted = sortSubstitutionsRecentFirst(input);
+      expect(sorted.map((s) => s.id)).toEqual(["noon", "morning", "early"]);
+    });
+
+    it("sorts Roman numeral hours properly within the same day", () => {
+      const input = [
+        { id: "sub_1", data: "2026-11-13", ora: "VEN — I ora" },
+        { id: "sub_3", data: "2026-11-13", ora: "VEN — III ora" },
+        { id: "sub_5", data: "2026-11-13", ora: "VEN — V ora" },
+      ];
+
+      const sorted = sortSubstitutionsRecentFirst(input);
+      expect(sorted.map((s) => s.id)).toEqual(["sub_5", "sub_3", "sub_1"]);
+    });
+
+    it("supports Italian date format DD/MM/YYYY alongside ISO YYYY-MM-DD", () => {
+      const input = [
+        { id: "older", data: "05/11/2026" },
+        { id: "newer", data: "2026-11-18" },
+        { id: "middle", data: "12/11/2026" },
+      ];
+
+      const sorted = sortSubstitutionsRecentFirst(input);
+      expect(sorted.map((s) => s.id)).toEqual(["newer", "middle", "older"]);
+    });
+
+    it("falls back to pubblicataIl timestamp when data is missing or identical", () => {
+      const input = [
+        { id: "pub_first", pubblicataIl: "2026-11-13T08:00:00Z" },
+        { id: "pub_later", pubblicataIl: "2026-11-13T10:30:00Z" },
+      ];
+
+      const sorted = sortSubstitutionsRecentFirst(input);
+      expect(sorted.map((s) => s.id)).toEqual(["pub_later", "pub_first"]);
+    });
+
+    it("uses descending id as final tie-breaker", () => {
+      const input = [
+        { id: 10, data: "2026-11-13", ora: "08:55" },
+        { id: 25, data: "2026-11-13", ora: "08:55" },
+        { id: 15, data: "2026-11-13", ora: "08:55" },
+      ];
+
+      const sorted = sortSubstitutionsRecentFirst(input);
+      expect(sorted.map((s) => s.id)).toEqual([25, 15, 10]);
+    });
+
+    it("handles null, undefined or empty arrays safely", () => {
+      expect(sortSubstitutionsRecentFirst(null)).toEqual([]);
+      expect(sortSubstitutionsRecentFirst(undefined)).toEqual([]);
+      expect(sortSubstitutionsRecentFirst([])).toEqual([]);
+    });
   });
 });

@@ -83,4 +83,67 @@ test.describe('Sostituzioni Docenti', () => {
     await expect(subCard.locator('.ack-title')).toContainText('Presa visione registrata');
     await expect(page.locator('.unread-pill')).toContainText('Tutte confermate');
   });
+
+  test('renders substitutions ordered from most recent to oldest', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('userEmail', 'rossi@lscortese.com');
+    });
+
+    await page.route('**/me/substitutions*', async (route) => {
+      await route.fulfill({
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          teacherName: 'Mario Rossi',
+          teacherEmail: 'rossi@lscortese.com',
+          substitutions: [
+            {
+              id: 101,
+              ora: '08:00',
+              data: '2026-11-10',
+              classe: '1A',
+              materia: 'Matematica',
+              docenteAssente: 'BIANCHI',
+              presaVisione: { stato: 'inviata', data: null },
+            },
+            {
+              id: 103,
+              ora: '11:40',
+              data: '2026-11-20',
+              classe: '3C',
+              materia: 'Fisica',
+              docenteAssente: 'VERDI',
+              presaVisione: { stato: 'inviata', data: null },
+            },
+            {
+              id: 102,
+              ora: '09:50',
+              data: '2026-11-15',
+              classe: '2B',
+              materia: 'Scienze',
+              docenteAssente: 'NERI',
+              presaVisione: { stato: 'inviata', data: null },
+            },
+          ],
+        }),
+      });
+    });
+
+    await page.goto('/app/way/tmp/sostituzioni');
+
+    const cards = page.locator('.cards-grid .sub-card');
+    await expect(cards).toHaveCount(3);
+
+    // Card 0: more recent (20/11/2026, 3C)
+    await expect(cards.nth(0)).toContainText('20/11/2026');
+    await expect(cards.nth(0)).toContainText('3C');
+
+    // Card 1: middle (15/11/2026, 2B)
+    await expect(cards.nth(1)).toContainText('15/11/2026');
+    await expect(cards.nth(1)).toContainText('2B');
+
+    // Card 2: oldest (10/11/2026, 1A)
+    await expect(cards.nth(2)).toContainText('10/11/2026');
+    await expect(cards.nth(2)).toContainText('1A');
+  });
 });

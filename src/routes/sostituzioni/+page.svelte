@@ -9,7 +9,8 @@
     acknowledgeSubstitution,
     unreadSubstitutionsCount,
     markSubstitutionAcknowledgedLocally,
-    cleanupPersonalSubstitutions
+    cleanupPersonalSubstitutions,
+    sortSubstitutionsRecentFirst
   } from "$lib/personalSubstitutions.js";
 
   let loading = true;
@@ -28,8 +29,10 @@
     return Boolean(sub.presaVisione?.data || sub.presaVisione?.stato === "presa_visione");
   }
 
-  $: pendingSubstitutions = substitutions.filter((s) => !isAcknowledged(s));
-  $: confirmedSubstitutions = substitutions.filter((s) => isAcknowledged(s));
+  // Ordina sempre tutte le sostituzioni dalla più recente alla più vecchia
+  $: sortedSubstitutions = sortSubstitutionsRecentFirst(substitutions);
+  $: pendingSubstitutions = sortedSubstitutions.filter((s) => !isAcknowledged(s));
+  $: confirmedSubstitutions = sortedSubstitutions.filter((s) => isAcknowledged(s));
   $: unreadCount = pendingSubstitutions.length;
 
   // Sincronizza il contatore unread con lo store globale per badge e menu
@@ -81,7 +84,7 @@
     try {
       const data = await fetchPersonalSubstitutions();
       if (data && Array.isArray(data.substitutions)) {
-        substitutions = data.substitutions;
+        substitutions = sortSubstitutionsRecentFirst(data.substitutions);
         teacherName = data.teacherName || "";
         teacherEmail = data.teacherEmail || $userEmail || "";
         error = null;

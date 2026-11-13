@@ -115,19 +115,149 @@ export async function personalSubstitutionsRequest(endpoint, options = {}, custo
 }
 
 /**
+ * Estrae un timestamp numerico confrontabile per una sostituzione.
+ * Combina data evento (o pubblicataIl), ora/timeSlotId e pubblicataIl come tie-breaker.
+ */
+export function getSubstitutionTimestamp(sub) {
+  if (!sub || typeof sub !== "object") return 0;
+
+  let timestamp = 0;
+
+  // 1. Prova a ricavare la data principale dell'evento
+  const dateStr = sub.data || sub.date;
+  if (dateStr) {
+    if (typeof dateStr === "string") {
+      const trimmed = dateStr.trim();
+      const partsYMD = trimmed.match(/^(\d{4})[/-](\d{1,2})[/-](\d{1,2})/);
+      const partsDMY = trimmed.match(/^(\d{1,2})[/-](\d{1,2})[/-](\d{4})/);
+
+      if (partsYMD) {
+        timestamp = new Date(
+          Number(partsYMD[1]),
+          Number(partsYMD[2]) - 1,
+          Number(partsYMD[3])
+        ).getTime();
+      } else if (partsDMY) {
+        timestamp = new Date(
+          Number(partsDMY[3]),
+          Number(partsDMY[2]) - 1,
+          Number(partsDMY[1])
+        ).getTime();
+      } else {
+        const parsed = Date.parse(trimmed.includes("T") ? trimmed : `${trimmed}T00:00:00`);
+        if (!isNaN(parsed)) {
+          timestamp = parsed;
+        }
+      }
+    } else if (dateStr instanceof Date) {
+      timestamp = dateStr.getTime();
+    } else if (typeof dateStr === "number") {
+      timestamp = dateStr;
+    }
+  }
+
+  // 2. Se non presente la data evento, fallback su pubblicataIl
+  if (!timestamp && sub.pubblicataIl) {
+    const pubParsed = Date.parse(sub.pubblicataIl);
+    if (!isNaN(pubParsed)) {
+      timestamp = pubParsed;
+    }
+  }
+
+  // 3. Aggiungi l'offset orario per ordinare correttamente all'interno dello stesso giorno
+  let timeOffsetMs = 0;
+  if (sub.ora) {
+    const timeMatch = String(sub.ora).match(/(\d{1,2}):(\d{2})/);
+    if (timeMatch) {
+      timeOffsetMs = (Number(timeMatch[1]) * 60 + Number(timeMatch[2])) * 60 * 1000;
+    } else {
+      const romanMatch = String(sub.ora).toUpperCase().match(/\b(VIII|VII|VI|IV|III|II|V|I)\b/);
+      if (romanMatch) {
+        const romanSlots = {
+          I: 8 * 60,
+          II: 8 * 60 + 55,
+          III: 9 * 60 + 50,
+          IV: 10 * 60 + 45,
+          V: 11 * 60 + 40,
+          VI: 12 * 60 + 35,
+          VII: 13 * 60 + 30,
+          VIII: 14 * 60 + 25,
+        };
+        const minutes = romanSlots[romanMatch[1]] || 0;
+        timeOffsetMs = minutes * 60 * 1000;
+      }
+    }
+  } else if (sub.timeSlotId) {
+    const slotNum = Number(sub.timeSlotId);
+    if (!isNaN(slotNum) && slotNum >= 1 && slotNum <= 8) {
+      const slotMinutes = [0, 480, 535, 590, 645, 700, 755, 810, 865];
+      timeOffsetMs = (slotMinutes[slotNum] || slotNum * 60) * 60 * 1000;
+    }
+  }
+
+  return timestamp + timeOffsetMs;
+}
+
+/**
+ * Ordina un array di sostituzioni dalla più recente alla più vecchia.
+ * Non modifica l'array originale (restituisce una copia ordinata).
+ */
+export function sortSubstitutionsRecentFirst(substitutions) {
+  if (!Array.isArray(substitutions)) return [];
+
+  return [...substitutions].sort((a, b) => {
+    const timeA = getSubstitutionTimestamp(a);
+    const timeB = getSubstitutionTimestamp(b);
+
+    if (timeA !== timeB) {
+      return timeB - timeA; // Discendente: più recente prima
+    }
+
+    // Tie-breaker 1: pubblicataIl
+    const pubA = a?.pubblicataIl ? Date.parse(a.pubblicataIl) || 0 : 0;
+    const pubB = b?.pubblicataIl ? Date.parse(b.pubblicataIl) || 0 : 0;
+    if (pubA !== pubB) {
+      return pubB - pubA;
+    }
+
+    // Tie-breaker 2: id discendente
+    const idA = Number(a?.id);
+    const idB = Number(b?.id);
+    if (!isNaN(idA) && !isNaN(idB) && idA !== idB) {
+      return idB - idA;
+    }
+    if (a?.id && b?.id && a.id !== b.id) {
+      return String(b.id).localeCompare(String(a.id));
+    }
+
+    return 0;
+  });
+}
+
+/**
  * Recupera l'elenco delle proprie sostituzioni pubblicate.
+ * Restituisce i dati con le sostituzioni ordinate dalla più recente alla più vecchia.
  * GET /me/substitutions
  */
 export async function fetchPersonalSubstitutions(customFetch) {
-  return personalSubstitutionsRequest("/me/substitutions", { method: "GET" }, customFetch);
+  const data = await personalSubstitutionsRequest("/me/substitutions", { method: "GET" }, customFetch);
+  if (data && Array.isArray(data.substitutions)) {
+    data.substitutions = sortSubstitutionsRecentFirst(data.substitutions);
+  }
+  return data;
 }
 
 /**
  * Recupera le notifiche personali e il numero di quelle non confermate.
+ * Restituisce i dati con gli elementi ordinati dalla più recente alla più vecchia.
  * GET /me/notifications
  */
 export async function fetchPersonalNotifications(customFetch) {
-  return personalSubstitutionsRequest("/me/notifications", { method: "GET" }, customFetch);
+  const data = await personalSubstitutionsRequest("/me/notifications", { method: "GET" }, customFetch);
+  if (data && Array.isArray(data.items)) {
+    data.items = sortSubstitutionsRecentFirst(data.items);
+  }
+  return data;
 }
 
 /**
