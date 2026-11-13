@@ -321,6 +321,12 @@ L'interfaccia personale del docente consente la consultazione esclusiva delle pr
   - Nessuna registrazione automatica all'apertura della pagina: richiesta azione esplicita con pulsante "Conferma presa visione".
   - Protezione anti-doppio invio con disabilitazione contestuale e stato "Registrazione in corso...".
   - Badge accessibile con contatore notifiche non lette visibile nella pagina delle sostituzioni, sulla tab di navigazione `Tabs.svelte` e nel drawer `HeaderMenuPanel.svelte`.
+  - **Struttura della Pagina in Due Sezioni:**
+    - L'interfaccia organizza le sostituzioni personali in 2 sezioni visive distinte:
+      1. **Da confermare (`pendingSubstitutions`):** elenca le ore assegnate in attesa di presa visione, ciascuna con l'azione esplicita "Conferma presa visione".
+      2. **Confermate (`confirmedSubstitutions`):** elenca le ore già visionate, con badge "Confermata", stato "Presa visione registrata" e timestamp di registrazione.
+    - Se una delle due sezioni è vuota, presenta un messaggio dedicato (es. "Nessuna sostituzione da confermare"). Se non vi è alcuna sostituzione in assoluto, mostra lo stato vuoto globale.
+  - **Dettagli Card e Posizione della Classe:** la classe è posizionata all'interno della sezione centrale dei dettagli (`.sub-details`) insieme a Materia, Aula, Docente sostituito, Tipologia e Note, mentre l'intestazione della card evidenzia orario (`slot-hour`), badge data e badge di stato.
   - **Dismissione Completa Legacy API:** rimossa qualsiasi invocazione e polling verso la vecchia API `docenti_sostituzioni_api.php`. Le notifiche desktop e la sincronizzazione di background del Service Worker operano esclusivamente tramite la nuova API `/app/orario/api/v1/me/notifications` con cookie di sessione.
 
 ### 5.4. Hotspot LIM Aule (`src/lib/hotspot.js`)

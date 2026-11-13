@@ -24,9 +24,13 @@
   let submittingIds = new Set();
   let itemErrors = {};
 
-  $: unreadCount = substitutions.filter(
-    (s) => !s.presaVisione?.data && s.presaVisione?.stato !== "presa_visione"
-  ).length;
+  function isAcknowledged(sub) {
+    return Boolean(sub.presaVisione?.data || sub.presaVisione?.stato === "presa_visione");
+  }
+
+  $: pendingSubstitutions = substitutions.filter((s) => !isAcknowledged(s));
+  $: confirmedSubstitutions = substitutions.filter((s) => isAcknowledged(s));
+  $: unreadCount = pendingSubstitutions.length;
 
   // Sincronizza il contatore unread con lo store globale per badge e menu
   $: unreadSubstitutionsCount.set(unreadCount);
@@ -61,10 +65,6 @@
       }
     } catch (e) {}
     return dateTimeStr;
-  }
-
-  function isAcknowledged(sub) {
-    return Boolean(sub.presaVisione?.data || sub.presaVisione?.stato === "presa_visione");
   }
 
   async function loadSubstitutions(isBackground = false) {
@@ -285,110 +285,109 @@
       </div>
     {/if}
 
-    <!-- Contenuto principale -->
-    <section class="section-container" aria-label="Elenco delle sostituzioni">
-      <div class="section-header">
-        <h2 class="section-heading">Sostituzioni pubblicate</h2>
-        <span class="count-pill" aria-label="{substitutions.length} sostituzioni totali">{substitutions.length}</span>
+    <!-- Contenuto principale diviso in 2 parti: 1. Da confermare, 2. Confermate -->
+    {#if loading && substitutions.length === 0}
+      <div class="loading-state-card" role="status">
+        <div class="spinner" aria-hidden="true"></div>
+        <p>Caricamento delle sostituzioni personali in corso...</p>
       </div>
-
-      {#if loading && substitutions.length === 0}
-        <div class="loading-state-card" role="status">
-          <div class="spinner" aria-hidden="true"></div>
-          <p>Caricamento delle sostituzioni personali in corso...</p>
+    {:else if substitutions.length === 0}
+      <div class="empty-state-card">
+        <div class="empty-icon" aria-hidden="true">📋</div>
+        <h3>Nessuna sostituzione pubblicata</h3>
+        <p>Al momento non risultano ore di sostituzione pubblicate per te.</p>
+      </div>
+    {:else}
+      <!-- 1. Da confermare -->
+      <section class="section-container" aria-label="Sostituzioni da confermare">
+        <div class="section-header">
+          <h2 class="section-heading">Da confermare</h2>
+          <span class="count-pill count-pill-pending" aria-label="{pendingSubstitutions.length} sostituzioni da confermare">
+            {pendingSubstitutions.length}
+          </span>
         </div>
-      {:else if substitutions.length > 0}
-        <div class="cards-grid">
-          {#each substitutions as sostituzione (sostituzione.id)}
-            {@const acknowledged = isAcknowledged(sostituzione)}
-            {@const isSubmitting = submittingIds.has(sostituzione.id)}
-            <article class="sub-card" class:card-pending={!acknowledged} class:card-acknowledged={acknowledged}>
-              <div class="sub-card-header">
-                <div class="slot-info">
-                  <span class="slot-hour">{sostituzione.ora || "-"}</span>
-                  <span class="slot-class">Classe {sostituzione.classe?.nome || sostituzione.classe || "-"}</span>
-                </div>
-                <div class="header-badges">
-                  {#if sostituzione.data}
-                    <span class="date-badge">{formatDate(sostituzione.data)}</span>
-                  {/if}
-                  <span class="status-badge" class:badge-confirmed={acknowledged}>
-                    {acknowledged ? "Confermata" : "Da confermare"}
-                  </span>
-                </div>
-              </div>
 
-              <div class="sub-details">
-                <div class="detail-row">
-                  <span class="detail-label">Materia:</span>
-                  <span class="detail-value">
-                    {sostituzione.materia?.nome || sostituzione.materia?.abbreviazione || sostituzione.materia || "Sostituzione"}
-                  </span>
+        {#if pendingSubstitutions.length > 0}
+          <div class="cards-grid">
+            {#each pendingSubstitutions as sostituzione (sostituzione.id)}
+              {@const isSubmitting = submittingIds.has(sostituzione.id)}
+              <article class="sub-card card-pending">
+                <div class="sub-card-header">
+                  <div class="slot-info">
+                    <span class="slot-hour">{sostituzione.ora || "-"}</span>
+                  </div>
+                  <div class="header-badges">
+                    {#if sostituzione.data}
+                      <span class="date-badge">{formatDate(sostituzione.data)}</span>
+                    {/if}
+                    <span class="status-badge">Da confermare</span>
+                  </div>
                 </div>
 
-                <div class="detail-row">
-                  <span class="detail-label">Aula:</span>
-                  <span class="detail-value">{sostituzione.aula?.nome || sostituzione.aula || "-"}</span>
-                </div>
-
-                <div class="detail-row">
-                  <span class="detail-label">Docente sostituito:</span>
-                  <span class="detail-value teacher-absent">
-                    {sostituzione.docenteAssente?.nome || sostituzione.docenteAssente?.shortName || sostituzione.docenteAssente || "-"}
-                  </span>
-                </div>
-
-                {#if sostituzione.tipologia}
+                <div class="sub-details">
                   <div class="detail-row">
-                    <span class="detail-label">Tipologia:</span>
-                    <span class="detail-value tipologia-tag">{sostituzione.tipologia}</span>
+                    <span class="detail-label">Classe:</span>
+                    <span class="detail-value class-value">
+                      {sostituzione.classe?.nome || sostituzione.classe || "-"}
+                    </span>
                   </div>
-                {/if}
 
-                {#if sostituzione.noteDocenti}
-                  <div class="note-box note-docenti">
-                    <span class="note-label">Note docenti:</span>
-                    <span class="note-body">{sostituzione.noteDocenti}</span>
+                  <div class="detail-row">
+                    <span class="detail-label">Materia:</span>
+                    <span class="detail-value">
+                      {sostituzione.materia?.nome || sostituzione.materia?.abbreviazione || sostituzione.materia || "Sostituzione"}
+                    </span>
                   </div>
-                {/if}
 
-                {#if sostituzione.noteStudenti}
-                  <div class="note-box note-studenti">
-                    <span class="note-label">Note studenti:</span>
-                    <span class="note-body">{sostituzione.noteStudenti}</span>
+                  <div class="detail-row">
+                    <span class="detail-label">Aula:</span>
+                    <span class="detail-value">{sostituzione.aula?.nome || sostituzione.aula || "-"}</span>
                   </div>
-                {/if}
 
-                {#if !sostituzione.noteDocenti && !sostituzione.noteStudenti && sostituzione.note}
-                  <div class="note-box">
-                    <span class="note-label">Note:</span>
-                    <span class="note-body">{sostituzione.note}</span>
+                  <div class="detail-row">
+                    <span class="detail-label">Docente sostituito:</span>
+                    <span class="detail-value teacher-absent">
+                      {sostituzione.docenteAssente?.nome || sostituzione.docenteAssente?.shortName || sostituzione.docenteAssente || "-"}
+                    </span>
                   </div>
-                {/if}
 
-                {#if itemErrors[sostituzione.id]}
-                  <div class="item-error-msg" role="alert">
-                    <span>{itemErrors[sostituzione.id]}</span>
-                  </div>
-                {/if}
-              </div>
-
-              <!-- Footer Presa Visione -->
-              <footer class="sub-card-footer">
-                {#if acknowledged}
-                  <div class="ack-confirmed" aria-label="Presa visione registrata">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
-                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
-                    </svg>
-                    <div class="ack-confirmed-meta">
-                      <span class="ack-title">Presa visione registrata</span>
-                      {#if sostituzione.presaVisione?.data}
-                        <span class="ack-timestamp">{formatDateTime(sostituzione.presaVisione.data)}</span>
-                      {/if}
+                  {#if sostituzione.tipologia}
+                    <div class="detail-row">
+                      <span class="detail-label">Tipologia:</span>
+                      <span class="detail-value tipologia-tag">{sostituzione.tipologia}</span>
                     </div>
-                  </div>
-                {:else}
+                  {/if}
+
+                  {#if sostituzione.noteDocenti}
+                    <div class="note-box note-docenti">
+                      <span class="note-label">Note docenti:</span>
+                      <span class="note-body">{sostituzione.noteDocenti}</span>
+                    </div>
+                  {/if}
+
+                  {#if sostituzione.noteStudenti}
+                    <div class="note-box note-studenti">
+                      <span class="note-label">Note studenti:</span>
+                      <span class="note-body">{sostituzione.noteStudenti}</span>
+                    </div>
+                  {/if}
+
+                  {#if !sostituzione.noteDocenti && !sostituzione.noteStudenti && sostituzione.note}
+                    <div class="note-box">
+                      <span class="note-label">Note:</span>
+                      <span class="note-body">{sostituzione.note}</span>
+                    </div>
+                  {/if}
+
+                  {#if itemErrors[sostituzione.id]}
+                    <div class="item-error-msg" role="alert">
+                      <span>{itemErrors[sostituzione.id]}</span>
+                    </div>
+                  {/if}
+                </div>
+
+                <!-- Footer Presa Visione -->
+                <footer class="sub-card-footer">
                   <div class="ack-action-container">
                     <button
                       type="button"
@@ -408,19 +407,133 @@
                       {/if}
                     </button>
                   </div>
-                {/if}
-              </footer>
-            </article>
-          {/each}
+                </footer>
+              </article>
+            {/each}
+          </div>
+        {:else}
+          <div class="sub-empty-box">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+              <polyline points="22 4 12 14.01 9 11.01"></polyline>
+            </svg>
+            <span>Nessuna sostituzione da confermare. Tutte le sostituzioni risultano visionate.</span>
+          </div>
+        {/if}
+      </section>
+
+      <!-- 2. Confermate -->
+      <section class="section-container" aria-label="Sostituzioni confermate">
+        <div class="section-header">
+          <h2 class="section-heading">Confermate</h2>
+          <span class="count-pill count-pill-confirmed" aria-label="{confirmedSubstitutions.length} sostituzioni confermate">
+            {confirmedSubstitutions.length}
+          </span>
         </div>
-      {:else}
-        <div class="empty-state-card">
-          <div class="empty-icon" aria-hidden="true">📋</div>
-          <h3>Nessuna sostituzione pubblicata</h3>
-          <p>Al momento non risultano ore di sostituzione pubblicate per te.</p>
-        </div>
-      {/if}
-    </section>
+
+        {#if confirmedSubstitutions.length > 0}
+          <div class="cards-grid">
+            {#each confirmedSubstitutions as sostituzione (sostituzione.id)}
+              <article class="sub-card card-acknowledged">
+                <div class="sub-card-header">
+                  <div class="slot-info">
+                    <span class="slot-hour">{sostituzione.ora || "-"}</span>
+                  </div>
+                  <div class="header-badges">
+                    {#if sostituzione.data}
+                      <span class="date-badge">{formatDate(sostituzione.data)}</span>
+                    {/if}
+                    <span class="status-badge badge-confirmed">Confermata</span>
+                  </div>
+                </div>
+
+                <div class="sub-details">
+                  <div class="detail-row">
+                    <span class="detail-label">Classe:</span>
+                    <span class="detail-value class-value">
+                      {sostituzione.classe?.nome || sostituzione.classe || "-"}
+                    </span>
+                  </div>
+
+                  <div class="detail-row">
+                    <span class="detail-label">Materia:</span>
+                    <span class="detail-value">
+                      {sostituzione.materia?.nome || sostituzione.materia?.abbreviazione || sostituzione.materia || "Sostituzione"}
+                    </span>
+                  </div>
+
+                  <div class="detail-row">
+                    <span class="detail-label">Aula:</span>
+                    <span class="detail-value">{sostituzione.aula?.nome || sostituzione.aula || "-"}</span>
+                  </div>
+
+                  <div class="detail-row">
+                    <span class="detail-label">Docente sostituito:</span>
+                    <span class="detail-value teacher-absent">
+                      {sostituzione.docenteAssente?.nome || sostituzione.docenteAssente?.shortName || sostituzione.docenteAssente || "-"}
+                    </span>
+                  </div>
+
+                  {#if sostituzione.tipologia}
+                    <div class="detail-row">
+                      <span class="detail-label">Tipologia:</span>
+                      <span class="detail-value tipologia-tag">{sostituzione.tipologia}</span>
+                    </div>
+                  {/if}
+
+                  {#if sostituzione.noteDocenti}
+                    <div class="note-box note-docenti">
+                      <span class="note-label">Note docenti:</span>
+                      <span class="note-body">{sostituzione.noteDocenti}</span>
+                    </div>
+                  {/if}
+
+                  {#if sostituzione.noteStudenti}
+                    <div class="note-box note-studenti">
+                      <span class="note-label">Note studenti:</span>
+                      <span class="note-body">{sostituzione.noteStudenti}</span>
+                    </div>
+                  {/if}
+
+                  {#if !sostituzione.noteDocenti && !sostituzione.noteStudenti && sostituzione.note}
+                    <div class="note-box">
+                      <span class="note-label">Note:</span>
+                      <span class="note-body">{sostituzione.note}</span>
+                    </div>
+                  {/if}
+
+                  {#if itemErrors[sostituzione.id]}
+                    <div class="item-error-msg" role="alert">
+                      <span>{itemErrors[sostituzione.id]}</span>
+                    </div>
+                  {/if}
+                </div>
+
+                <!-- Footer Presa Visione -->
+                <footer class="sub-card-footer">
+                  <div class="ack-confirmed" aria-label="Presa visione registrata">
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                      <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+                      <polyline points="22 4 12 14.01 9 11.01"></polyline>
+                    </svg>
+                    <div class="ack-confirmed-meta">
+                      <span class="ack-title">Presa visione registrata</span>
+                      {#if sostituzione.presaVisione?.data}
+                        <span class="ack-timestamp">{formatDateTime(sostituzione.presaVisione.data)}</span>
+                      {/if}
+                    </div>
+                  </div>
+                </footer>
+              </article>
+            {/each}
+          </div>
+        {:else}
+          <div class="sub-empty-box">
+            <span>Nessuna sostituzione confermata in archivio.</span>
+          </div>
+        {/if}
+      </section>
+    {/if}
   {:else}
     <div class="empty-state-card access-restricted">
       <div class="empty-icon" aria-hidden="true">🔒</div>
@@ -685,6 +798,48 @@
     color: var(--brand-text-muted);
   }
 
+  .count-pill-pending {
+    background: rgba(245, 158, 11, 0.12);
+    color: #d97706;
+    border-color: rgba(245, 158, 11, 0.3);
+  }
+
+  :global([data-theme="dark"]) .count-pill-pending {
+    color: #fbbf24;
+  }
+
+  .count-pill-confirmed {
+    background: rgba(34, 197, 94, 0.12);
+    color: #16a34a;
+    border-color: rgba(34, 197, 94, 0.3);
+  }
+
+  :global([data-theme="dark"]) .count-pill-confirmed {
+    color: #4ade80;
+  }
+
+  .sub-empty-box {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    padding: 1.25rem 1.5rem;
+    background: var(--brand-surface-card);
+    border: 1px dashed var(--brand-border);
+    border-radius: 12px;
+    color: var(--brand-text-muted);
+    font-size: 0.9rem;
+    line-height: 1.4;
+  }
+
+  .sub-empty-box svg {
+    color: #16a34a;
+    flex-shrink: 0;
+  }
+
+  :global([data-theme="dark"]) .sub-empty-box svg {
+    color: #4ade80;
+  }
+
   .loading-state-card {
     display: flex;
     flex-direction: column;
@@ -761,12 +916,6 @@
     color: var(--brand-primary);
   }
 
-  .slot-class {
-    font-size: 0.95rem;
-    font-weight: 700;
-    color: var(--brand-text);
-  }
-
   .header-badges {
     display: flex;
     align-items: center;
@@ -833,6 +982,11 @@
     color: var(--brand-text);
     font-weight: 600;
     text-align: right;
+  }
+
+  .detail-value.class-value {
+    font-weight: 700;
+    color: var(--brand-text);
   }
 
   .teacher-absent {

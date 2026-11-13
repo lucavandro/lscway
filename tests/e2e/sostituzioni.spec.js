@@ -27,10 +27,24 @@ test.describe('Sostituzioni Docenti', () => {
     await page.goto('/app/way/tmp/sostituzioni');
 
     await expect(page).toHaveTitle(/Sostituzioni/);
+
+    // Verify 2 sections: "Da confermare" and "Confermate"
+    const headingPending = page.locator('h2.section-heading', { hasText: 'Da confermare' });
+    const headingConfirmed = page.locator('h2.section-heading', { hasText: 'Confermate' });
+    await expect(headingPending).toBeVisible();
+    await expect(headingConfirmed).toBeVisible();
+
     const subCard = page.locator('.sub-card').first();
     await expect(subCard).toBeVisible();
     await expect(subCard).toContainText('08:55');
-    await expect(subCard).toContainText('2B');
+
+    // Verify Classe is in the central details section (.sub-details)
+    const classDetailRow = subCard.locator('.sub-details .detail-row', { hasText: 'Classe:' });
+    await expect(classDetailRow).toBeVisible();
+    await expect(classDetailRow).toContainText('2B');
+
+    // Verify slot-info in header does not contain slot-class
+    await expect(subCard.locator('.slot-info .slot-class')).toHaveCount(0);
 
     // Checks presence of teacher header and unread counter
     await expect(page.locator('.teacher-header-card')).toBeVisible();
