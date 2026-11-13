@@ -26,6 +26,8 @@ export const mockTimetableData = {
 };
 
 export const mockSubstitutionsData = {
+  teacherName: "Mario Rossi",
+  teacherEmail: "rossi@lscortese.com",
   substitutions: [
     {
       id: 991,
@@ -33,10 +35,12 @@ export const mockSubstitutionsData = {
       data: new Date().toISOString().split('T')[0],
       stato: 'pubblicata',
       classe: '2B',
+      materia: 'Matematica',
       aula: 'B204',
       docenteAssente: 'BIANCHI LUIGI',
       note: 'Sostituzione urgente laboratorio',
-      presaVisione: { stato: 'inviata' },
+      noteDocenti: 'Sostituzione urgente laboratorio',
+      presaVisione: { stato: 'inviata', data: null },
       accettato: false
     }
   ]

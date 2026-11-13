@@ -270,20 +270,26 @@ lscway/
      - *Colonna Materia nella pagina docente:* il campo materia mostra l'etichetta `"Sostituzione"` (o `"Sorveglianza"`) con badge ambrato (`.is-substitution`) e, direttamente sotto di essa, il nome del docente sostituito (`sost. Prof. ...`). La colonna Classe mostra unicamente il chip della classe.
      - *Pulizia badge:* il tag ridondante `"SUPPLENZA"` è rimosso da tutte le viste; nella vista classe il docente mostra il supplente con icona di scambio `SwapIcon` e indicazione del titolare.
 
-### 5.2. API Sostituzioni Docenti
-- **Endpoint Sostituzioni Dettagliate (UI):**  
-  `GET https://www.liceoscientificocortese.edu.it/app/orario/api/v0/sostituzioni?email={userEmail}`
-- **Filtro applicato nel frontend:**
-  ```javascript
-  s.data >= getTodayDate() &&
-  s.stato === "pubblicata" &&
-  s.presaVisione?.stato &&
-  s.presaVisione.stato !== "non_inviata" &&
-  s.presaVisione.stato !== "fallita"
-  ```
-- **Endpoint Polling Service Worker (Notifiche Background):**  
-  `GET https://www.liceoscientificocortese.edu.it/app/way/docenti_sostituzioni_api.php?email={userEmail}`
-  Restituisce `{ success: true, data: [ { id, data, ora, classe, accettato } ] }`. Se trova sostituzioni per la data odierna non ancora accettate e non ancora notificate, invia una `Notification` nativa.
+### 5.2. API Sostituzioni Personali Docenti (`src/lib/personalSubstitutions.js`)
+L'interfaccia personale del docente consente la consultazione esclusiva delle proprie sostituzioni pubblicate, il monitoraggio delle notifiche senza presa visione e la registrazione esplicita della presa visione.
+- **Autenticazione e Isolamento:**
+  - Base path: `/app/orario/api/v1` (Same-Domain con credenziali `same-origin` o `include`).
+  - Identificazione automatica del docente tramite cookie di sessione HTTP (`orariolsc_session`, acquisito tramite `/auth/google` o sessione Google). Nessun parametro email o ID docente passato in query o body.
+- **Endpoint API v1:**
+  - `GET /app/orario/api/v1/me/substitutions`: restituisce `{ teacherName, teacherEmail, substitutions: [...] }` con l'elenco esclusivo delle sostituzioni pubblicate assegnate al docente autenticato. Ogni sostituzione include: `id`, `data`, `giorno`, `ora`, `timeSlotId`, `tipologia`, `classe` (`{ id, nome }`), `materia` (`{ id, nome, abbreviazione }`), `aula` (`{ id, nome }`), `docenteAssente` (`{ id, nome, shortName }`), `docenteSostituto`, `noteDocenti`, `noteStudenti`, `stato`, `pubblicataIl` e `presaVisione` (`{ stato, data }`).
+  - `GET /app/orario/api/v1/me/notifications`: restituisce `{ items: [...], unreadCount }` con tutte le sostituzioni personali pubblicate (anche già lette) e `unreadCount` indicante il numero di elementi privi di presa visione (`presaVisione.data === null`).
+  - `POST /app/orario/api/v1/me/substitutions/{id}/acknowledgment`: invia payload JSON vuoto `{}` e riceve `{ acknowledged: true }`. Operazione idempotente che registra o preserva timestamp e metadati di conferma presa visione senza alterare conferme pregresse.
+- **Gestione Errori:**
+  - `401`: sessione scaduta o assente (invito al re-login).
+  - `403`: nessun docente attivo univocamente associato all'email di sessione.
+  - `404`: sostituzione inesistente, di altro docente o non più pubblicata.
+  - `422`: payload non valido (corpo non vuoto).
+- **Ciclo di Vita, Polling e Presa Visione UI:**
+  - Polling a 60 secondi con guardia di concorrenza per evitare richieste sovrapposte.
+  - Interruzione automatica del polling e pulizia immediata dei dati e degli store reattivi al logout o allo smontaggio dei componenti.
+  - Nessuna registrazione automatica all'apertura della pagina: richiesta azione esplicita con pulsante "Conferma presa visione".
+  - Protezione anti-doppio invio con disabilitazione contestuale e stato "Registrazione in corso...".
+  - Badge accessibile con contatore notifiche non lette visibile nella pagina delle sostituzioni, sulla tab di navigazione `Tabs.svelte` e nel drawer `HeaderMenuPanel.svelte`.
 
 ### 5.3. Hotspot LIM Aule (`src/lib/hotspot.js`)
 - Mappa statica `chiave_aula: password`.

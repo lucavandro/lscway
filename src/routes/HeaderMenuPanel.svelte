@@ -18,6 +18,7 @@
   import LinkIcon from "$icons/LinkIcon.svelte";
   import CalendarEditIcon from "$icons/CalendarEditIcon.svelte";
   import { canEditInternalTimetable, checkTeacherHasSubsubjects } from "$lib/internalTimetable.js";
+  import { unreadSubstitutionsCount, cleanupPersonalSubstitutions } from "$lib/personalSubstitutions.js";
   import {
     isLoading,
     userEmail,
@@ -86,6 +87,7 @@
   function logout() {
     userEmail.set(null);
     canEditInternalTimetable.set(false);
+    cleanupPersonalSubstitutions();
     closeMenu();
   }
 
@@ -334,6 +336,9 @@
               >
                 <span class="nav-icon"><SwapIcon /></span>
                 <span class="nav-text">Sostituzioni</span>
+                {#if $unreadSubstitutionsCount > 0}
+                  <span class="drawer-badge" aria-label="{$unreadSubstitutionsCount} sostituzioni da confermare">{$unreadSubstitutionsCount}</span>
+                {/if}
               </a>
             </li>
             <li>
@@ -811,6 +816,17 @@
   .nav-text {
     display: inline-block;
     vertical-align: middle;
+  }
+
+  .drawer-badge {
+    margin-left: auto;
+    padding: 0.15rem 0.5rem;
+    font-size: 0.75rem;
+    font-weight: 700;
+    line-height: 1;
+    border-radius: 9999px;
+    background: #f59e0b;
+    color: white;
   }
 
   .nav-link.active .nav-icon,

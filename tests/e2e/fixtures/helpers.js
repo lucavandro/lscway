@@ -94,7 +94,33 @@ export async function setupMockRoutes(page) {
       return;
     }
 
-    if (url.includes('/sostituzioni')) {
+    if (url.includes('/acknowledgment')) {
+      await route.fulfill({
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ acknowledged: true }),
+      });
+      return;
+    }
+
+    if (url.includes('/me/notifications')) {
+      const items = mockSubstitutionsData.substitutions || [];
+      const unreadCount = items.filter((s) => !s.presaVisione?.data).length;
+      await route.fulfill({
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ items, unreadCount }),
+      });
+      return;
+    }
+
+    if (url.includes('/sostituzioni') || url.includes('/me/substitutions')) {
       await route.fulfill({
         status: 200,
         headers: {
@@ -103,6 +129,7 @@ export async function setupMockRoutes(page) {
         },
         body: JSON.stringify(mockSubstitutionsData),
       });
+      return;
     } else {
       await route.fulfill({
         status: 200,

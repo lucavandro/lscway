@@ -16,6 +16,10 @@
     syncNotificationsWithServiceWorker,
     clearUserFromServiceWorker,
   } from "$lib/notifications.js";
+  import {
+    startPersonalSubstitutionsPolling,
+    stopPersonalSubstitutionsPolling,
+  } from "$lib/personalSubstitutions.js";
 
   $: day = $clockStore.day;
   $: schoolHour = $clockStore.schoolHour;
@@ -53,7 +57,16 @@
 
   onDestroy(() => {
     if (substitutionInterval) clearInterval(substitutionInterval);
+    stopPersonalSubstitutionsPolling();
   });
+
+  $: if (mounted) {
+    if ($userEmail && $isTeacher) {
+      startPersonalSubstitutionsPolling();
+    } else {
+      stopPersonalSubstitutionsPolling();
+    }
+  }
 
   $: if (mounted) {
     if ($userEmail && $notificationsEnabled) {

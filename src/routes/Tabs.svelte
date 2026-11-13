@@ -2,6 +2,7 @@
   import { page } from "$app/stores";
   import { base } from "$app/paths";
   import { isTeacher } from "$lib/stores.js";
+  import { unreadSubstitutionsCount } from "$lib/personalSubstitutions.js";
 
   $: currentPath = $page.url.pathname;
   $: isHome = currentPath === base || currentPath === base + "/";
@@ -53,7 +54,12 @@
           role="tab"
           aria-selected={isSostituzioni}
         >
-          Sostituzioni
+          <span>Sostituzioni</span>
+          {#if $unreadSubstitutionsCount > 0}
+            <span class="tab-badge" aria-label="{$unreadSubstitutionsCount} sostituzioni da confermare">
+              {$unreadSubstitutionsCount}
+            </span>
+          {/if}
         </a>
       {/if}
     </div>
@@ -108,6 +114,17 @@
     color: var(--brand-primary);
     font-weight: 600;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.08), 0 1px 2px rgba(0, 0, 0, 0.04);
+  }
+
+  .tab-badge {
+    margin-left: 0.35rem;
+    padding: 0.1rem 0.42rem;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1;
+    border-radius: 9999px;
+    background: #f59e0b;
+    color: white;
   }
 
   @media (max-width: 400px) {
