@@ -878,6 +878,7 @@
     flex-direction: column;
     overflow: hidden;
     transition: border-color 0.15s ease, transform 0.15s ease;
+    container-type: inline-size;
   }
 
   .sub-card.card-pending {
@@ -898,38 +899,49 @@
     display: flex;
     align-items: center;
     justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 0.5rem 0.75rem;
     padding: 0.85rem 1rem;
     background: var(--brand-surface-subtle);
     border-bottom: 1px solid var(--brand-border);
-    gap: 0.5rem;
   }
 
   .slot-info {
     display: flex;
     align-items: center;
     gap: 0.6rem;
+    min-width: 0;
   }
 
   .slot-hour {
     font-size: 1rem;
     font-weight: 700;
+    line-height: 1.25;
+    letter-spacing: -0.01em;
     color: var(--brand-primary);
+    white-space: nowrap;
   }
 
   .header-badges {
     display: flex;
     align-items: center;
+    flex-wrap: wrap;
     gap: 0.4rem;
   }
 
   .date-badge {
     font-size: 0.75rem;
     font-weight: 600;
-    padding: 0.2rem 0.5rem;
+    padding: 0.2rem 0.55rem;
     border-radius: 6px;
     background: var(--brand-surface-card);
     border: 1px solid var(--brand-border);
     color: var(--brand-text-muted);
+    white-space: nowrap;
+    font-variant-numeric: tabular-nums;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1.25;
   }
 
   .status-badge {
@@ -942,10 +954,16 @@
     background: rgba(245, 158, 11, 0.12);
     color: #d97706;
     border: 1px solid rgba(245, 158, 11, 0.3);
+    white-space: nowrap;
+    display: inline-flex;
+    align-items: center;
+    line-height: 1.25;
   }
 
   :global([data-theme="dark"]) .status-badge {
     color: #fbbf24;
+    background: rgba(245, 158, 11, 0.16);
+    border-color: rgba(245, 158, 11, 0.4);
   }
 
   .status-badge.badge-confirmed {
@@ -956,6 +974,33 @@
 
   :global([data-theme="dark"]) .status-badge.badge-confirmed {
     color: #4ade80;
+    background: rgba(34, 197, 94, 0.16);
+    border-color: rgba(34, 197, 94, 0.4);
+  }
+
+  @container (max-width: 360px) {
+    .sub-card-header {
+      padding: 0.75rem 0.85rem;
+      gap: 0.45rem;
+    }
+
+    .header-badges {
+      width: 100%;
+      justify-content: flex-start;
+      gap: 0.35rem 0.5rem;
+    }
+  }
+
+  @container (max-width: 280px) {
+    .slot-hour {
+      font-size: 0.925rem;
+    }
+
+    .date-badge,
+    .status-badge {
+      font-size: 0.68rem;
+      padding: 0.18rem 0.45rem;
+    }
   }
 
   .sub-details {
