@@ -2,6 +2,7 @@ import { userEmail, currentUser, authStatus, authError } from './stores.js';
 import { cleanupPersonalSubstitutions } from './personalSubstitutions.js';
 import { canEditInternalTimetable, checkTeacherHasSubsubjects } from './internalTimetable.js';
 import { clearNotifiedSubstitutions, clearUserFromServiceWorker } from './notifications.js';
+import { handleLogoutPushCleanup } from './pushNotifications.js';
 
 /**
  * Risolve l'URL di base per le API di autenticazione condivise con OrarioLSC.
@@ -199,6 +200,7 @@ export async function logout(customFetch = fetch) {
     cleanupPersonalSubstitutions();
     clearNotifiedSubstitutions();
     clearUserFromServiceWorker();
+    handleLogoutPushCleanup();
 
     if (typeof window !== 'undefined' && window.google?.accounts?.id?.disableAutoSelect) {
       try {
@@ -233,4 +235,5 @@ export function handleAuth401() {
   authStatus.set('unauthenticated');
   cleanupPersonalSubstitutions();
   canEditInternalTimetable.set(false);
+  handleLogoutPushCleanup();
 }

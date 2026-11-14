@@ -30,7 +30,7 @@
 | **State Management** | Svelte Stores (Writable / Readable) | Store reattivi con sincronizzazione `localStorage` |
 | **PWA & Offline** | Workbox CDN 5.1.2 + Custom Service Worker | Manifest V3, strategie `CacheFirst` per bundle immutabili, `StaleWhileRevalidate` per asset statici e shell SPA |
 | **Autenticazione** | Google Identity Services (GIS) | OAuth 2.0 client-side JWT decode ristretto al dominio `@lscortese.com` |
-| **Notifiche** | Web Notifications API + Service Worker | Notifiche push locali per sostituzioni docenti |
+| **Notifiche** | Web Notifications API + Web Push API (VAPID) + Service Worker | Notifiche push in background per sostituzioni docenti (OrarioLSC API v1) |
 
 ---
 
@@ -331,12 +331,36 @@ L'interfaccia personale del docente consente la consultazione esclusiva delle pr
     Tutte le sostituzioni personali pubblicate (sia nella sezione *Da confermare* sia nella sezione *Confermate*, oltre che negli store di polling e nei payload restituiti da `fetchPersonalSubstitutions`) vengono presentate in ordine cronologico decrescente dalla più recente alla più vecchia. L'algoritmo di ordinamento confronta in via primaria la data dell'evento (`data`), in via secondaria l'orario o la fascia oraria del giorno (`ora` / `timeSlotId`), e in caso di parità la data di pubblicazione (`pubblicataIl`) e l'identificativo (`id`).
   - **Dismissione Completa Legacy API:** rimossa qualsiasi invocazione e polling verso la vecchia API `docenti_sostituzioni_api.php`. Le notifiche desktop e la sincronizzazione di background del Service Worker operano esclusivamente tramite la nuova API `/app/orario/api/v1/me/notifications` con cookie di sessione.
 
-### 5.4. Hotspot LIM Aule (`src/lib/hotspot.js`)
+### 5.4. Notifiche Web Push VAPID Docenti (`src/lib/pushNotifications.js` & `static/service-worker.js`)
+L'applicazione integra le notifiche Web Push standard basate su chiavi VAPID fornite dal backend OrarioLSC, permettendo la consegna immediata degli avvisi di sostituzione anche quando l'applicazione o il browser sono completamente chiusi o in background.
+- **Contratto API OrarioLSC (Base: `/app/orario/api/v1`, Same-Origin con cookie `orariolsc_session`):**
+  1. `GET /app/orario/api/v1/me/push-config`: restituisce `{ configured: boolean, publicKey: string, subscribed?: boolean }`. Fornisce la chiave VAPID pubblica del server per la sottoscrizione.
+  2. `POST /app/orario/api/v1/me/push-subscription`: registra la sottoscrizione del dispositivo inviando il payload di `PushSubscription.toJSON()` (`{ endpoint, expirationTime, keys: { p256dh, auth } }`). Il backend associa la sottoscrizione al docente autenticato tramite la sessione HTTP e l'email; nessun parametro identità viene inviato nel corpo o nella query.
+  3. `DELETE /app/orario/api/v1/me/push-subscription`: rimuove la sottoscrizione del dispositivo inviando `{ endpoint: string }`.
+  4. `GET /app/orario/api/v1/me/push-substitutions`: restituisce l'elenco aggiornato delle sostituzioni pubblicate del docente autenticato.
+- **Ciclo di Attivazione, Disattivazione e Tolleranza ai Guasti:**
+  - *Attivazione esplicita:* `Notification.requestPermission()` viene invocata esclusivamente a fronte di un'interazione utente diretta (click su "Attiva notifiche su questo dispositivo").
+  - *Conversione Chiave VAPID:* la chiave pubblica Base64URL ricevuta da `/me/push-config` viene convertita in `Uint8Array` (`urlBase64ToUint8Array`) per `pushManager.subscribe({ userVisibleOnly: true, applicationServerKey })`.
+  - *Rilevamento e Migrazione Chiave:* se nel browser esiste già una sottoscrizione con chiave VAPID non corrispondente, essa viene revocata (`unsubscribe()`) e ricreata con la nuova chiave.
+  - *Registrazione Atomica con Rollback:* se la registrazione sul server (`POST /me/push-subscription`) fallisce, l'app esegue immediatamente `unsubscribe()` sul browser, evitando di presentare falsamente il servizio come attivo.
+  - *Disattivazione Ordinata:* invia prima la cancellazione al backend (`DELETE /me/push-subscription`) e poi esegue `unsubscribe()` sul browser, gestendo con tolleranza il caso in cui la sottoscrizione locale sia già decaduta.
+  - *Dispositivi Multipli e Logout:* ogni dispositivo mantiene un proprio endpoint univoco; al logout o alla scadenza sessione (`401`), lo stato locale viene azzerato tramite `handleLogoutPushCleanup()`.
+- **Integrazione Service Worker (`static/service-worker.js`):**
+  - *Evento `push`:* decodifica il payload JSON `{ title, body, tag }` o applica fallback generici sicuri ("OrarioLSC · Sostituzioni"). Mostra la notifica visibile di sistema (`self.registration.showNotification`) senza esporre dati personali indebiti sulla lockscreen e senza salvare risposte API autenticate in cache.
+  - *Evento `notificationclick`:* chiude la notifica, porta in primo piano una finestra già aperta della PWA o ne apre una nuova navigando rigorosamente verso la destinazione controllata interna `/sostituzioni`. Non apre mai URL esterni o arbitrari provenienti dal payload push.
+  - *Nessuna Presa Visione Automatica:* la ricezione o il click della notifica non registra la presa visione; la conferma rimane un'azione esplicita del docente.
+- **Interfaccia Utente (`PushNotificationsSection.svelte` in `/sostituzioni`):**
+  - Mostra lo stato di supporto del browser, lo stato del permesso del browser (`granted`, `denied`, `default`) e lo stato di registrazione effettiva sul server (`subscribed`).
+  - Distingue esplicitamente il permesso del browser concesso (`permission === "granted"`) dalla registrazione attiva sul server.
+  - Include pulsanti con stati di caricamento/disabilitazione, banner di successo ed errore, e istruzioni specifiche per iPhone/iPad (iOS/iPadOS 16.4+: richiesta aggiunta alla schermata Home prima di abilitare le notifiche).
+  - Preserva la destinazione di ritorno dopo il login: i link di accesso verso `/signin` includono `?redirect={encodeURIComponent(destination)}`, consentendo all'utente che clicca una notifica da sloggato di effettuare il login e tornare istantaneamente alle proprie sostituzioni.
+
+### 5.5. Hotspot LIM Aule (`src/lib/hotspot.js`)
 - Mappa statica `chiave_aula: password`.
 - Gestisce aule singole (es. `"A101": "89287577"`) e aule con più punti d'accesso (es. `"B105_1"`, `"B105_2"`, `"B105_3"`).
 - Include l'hotspot generale docenti: `"NINOCORTESE": "N1n0$d0cent1"`.
 
-### 5.5. API Orario Interno e Sottomaterie (`src/lib/internalTimetable.js`)
+### 5.6. API Orario Interno e Sottomaterie (`src/lib/internalTimetable.js`)
 L'orario interno permette ai docenti abilitati di specificare per ciascuna ora di lezione la specifica **sottomateria** svolta (`subsubjectId`), lasciando invariata la disciplina principale dell'orario d'istituto (`subjectId`).
 - **Condivisione Sessione e Cookie:**
   - Prefisso API: `/app/orario/api/v1` (Same-Domain con credenziali `same-origin` o `include`).

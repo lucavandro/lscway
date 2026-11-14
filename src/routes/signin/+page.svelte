@@ -1,6 +1,7 @@
 <script>
   import { onMount } from "svelte";
   import { goto } from "$app/navigation";
+  import { page } from "$app/stores";
   import { userEmail } from "$lib/stores.js";
   import { base } from "$app/paths";
   import { loginWithGoogle, checkSession } from "$lib/auth.js";
@@ -13,11 +14,21 @@
     errorMessage = "";
   }
 
+  function getSafeRedirect() {
+    const raw = $page.url.searchParams.get("redirect") || $page.url.searchParams.get("returnTo");
+    if (!raw) return `${base}/`;
+    // Protezione da Open Redirect: accetta solo path interni
+    if ((raw.startsWith(`${base}/`) || raw.startsWith("/")) && !raw.startsWith("//") && !raw.includes("://")) {
+      return raw;
+    }
+    return `${base}/`;
+  }
+
   async function handleGoogleCredential(response) {
     resetMessages();
     try {
       await loginWithGoogle(response.credential);
-      goto(`${base}/`);
+      goto(getSafeRedirect());
     } catch (err) {
       errorMessage = err.message || "Impossibile completare l'accesso con Google.";
     }
@@ -71,13 +82,13 @@
     try {
       const res = await checkSession();
       if (res && res.authenticated) {
-        goto(`${base}/`);
+        goto(getSafeRedirect());
         return;
       }
     } catch (e) {}
 
     if ($userEmail) {
-      goto(`${base}/`);
+      goto(getSafeRedirect());
       return;
     }
     await loadGoogleAuth();

@@ -146,4 +146,55 @@ test.describe('Sostituzioni Docenti', () => {
     await expect(cards.nth(2)).toContainText('10/11/2026');
     await expect(cards.nth(2)).toContainText('1A');
   });
+
+  test('displays Web Push notification section with status badges and iOS help toggle', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.setItem('userEmail', 'rossi@lscortese.com');
+    });
+
+    await page.goto('/app/way/tmp/sostituzioni');
+
+    const pushCard = page.locator('.push-card');
+    await expect(pushCard).toBeVisible();
+    await expect(pushCard.locator('#push-section-heading')).toContainText('Notifiche sostituzioni (Web Push)');
+
+    // Status grid with 3 tiles
+    const statusGrid = pushCard.locator('.push-status-grid');
+    await expect(statusGrid).toBeVisible();
+    await expect(statusGrid).toContainText('Browser:');
+    await expect(statusGrid).toContainText('Permesso:');
+    await expect(statusGrid).toContainText('Dispositivo:');
+
+    // Subscribe and sync buttons
+    await expect(pushCard.locator('.btn-push-subscribe, .btn-push-unsubscribe')).toBeVisible();
+    await expect(pushCard.locator('.btn-push-sync')).toBeVisible();
+
+    // Toggle iOS instructions
+    const iosToggle = pushCard.locator('.ios-toggle-btn');
+    await expect(iosToggle).toBeVisible();
+    await iosToggle.click();
+    await expect(pushCard.locator('#ios-instructions-content')).toBeVisible();
+    await expect(pushCard.locator('#ios-instructions-content')).toContainText('schermata Home');
+  });
+
+  test('preserves destination and redirects back to /sostituzioni after signin', async ({ page }) => {
+    await page.addInitScript(() => {
+      window.localStorage.removeItem('userEmail');
+    });
+
+    // Navigate to signin with redirect query param
+    await page.goto('/app/way/tmp/signin?redirect=%2Fapp%2Fway%2Ftmp%2Fsostituzioni');
+
+    // Set authenticated session and trigger check
+    await page.addInitScript(() => {
+      window.localStorage.setItem('userEmail', 'rossi@lscortese.com');
+      document.cookie = 'orariolsc_session=' + encodeURIComponent('rossi@lscortese.com') + '; path=/';
+    });
+
+    await page.reload();
+
+    // Should redirect back to /app/way/tmp/sostituzioni
+    await page.waitForURL('**/sostituzioni');
+    expect(page.url()).toContain('/sostituzioni');
+  });
 });

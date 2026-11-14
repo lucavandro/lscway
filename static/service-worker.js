@@ -1,6 +1,6 @@
 // This is the service worker with the combined offline experience (Offline page + Offline copy of pages)
 
-const CACHE_VERSION = "v1.8.0";
+const CACHE_VERSION = "v1.9.0";
 const CACHE = `lscway-cache-${CACHE_VERSION}`;
 let userEmail = null;
 let notificationsEnabled = true;
@@ -315,15 +315,19 @@ async function checkSubstitutionsInBackground() {
           ? (substitution.classe.nome || '')
           : (substitution.classe || '');
 
+        const scopeUrl = self.registration ? self.registration.scope : self.location.href;
+        const iconUrl = new URL('favicon.png', scopeUrl).href;
+        const targetUrl = new URL('sostituzioni', scopeUrl).href;
+
         await self.registration.showNotification('Sostituzione non confermata', {
           body: `Hai una sostituzione alle ${substitution.ora} per la classe ${className} che necessita conferma.`,
-          icon: 'https://www.liceoscientificocortese.edu.it/app/way/tmp/favicon.png',
-          badge: 'https://www.liceoscientificocortese.edu.it/app/way/tmp/favicon.png',
+          icon: iconUrl,
+          badge: iconUrl,
           tag: `substitution-${substitution.id}`,
           requireInteraction: true,
           data: {
             substitutionId: substitution.id,
-            url: 'https://www.liceoscientificocortese.edu.it/app/way/tmp/sostituzioni'
+            url: targetUrl
           }
         });
 
@@ -337,12 +341,85 @@ async function checkSubstitutionsInBackground() {
   }
 }
 
-self.addEventListener('notificationclick', function(event) {
-	event.notification.close();
-	
-	if (event.notification.data && event.notification.data.url) {
-		event.waitUntil(
-			clients.openWindow(event.notification.data.url)
-		);
-	}
+// Gestione Notifiche Web Push (VAPID) inviate dal backend OrarioLSC
+self.addEventListener('push', (event) => {
+  let payload = {};
+  if (event.data) {
+    try {
+      payload = event.data.json();
+    } catch (e) {
+      try {
+        payload = { body: event.data.text() };
+      } catch (err) {
+        payload = {};
+      }
+    }
+  }
+
+  const title = (payload && typeof payload.title === 'string' && payload.title.trim())
+    ? payload.title.trim()
+    : 'OrarioLSC · Sostituzioni';
+
+  const body = (payload && typeof payload.body === 'string' && payload.body.trim())
+    ? payload.body.trim()
+    : 'Una sostituzione è stata pubblicata o aggiornata. Accedi per i dettagli.';
+
+  const tag = (payload && typeof payload.tag === 'string' && payload.tag.trim())
+    ? payload.tag.trim()
+    : 'orariolsc-substitution';
+
+  const scopeUrl = self.registration ? self.registration.scope : self.location.href;
+  const iconUrl = new URL('favicon.png', scopeUrl).href;
+  const targetUrl = new URL('sostituzioni', scopeUrl).href;
+
+  const options = {
+    body,
+    tag,
+    icon: iconUrl,
+    badge: iconUrl,
+    requireInteraction: true,
+    data: {
+      url: targetUrl,
+      tag
+    }
+  };
+
+  event.waitUntil(self.registration.showNotification(title, options));
+});
+
+self.addEventListener('notificationclick', (event) => {
+  event.notification.close();
+
+  const scopeUrl = self.registration ? self.registration.scope : self.location.href;
+  const targetUrl = new URL('sostituzioni', scopeUrl).href;
+
+  event.waitUntil(
+    (async () => {
+      const windowClients = await clients.matchAll({
+        type: 'window',
+        includeUncontrolled: true
+      });
+
+      // Se una finestra della PWA sullo stesso dominio è già aperta, portala in primo piano e naviga
+      for (const client of windowClients) {
+        if (client.url && 'focus' in client) {
+          try {
+            const clientUrl = new URL(client.url, self.location.origin);
+            if (clientUrl.origin === self.location.origin) {
+              await client.focus();
+              if (client.url !== targetUrl && 'navigate' in client) {
+                await client.navigate(targetUrl);
+              }
+              return client;
+            }
+          } catch (e) {}
+        }
+      }
+
+      // Se non vi è alcuna finestra aperta, apri la pagina /sostituzioni
+      if (clients.openWindow) {
+        return await clients.openWindow(targetUrl);
+      }
+    })()
+  );
 });

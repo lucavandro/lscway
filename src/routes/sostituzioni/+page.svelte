@@ -12,6 +12,7 @@
     cleanupPersonalSubstitutions,
     sortSubstitutionsRecentFirst
   } from "$lib/personalSubstitutions.js";
+  import PushNotificationsSection from "./PushNotificationsSection.svelte";
 
   let loading = true;
   let error = null;
@@ -149,7 +150,7 @@
 
   onMount(() => {
     if (!$userEmail) {
-      goto(`${base}/`);
+      loading = false;
       return;
     }
 
@@ -239,26 +240,17 @@
       </div>
     </header>
 
-    <!-- Banner Notifiche push -->
-    {#if !$notificationPermission || !$notificationsEnabled}
-      <div class="banner-card notification-banner">
-        <div class="banner-icon-wrap" aria-hidden="true">
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-            <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-          </svg>
-        </div>
-        <div class="banner-content">
-          <h2 class="banner-title">Abilita le notifiche push</h2>
-          <p class="banner-text">
-            Ricevi un avviso immediato non appena ti viene assegnata una nuova sostituzione da confermare.
-          </p>
-          <button type="button" on:click={handleEnableNotifications} class="banner-action-btn">
-            Attiva notifiche
-          </button>
-        </div>
-      </div>
-    {/if}
+    <!-- Sezione Notifiche Web Push -->
+    <PushNotificationsSection
+      on:pushSubstitutionsLoaded={(e) => {
+        if (e.detail?.substitutions?.length) {
+          substitutions = e.detail.substitutions;
+        } else {
+          loadSubstitutions(false);
+        }
+      }}
+      on:refreshRequest={() => loadSubstitutions(false)}
+    />
 
     <!-- Banner Errore -->
     {#if error}
@@ -542,7 +534,7 @@
       <div class="empty-icon" aria-hidden="true">🔒</div>
       <h3>Accesso riservato</h3>
       <p>Effettua l'accesso con il tuo account istituzionale Google per consultare le tue sostituzioni personali.</p>
-      <a href="{base}/signin" class="login-link-btn">Vai al login con Google</a>
+      <a href="{base}/signin?redirect={encodeURIComponent(`${base}/sostituzioni`)}" class="login-link-btn">Vai al login con Google</a>
     </div>
   {/if}
 </div>
@@ -666,66 +658,6 @@
     to {
       transform: rotate(360deg);
     }
-  }
-
-  .banner-card {
-    display: flex;
-    gap: 1rem;
-    align-items: flex-start;
-    padding: 1.25rem;
-    border-radius: 14px;
-    background: color-mix(in srgb, var(--brand-primary) 8%, var(--brand-surface-card));
-    border: 1px solid color-mix(in srgb, var(--brand-primary) 25%, transparent);
-  }
-
-  .banner-icon-wrap {
-    color: var(--brand-primary);
-    padding: 0.5rem;
-    background: color-mix(in srgb, var(--brand-primary) 15%, transparent);
-    border-radius: 10px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-shrink: 0;
-  }
-
-  .banner-content {
-    display: flex;
-    flex-direction: column;
-    gap: 0.4rem;
-    flex: 1;
-  }
-
-  .banner-title {
-    font-size: 1rem;
-    font-weight: 700;
-    margin: 0;
-    color: var(--brand-text);
-  }
-
-  .banner-text {
-    font-size: 0.85rem;
-    color: var(--brand-text-muted);
-    margin: 0;
-    line-height: 1.4;
-  }
-
-  .banner-action-btn {
-    align-self: flex-start;
-    margin-top: 0.25rem;
-    padding: 0.45rem 0.95rem;
-    border-radius: 8px;
-    font-size: 0.85rem;
-    font-weight: 600;
-    background: var(--brand-primary);
-    color: white;
-    border: none;
-    cursor: pointer;
-    transition: background 0.15s ease;
-  }
-
-  .banner-action-btn:hover {
-    background: var(--brand-primary-hover);
   }
 
   .status-banner.error {

@@ -187,6 +187,46 @@ export async function setupMockRoutes(page) {
       return;
     }
 
+    if (url.includes('/me/push-config')) {
+      await route.fulfill({
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          configured: true,
+          publicKey: 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjBJuBkr3qBUYIHBQFLXYp5Nksh8U',
+          subscribed: false,
+        }),
+      });
+      return;
+    }
+
+    if (url.includes('/me/push-subscription')) {
+      await route.fulfill({
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ success: true }),
+      });
+      return;
+    }
+
+    if (url.includes('/me/push-substitutions')) {
+      await route.fulfill({
+        status: 200,
+        headers: {
+          ...corsHeaders,
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(mockSubstitutionsData),
+      });
+      return;
+    }
+
     if (url.includes('/acknowledgment')) {
       await route.fulfill({
         status: 200,
