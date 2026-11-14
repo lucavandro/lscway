@@ -176,81 +176,83 @@
 
 <div class="sostituzioni-page">
   {#if $userEmail}
-    <!-- Profilo docente e contatore notifiche -->
+    <!-- Profilo docente, contatore e notifiche push integrate -->
     <header class="teacher-header-card">
-      <div class="teacher-meta">
-        <div class="teacher-avatar" aria-hidden="true">
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-            <circle cx="12" cy="7" r="4"></circle>
-          </svg>
-        </div>
-        <div class="teacher-info">
-          <h1 class="page-title">Sostituzioni Personali</h1>
-          <p class="teacher-email">
-            {#if teacherName}<strong>{teacherName}</strong> • {/if}
-            {teacherEmail || $userEmail}
-          </p>
-        </div>
-      </div>
-
-      <div class="header-actions">
-        <div
-          class="unread-pill"
-          class:has-unread={unreadCount > 0}
-          role="status"
-          aria-live="polite"
-          aria-label="{unreadCount} {unreadCount === 1 ? 'sostituzione' : 'sostituzioni'} senza presa visione"
-        >
-          <span class="unread-icon" aria-hidden="true">{unreadCount > 0 ? "🔔" : "✓"}</span>
-          <span class="unread-text">
-            {#if unreadCount > 0}
-              <strong>{unreadCount}</strong> da confermare
-            {:else}
-              Tutte confermate
-            {/if}
-          </span>
+      <div class="teacher-header-main">
+        <div class="teacher-meta">
+          <div class="teacher-avatar" aria-hidden="true">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+              <circle cx="12" cy="7" r="4"></circle>
+            </svg>
+          </div>
+          <div class="teacher-info">
+            <h1 class="page-title">Sostituzioni Personali</h1>
+            <p class="teacher-email">
+              {#if teacherName}<strong>{teacherName}</strong> • {/if}
+              {teacherEmail || $userEmail}
+            </p>
+          </div>
         </div>
 
-        <button
-          type="button"
-          class="btn-refresh"
-          on:click={() => loadSubstitutions(false)}
-          title="Aggiorna sostituzioni"
-          aria-label="Aggiorna elenco sostituzioni"
-          disabled={loading || isPollingInFlight}
-        >
-          <svg
-            class:spinning={loading || isPollingInFlight}
-            width="16"
-            height="16"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            stroke-width="2"
-            stroke-linecap="round"
-            stroke-linejoin="round"
+        <div class="header-actions">
+          <div
+            class="unread-pill"
+            class:has-unread={unreadCount > 0}
+            role="status"
+            aria-live="polite"
+            aria-label="{unreadCount} {unreadCount === 1 ? 'sostituzione' : 'sostituzioni'} senza presa visione"
           >
-            <polyline points="23 4 23 10 17 10"></polyline>
-            <polyline points="1 20 1 14 7 14"></polyline>
-            <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
-          </svg>
-          <span>Aggiorna</span>
-        </button>
-      </div>
-    </header>
+            <span class="unread-icon" aria-hidden="true">{unreadCount > 0 ? "🔔" : "✓"}</span>
+            <span class="unread-text">
+              {#if unreadCount > 0}
+                <strong>{unreadCount}</strong> da confermare
+              {:else}
+                Tutte confermate
+              {/if}
+            </span>
+          </div>
 
-    <!-- Sezione Notifiche Web Push -->
-    <PushNotificationsSection
-      on:pushSubstitutionsLoaded={(e) => {
-        if (e.detail?.substitutions?.length) {
-          substitutions = e.detail.substitutions;
-        } else {
-          loadSubstitutions(false);
-        }
-      }}
-      on:refreshRequest={() => loadSubstitutions(false)}
-    />
+          <button
+            type="button"
+            class="btn-refresh"
+            on:click={() => loadSubstitutions(false)}
+            title="Aggiorna sostituzioni"
+            aria-label="Aggiorna elenco sostituzioni"
+            disabled={loading || isPollingInFlight}
+          >
+            <svg
+              class:spinning={loading || isPollingInFlight}
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+            >
+              <polyline points="23 4 23 10 17 10"></polyline>
+              <polyline points="1 20 1 14 7 14"></polyline>
+              <path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"></path>
+            </svg>
+            <span>Aggiorna</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Sezione Notifiche Web Push (collapsible integrato normalmente chiuso) -->
+      <PushNotificationsSection
+        on:pushSubstitutionsLoaded={(e) => {
+          if (e.detail?.substitutions?.length) {
+            substitutions = e.detail.substitutions;
+          } else {
+            loadSubstitutions(false);
+          }
+        }}
+        on:refreshRequest={() => loadSubstitutions(false)}
+      />
+    </header>
 
     <!-- Banner Errore -->
     {#if error}
@@ -549,15 +551,21 @@
 
   .teacher-header-card {
     display: flex;
+    flex-direction: column;
+    background: var(--brand-surface-card);
+    border: 1px solid var(--brand-border);
+    border-radius: 14px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
+    overflow: hidden;
+  }
+
+  .teacher-header-main {
+    display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
     gap: 1rem;
     padding: 1rem 1.25rem;
-    background: var(--brand-surface-card);
-    border: 1px solid var(--brand-border);
-    border-radius: 14px;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04);
   }
 
   .teacher-meta {

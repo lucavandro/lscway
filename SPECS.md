@@ -350,9 +350,9 @@ L'applicazione integra le notifiche Web Push standard basate su chiavi VAPID for
   - *Evento `notificationclick`:* chiude la notifica, porta in primo piano una finestra già aperta della PWA o ne apre una nuova navigando rigorosamente verso la destinazione controllata interna `/sostituzioni`. Non apre mai URL esterni o arbitrari provenienti dal payload push.
   - *Nessuna Presa Visione Automatica:* la ricezione o il click della notifica non registra la presa visione; la conferma rimane un'azione esplicita del docente.
 - **Interfaccia Utente (`PushNotificationsSection.svelte` in `/sostituzioni`):**
-  - Mostra lo stato di supporto del browser, lo stato del permesso del browser (`granted`, `denied`, `default`) e lo stato di registrazione effettiva sul server (`subscribed`).
-  - Distingue esplicitamente il permesso del browser concesso (`permission === "granted"`) dalla registrazione attiva sul server.
-  - Include pulsanti con stati di caricamento/disabilitazione, banner di successo ed errore, e istruzioni specifiche per iPhone/iPad (iOS/iPadOS 16.4+: richiesta aggiunta alla schermata Home prima di abilitare le notifiche).
+  - Integrata come collapsible all'interno della card superiore `teacher-header-card` ("Sostituzioni Personali"), normalmente chiusa per ottimizzare lo spazio verticale su mobile e mantenere le sostituzioni "above the fold".
+  - **Barra riassuntiva sempre visibile:** presenta l'icona campana, il titolo "Notifiche Web Push", tre indicatori cromatici semantici per ciascuno dei 3 requisiti (Browser supportato, Permesso concesso, Dispositivo registrato su OrarioLSC) e un badge con il conteggio sintetico (`3/3 Attive`, `X/3 Incompleto` o `X/3 Bloccato`), oltre alla freccia chevron espandibile.
+  - **Pannello dettagliato espandibile:** al click/tap, mostra lo stato analitico dei 3 requisiti in tessere distinte, distingue esplicitamente il permesso accordato dal dispositivo non registrato, include i pulsanti di attivazione/disattivazione e sincronizzazione con feedback visivo e banner di stato, e le istruzioni dettagliate per iPhone/iPad (iOS/iPadOS 16.4+).
   - Preserva la destinazione di ritorno dopo il login: i link di accesso verso `/signin` includono `?redirect={encodeURIComponent(destination)}`, consentendo all'utente che clicca una notifica da sloggato di effettuare il login e tornare istantaneamente alle proprie sostituzioni.
 
 ### 5.5. Hotspot LIM Aule (`src/lib/hotspot.js`)

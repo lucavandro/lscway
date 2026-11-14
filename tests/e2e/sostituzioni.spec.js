@@ -156,6 +156,20 @@ test.describe('Sostituzioni Docenti', () => {
 
     const pushCard = page.locator('.push-card');
     await expect(pushCard).toBeVisible();
+
+    // Verify collapsible trigger bar is visible with requirements indicator
+    const trigger = pushCard.locator('.push-collapse-trigger');
+    await expect(trigger).toBeVisible();
+    await expect(trigger).toContainText('Notifiche Web Push');
+    await expect(pushCard.locator('.requirement-dots')).toBeVisible();
+    await expect(pushCard.locator('.req-badge')).toBeVisible();
+
+    // Details are initially collapsed
+    await expect(pushCard.locator('#push-section-heading')).toHaveCount(0);
+
+    // Click to expand collapsible
+    await trigger.click();
+    await expect(pushCard.locator('#push-section-heading')).toBeVisible();
     await expect(pushCard.locator('#push-section-heading')).toContainText('Notifiche sostituzioni (Web Push)');
 
     // Status grid with 3 tiles
