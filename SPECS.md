@@ -110,9 +110,9 @@ lscway/
     ├── icons/                  # Componenti Svelte icone SVG scalabili
     │   ├── BellIcon.svelte / BellOffIcon.svelte
     │   ├── BookingIcon.svelte
-    │   ├── CalendarEditIcon.svelte # Icona matita/modifica per Orario Interno
+    │   ├── CalendarEditIcon.svelte # Icona orologio per Orario Interno (Material Symbols schedule)
     │   ├── HomeIcon.svelte
-    │   ├── LinkIcon.svelte
+    │   ├── LinkIcon.svelte         # Icona catena diagonale per Link Rapidi (Material Symbols link 45°)
     │   ├── LoginIcon.svelte / LogoutIcon.svelte
     │   ├── MoonIcon.svelte / SunIcon.svelte
     │   ├── ReloadIcon.svelte
