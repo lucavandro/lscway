@@ -481,6 +481,7 @@ Il liceo adotta la convenzione di Google Workspace:
   - *Indirizzi gruppi mail scolastici* (`https://docs.google.com/spreadsheets/d/1CHoQed5cFo5ryTkfugP5-4K2jlOuV_RiNbSYj_wD6G4/edit?usp=sharing`)
   - *Moduli Web 2.0* (`https://forms.gle/UPLBbEKaK56fpDaL6`)
   - *ELS Cortese* (`https://www.liceoscientificocortese.edu.it/els/`)
+  - *Invio Articoli e Locandine* (`https://www.liceoscientificocortese.edu.it/app/locandine/`): portale dove i docenti possono inviare articoli da pubblicare su sito e social della scuola e creare locandine.
 
 ### 8.5. Orario Interno e Modale Sottomaterie (`src/routes/orario-interno/+page.svelte`)
 - **Regole di Visibilità e Accesso:**

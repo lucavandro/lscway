@@ -53,6 +53,21 @@
       borderTint: "rgba(37, 99, 235, 0.25)",
       textColor: "#2563eb",
       icon: "globe"
+    },
+    {
+      id: "invio-locandine",
+      name: "Invio Articoli e Locandine",
+      handle: "liceoscientificocortese.edu.it/app/locandine",
+      badge: "Articoli & Locandine",
+      url: "https://www.liceoscientificocortese.edu.it/app/locandine/",
+      description:
+        "Invia articoli da pubblicare su sito e social della scuola e crea locandine.",
+      actionLabel: "Apri Invio Articoli e Locandine",
+      themeColor: "#ea580c",
+      bgTint: "rgba(234, 88, 12, 0.1)",
+      borderTint: "rgba(234, 88, 12, 0.25)",
+      textColor: "#ea580c",
+      icon: "newspaper"
     }
   ];
 
@@ -143,6 +158,13 @@
                     <circle cx="12" cy="12" r="10"></circle>
                     <line x1="2" y1="12" x2="22" y2="12"></line>
                     <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                  </svg>
+                {:else if item.icon === "newspaper"}
+                  <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 22h16a2 2 0 0 0 2-2V4a2 2 0 0 0-2-2H8a2 2 0 0 0-2 2v16a2 2 0 0 1-2 2Zm0 0a2 2 0 0 1-2-2v-9c0-1.1.9-2 2-2h2"></path>
+                    <path d="M18 14h-8"></path>
+                    <path d="M15 18h-5"></path>
+                    <path d="M10 6h8v4h-8V6Z"></path>
                   </svg>
                 {/if}
               </div>

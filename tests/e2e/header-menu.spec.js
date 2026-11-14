@@ -133,5 +133,9 @@ test.describe('Header Menu - Drawer, Temi e Font Scale', () => {
     const elsCard = page.locator('.els-cortese-card a.btn-visit');
     await expect(elsCard).toBeVisible();
     await expect(elsCard).toHaveAttribute('href', 'https://www.liceoscientificocortese.edu.it/els/');
+
+    const locandineCard = page.locator('.invio-locandine-card a.btn-visit');
+    await expect(locandineCard).toBeVisible();
+    await expect(locandineCard).toHaveAttribute('href', 'https://www.liceoscientificocortese.edu.it/app/locandine/');
   });
 });
