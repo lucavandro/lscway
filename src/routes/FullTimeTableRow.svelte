@@ -87,10 +87,10 @@
             {@const isRic = displayedSubject === "RIC" || displayedSubject === "sub_ricevimento"}
             {@const isSecondarySostegno = idx > 0 && isSostegno}
             {@const isRoomView = fields.includes("classe") && fields.includes("docente")}
-            {@const showPrimaryClass = fields.includes("classe") && !isRoomView && entry["classe"] && !isSecondarySostegno && !isPot}
+            {@const showPrimaryClass = fields.includes("classe") && !isRoomView && entry["classe"] && !isSecondarySostegno && !isPot && !isRic}
             {@const showPrimaryTeacher = fields.includes("docente") && entry["docente"]}
             {@const hasPrimary = Boolean(showPrimaryClass || showPrimaryTeacher)}
-            {@const showClassTag = isRoomView && entry["classe"] && !isSecondarySostegno && !isPot}
+            {@const showClassTag = isRoomView && entry["classe"] && !isSecondarySostegno && !isPot && !isRic}
             {@const showAula = fields.includes("aula") && entry["aula"] && entry["aula"] !== "-" && !isSecondarySostegno && !isPot && !isRic}
 
             <div class="entry-micro">

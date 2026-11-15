@@ -177,7 +177,7 @@
                   <span class="dash">—</span>
                 {/if}
               {:else if field === "classe"}
-                {#if rd["classe"] && entryMateria !== "POT" && entryMateria !== "sub_potenziamento"}
+                {#if rd["classe"] && entryMateria !== "POT" && entryMateria !== "sub_potenziamento" && entryMateria !== "RIC" && entryMateria !== "sub_ricevimento"}
                   <div class="class-slot">
                     <a href="{base}/?q={queryValue(rd['classe'])}" class="link-chip class-chip" title="Classe {rd['classe']}">
                       <span>{rd["classe"]}</span>

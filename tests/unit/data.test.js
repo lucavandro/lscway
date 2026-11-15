@@ -43,13 +43,14 @@ describe('data module', () => {
     expect(result.data[1].aula).toBe('');
     expect(result.data[1].classe).toBe('');
 
-    // Row 2: materia 'sub_ricevimento' -> 'RIC', aula cleared
+    // Row 2: materia 'sub_ricevimento' -> 'RIC', aula and classe cleared
     expect(result.data[2].materia).toBe('RIC');
     expect(result.data[2].aula).toBe('');
+    expect(result.data[2].classe).toBe('');
 
     // O(1) lookup indexes are attached and non-enumerable
     expect(result._index).toBeDefined();
-    expect(result._index.byClass['1A']).toHaveLength(2);
+    expect(result._index.byClass['1A']).toHaveLength(1);
     expect(result._index.byTeacher['ROSSI MARIO']).toHaveLength(3);
     expect(result._index.byAula['A101']).toHaveLength(1);
     expect(Object.keys(result)).not.toContain('_index');
@@ -108,7 +109,7 @@ describe('data module', () => {
           teacherId: 'T_ROSSI',
           roomId: 'A101',
           subjectId: 'sub_ricevimento',
-          isPotenziamento: false,
+          isPotenziamento: true,
           isRicevimento: true
         }
       ]
@@ -144,11 +145,12 @@ describe('data module', () => {
     expect(result.data[1].aula).toBe('');
     expect(result.data[1].classe).toBe('');
 
-    // Lesson 2: ricevimento -> materia RIC, empty aula
+    // Lesson 2: ricevimento (even when isPotenziamento is also true) -> materia RIC, empty aula and classe
     expect(result.data[2].day).toBe('LUN');
     expect(result.data[2].ora).toBe('09:50');
     expect(result.data[2].materia).toBe('RIC');
     expect(result.data[2].aula).toBe('');
+    expect(result.data[2].classe).toBe('');
 
     // Index lookup attached
     expect(result._index.byClass['1A']).toBeDefined();
@@ -284,6 +286,41 @@ describe('data module', () => {
     expect(result.data[2].subsubjectId).toBe('CUSTOM_SUB');
     expect(result.data[2].displaySubjectId).toBe('INF_IA');
     expect(result.data[2].materia).toBe('CUSTOM_SUB');
+  });
+
+  it('prioritizes isRicevimento over isPotenziamento when both flags are true (API v1)', async () => {
+    const mockResponse = {
+      teachers: [{ id: 'T1', nome: 'ANNA', cognome: 'BIANCHI', shortName: 'BIANCHI A.' }],
+      classes: [{ id: '2B', nome: '2B' }],
+      rooms: [],
+      subjects: [],
+      lessons: [
+        {
+          id: 'les_ric_1',
+          giorno: 2,
+          timeSlotId: 'slot_2_3',
+          classId: '',
+          teacherId: 'T1',
+          roomId: null,
+          subjectId: 'sub_ricevimento',
+          subsubjectId: null,
+          displaySubjectId: 'sub_ricevimento',
+          isPotenziamento: true,
+          isRicevimento: true
+        }
+      ]
+    };
+
+    const mockFetch = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => mockResponse
+    });
+
+    const result = await getData(mockFetch);
+    expect(result.data[0].materia).toBe('RIC');
+    expect(result.data[0].aula).toBe('');
+    expect(result.data[0].classe).toBe('');
+    expect(result.data[0].docente).toBe('BIANCHI ANNA');
   });
 
   it('rejects Google OAuth credential with non-school domain', async () => {

@@ -255,5 +255,78 @@ test.describe('Home Page - Orario Classe', () => {
     const weeklyTag = page.locator('.compact-timetable .subj-tag').first();
     await expect(weeklyTag).toBeVisible();
     await expect(weeklyTag).toHaveText('INFO');
+  });
+  test('displays Ricevimento in daily and weekly teacher timetable and not as Potenziamento even with isPotenziamento true', async ({ page }) => {
+    const today = new Date();
+    const dayIndex = today.getDay();
+    const schoolDay = (dayIndex >= 1 && dayIndex <= 5) ? ['LUN', 'MAR', 'MER', 'GIO', 'VEN'][dayIndex - 1] : 'LUN';
+    const dayNum = (dayIndex >= 1 && dayIndex <= 5) ? dayIndex : 1;
+
+    await page.route(/\/app\/orario\/api\/.*/, async (route) => {
+      const url = route.request().url();
+      if (url.includes('/auth/session')) {
+        await route.fulfill({
+          status: 401,
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ message: 'Unauthenticated' })
+        });
+        return;
+      }
+
+      await route.fulfill({
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          data: '2026-11-15',
+          giorno: dayNum,
+          classes: [],
+          rooms: [],
+          teachers: [
+            { id: 'T_TEST', nome: 'MARIO', cognome: 'ROSSI', shortName: 'ROSSI M.' }
+          ],
+          subjects: [],
+          lessons: [
+            {
+              id: 'les_ric_1',
+              day: schoolDay,
+              giorno: dayNum,
+              ora: '08:00',
+              timeSlotId: 'slot_' + dayNum + '_1',
+              classId: '',
+              teacherId: 'T_TEST',
+              roomId: null,
+              subjectId: 'sub_ricevimento',
+              displaySubjectId: 'sub_ricevimento',
+              subsubjectId: null,
+              isPotenziamento: true,
+              isRicevimento: true,
+              isSubstitution: false
+            }
+          ]
+        })
+      });
+    });
+
+    await page.goto('/app/way/tmp/docente?q=ROSSI%20MARIO');
+
+    const currentDay = ['DOM', 'LUN', 'MAR', 'MER', 'GIO', 'VEN', 'SAB'][dayIndex];
+    if (currentDay !== 'SAB' && currentDay !== 'DOM') {
+      // Daily timetable: spanned special row should display RICEVIMENTO (not POTENZIAMENTO)
+      const dailyTag = page.locator('.daily-timetable .spanned-tag.is-ric').first();
+      await expect(dailyTag).toBeVisible();
+      await expect(dailyTag).toHaveText('RICEVIMENTO');
+      await expect(page.locator('.daily-timetable')).not.toContainText('POTENZIAMENTO');
+    }
+
+    // Weekly timetable: switch to Settimana view
+    const switchEl = page.locator('.segment-btn', { hasText: 'Settimana' });
+    await switchEl.click();
+    await expect(page.locator('.compact-timetable')).toBeVisible();
+
+    // Verify weekly cell displays RIC with is-ric class (not POT)
+    const weeklyTag = page.locator('.compact-timetable .subj-tag.is-ric').first();
+    await expect(weeklyTag).toBeVisible();
+    await expect(weeklyTag).toHaveText('RIC');
+    await expect(page.locator('.compact-timetable')).not.toContainText('POT');
   });
 });

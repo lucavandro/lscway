@@ -160,13 +160,14 @@ function normalizeTimetableData(raw) {
             const s = subjectMap.get(targetSubjectId);
             let materia = s ? (s.shortName || s.codice || s.nome || targetSubjectId) : (l.materia || targetSubjectId || "");
 
-            if (l.isPotenziamento || materia === "sub_potenziamento" || materia === "POT" || targetSubjectId === "sub_potenziamento" || targetSubjectId === "POT") {
+            if (l.isRicevimento || materia === "sub_ricevimento" || materia === "RIC" || targetSubjectId === "sub_ricevimento" || targetSubjectId === "RIC") {
+                materia = "RIC";
+                aula = "";
+                classe = "";
+            } else if (l.isPotenziamento || materia === "sub_potenziamento" || materia === "POT" || targetSubjectId === "sub_potenziamento" || targetSubjectId === "POT") {
                 materia = "POT";
                 aula = "";
                 classe = "";
-            } else if (l.isRicevimento || materia === "sub_ricevimento" || materia === "RIC" || targetSubjectId === "sub_ricevimento" || targetSubjectId === "RIC") {
-                materia = "RIC";
-                aula = "";
             }
 
             const isSubstitution = Boolean(l.isSubstitution);
@@ -213,13 +214,14 @@ function normalizeTimetableData(raw) {
                 let materia = (e.subsubjectId !== null && e.subsubjectId !== undefined)
                     ? e.subsubjectId
                     : (e.displaySubjectId || e.materia);
-                if (materia == "sub_potenziamento" || materia == "POT") {
+                if (e.isRicevimento || materia == "sub_ricevimento" || materia == "RIC") {
+                    materia = "RIC";
+                    e.aula = "";
+                    e.classe = "";
+                } else if (e.isPotenziamento || materia == "sub_potenziamento" || materia == "POT") {
                     materia = "POT";
                     e.aula = "";
                     e.classe = "";
-                } else if (materia == "sub_ricevimento" || materia == "RIC") {
-                    materia = "RIC";
-                    e.aula = "";
                 }
                 return {
                     ...e,

@@ -258,8 +258,9 @@ lscway/
 3. **Filtro classi:** le classi contenenti caratteri speciali come `.` o `*` vengono ripulite o escluse.
 4. **Sostegno / Inclusione:** le materie `INC` o `MADISO` vengono poste in coda tramite la funzione di comparazione `inclusioneInFondo` (`src/lib/utils.js`).
 5. **Potenziamento & Ricevimento:**
+   - **Priorità Ricevimento su Potenziamento:** nell'API v1 OrarioLSC, le ore di ricevimento sono contrassegnate contemporaneamente con `isRicevimento: true` e `isPotenziamento: true` (oltre a `subjectId: 'sub_ricevimento'`). Il parser assegna priorità alla verifica di ricevimento per evitare che vengano erroneamente catalogate e mostrate come potenziamento (`POT`).
+   - Materie `sub_ricevimento`, `RIC` o flag `isRicevimento: true` -> materia standardizzata in `RIC`, aula vuota, classe vuota.
    - Materie `sub_potenziamento`, `POT` o flag `isPotenziamento: true` -> materia standardizzata in `POT`, aula vuota, classe vuota.
-   - Materie `sub_ricevimento`, `RIC` o flag `isRicevimento: true` -> materia standardizzata in `RIC`, aula vuota.
 6. **Sostituzioni e Supplenze:**
    - I campi `isSubstitution`, `tipologia` (`sostituto` o `sorveglianza`) e `originalTeacherId` dell'API v1 vengono normalizzati e propagati ad ogni record di lezione.
    - Viene risolto il nome del docente sostituito (`docenteOriginale` e `docenteOriginaleAbbr`) mappando `originalTeacherId` nell'anagrafica docenti.
