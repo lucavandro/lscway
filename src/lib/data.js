@@ -68,6 +68,14 @@ function attachIndexes(target, rows) {
     return target;
 }
 
+export function getTeacherName(teacher) {
+    if (!teacher) return "";
+    if (teacher.cognome && teacher.nome) return `${teacher.cognome} ${teacher.nome}`.trim();
+    if (teacher.cognome) return teacher.cognome.trim();
+    if (teacher.shortName) return teacher.shortName.replace(/\.$/, "").trim();
+    return teacher.id || "";
+}
+
 function normalizeTimetableData(raw) {
     if (!raw || typeof raw !== "object") return null;
 
@@ -94,14 +102,6 @@ function normalizeTimetableData(raw) {
         const subjectMap = new Map((raw.subjects || []).map((s) => [s.id, s]));
         const classMap = new Map((raw.classes || []).map((c) => [c.id, c]));
         const roomMap = new Map((raw.rooms || []).map((r) => [r.id, r]));
-
-        const getTeacherName = (t) => {
-            if (!t) return "";
-            if (t.cognome && t.nome) return `${t.cognome} ${t.nome}`.trim();
-            if (t.cognome) return t.cognome.trim();
-            if (t.shortName) return t.shortName.replace(/\.$/, "").trim();
-            return t.id || "";
-        };
 
         const getTeacherAbbr = (t) => {
             if (!t) return "";

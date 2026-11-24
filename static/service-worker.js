@@ -1,6 +1,6 @@
 // This is the service worker with the combined offline experience (Offline page + Offline copy of pages)
 
-const CACHE_VERSION = "v1.11.1";
+const CACHE_VERSION = "v1.12.0";
 const CACHE = `lscway-cache-${CACHE_VERSION}`;
 let userEmail = null;
 let notificationsEnabled = true;

@@ -3,6 +3,7 @@
 
   export let item;
   export let list = [];
+  export let labels = new Map();
   export let label = "Seleziona";
   export let onChange = function () {};
 
@@ -17,9 +18,11 @@
   let nativeSelectEl;
 
   // Filter list by search query (case-insensitive)
-  $: filteredList = searchQuery.trim()
+  $: searchTerm = searchQuery.trim().toLowerCase();
+  $: filteredList = searchTerm
     ? list.filter((el) =>
-        String(el).toLowerCase().includes(searchQuery.trim().toLowerCase())
+        String(el).toLowerCase().includes(searchTerm) ||
+        labels.get(el)?.toLowerCase().includes(searchTerm)
       )
     : list;
 
@@ -209,7 +212,7 @@
       aria-hidden="true"
     >
       {#each list as element}
-        <option value={element}>{element}</option>
+        <option value={element}>{labels.get(element) ?? element}</option>
       {/each}
     </select>
 
@@ -225,7 +228,7 @@
       on:click={() => (isOpen ? closeSelect() : openSelect())}
     >
       <span class="trigger-value" class:is-empty={!item}>
-        {item || `Seleziona ${label}`}
+        {labels.get(item) ?? (item || `Seleziona ${label}`)}
       </span>
       <span class="select-arrow" aria-hidden="true" class:arrow-open={isOpen}>
         <svg
@@ -301,7 +304,7 @@
                 on:click={() => selectItem(element)}
                 on:mouseenter={() => (highlightedIndex = index)}
               >
-                <span class="option-text">{element}</span>
+                <span class="option-text">{labels.get(element) ?? element}</span>
                 {#if element === item}
                   <span class="check-icon" aria-hidden="true">✓</span>
                 {/if}
@@ -423,7 +426,7 @@
               class:is-selected={element === item}
               on:click={() => selectItem(element)}
             >
-              <span class="option-text">{element}</span>
+              <span class="option-text">{labels.get(element) ?? element}</span>
               {#if element === item}
                 <span class="sheet-check-icon" aria-hidden="true">
                   <svg

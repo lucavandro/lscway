@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy } from "svelte";
   import { clockStore } from "$lib/dateutils.js";
+  import { getTeacherName } from "$lib/data.js";
   import { getPrefTeacher, setPrefTeacher } from "$lib/utils.js";
   import { page } from "$app/stores";
   import { timetableData } from "$lib/stores.js";
@@ -16,6 +17,11 @@
   $: currenDay = $clockStore.day;
   $: activeData = $timetableData || data;
   $: teachers = activeData?.docenti || [];
+  $: teacherLabels = new Map(
+    (Array.isArray(activeData?.teachers) ? activeData.teachers : [])
+      .filter((teacher) => typeof teacher?.teacherFullName === "string" && teacher.teacherFullName.trim())
+      .map((teacher) => [getTeacherName(teacher), teacher.teacherFullName.trim()])
+  );
   $: teacherWeekData =
     activeData?._index?.byTeacher?.[selectedTeacher] ??
     activeData?.data?.filter((e) => e.docente === selectedTeacher) ??
@@ -63,6 +69,7 @@
         label="Docente"
         bind:item={selectedTeacher}
         list={teachers}
+        labels={teacherLabels}
         onChange={onSelectedItemChange}
       />
     </div>

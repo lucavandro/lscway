@@ -218,6 +218,7 @@ lscway/
         "nome": "ANTONIO",
         "cognome": "ADINOLFI",
         "shortName": "ADINOLFI A.",
+        "teacherFullName": "ANTONIO ADINOLFI",
         "email": "antonioadinolfi@lscortese.com"
       }
     ],
@@ -447,6 +448,7 @@ Il liceo adotta la convenzione di Google Workspace:
 
 ### 8.1. `ItemSelect.svelte`
 - Selettore con autocompletamento e ricerca elastica per Classi, Docenti e Aule.
+- Nella vista Docente, il selettore mostra `teachers[].teacherFullName` quando disponibile e usa il valore esistente come etichetta di ripiego. La ricerca accetta sia il nome visualizzato sia il valore della selezione, che resta la chiave usata per orario, preferenze e link.
 - **Supporto Mobile Avanzato:**
   - Quando lo schermo è < 640px, il menu si apre come un foglio a tutto schermo o anchored sheet.
   - Si collega alla `window.visualViewport` per ricalcolare l'altezza disponibile e posizionarsi sopra la tastiera virtuale degli smartphone, garantendo che tutti i risultati siano visibili e scrollabili.

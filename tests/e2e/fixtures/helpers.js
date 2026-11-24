@@ -1,6 +1,6 @@
 import { mockTimetableData, mockSubstitutionsData } from './mockData.js';
 
-export async function setupMockRoutes(page) {
+export async function setupMockRoutes(page, timetable = mockTimetableData) {
   // Sync localStorage userEmail with session cookie for same-origin auth requests
   await page.addInitScript(() => {
     const syncCookie = () => {
@@ -270,7 +270,7 @@ export async function setupMockRoutes(page) {
           ...corsHeaders,
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify(mockTimetableData),
+        body: JSON.stringify(timetable),
       });
     }
   });
